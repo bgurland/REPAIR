@@ -149,11 +149,10 @@ const Btn = ({ children, onClick, variant = "primary", className = "", disabled 
 const NAV = [
   { id: "home", label: "Home", icon: "🏠" },
   { id: "prolapse", label: "Understanding Prolapse", icon: "📖" },
-  { id: "symptoms", label: "Symptom Explorer", icon: "🔍" },
-  { id: "imaging", label: "Imaging Guide", icon: "🩻" },
+  { id: "symptoms", label: "Symptoms & My Score", icon: "🔍" },
+  { id: "imaging", label: "Pelvic Floor Testing", icon: "🩻" },
   { id: "lifestyle", label: "Lifestyle", icon: "🥦" },
-  { id: "calculators", label: "My Scores", icon: "📊" },
-  { id: "surgical", label: "Surgery", icon: "🏥" },
+  { id: "surgical", label: "Considering Surgery", icon: "🏥" },
   { id: "redflags", label: "Red Flags", icon: "🚨" },
 ];
 
@@ -327,7 +326,7 @@ const ProlapseSection = ({ speak, stop, speaking }) => {
         <div>
           <p style={{ color: C.navy, fontSize: 16, lineHeight: 1.7, marginBottom: 16 }}>A healthcare provider will typically take a thorough approach to evaluation:</p>
           {[
-            { step: "1", title: "Symptom History", body: "A detailed conversation about what you're experiencing, how long it's been happening, and how it affects your daily life. Scoring tools (like those in the 'My Scores' section) help quantify this." },
+            { step: "1", title: "Symptom History", body: "A detailed conversation about what you're experiencing, how long it's been happening, and how it affects your daily life. Scoring tools (like those in the 'Symptoms & My Score' section) help quantify this." },
             { step: "2", title: "Physical Examination", body: "Often includes examination while straining, to see how the rectum behaves under pressure. This may feel vulnerable — the team performs this regularly and is experienced with patient comfort." },
             { step: "3", title: "Imaging Studies", body: "Depending on findings, your team may order defecography, dynamic MRI, or other studies. See the Imaging Guide section for what to expect." },
             { step: "4", title: "Specialist Referral", body: "You may be referred to a colorectal surgeon, urogynecologist, pelvic floor PT, or gastroenterologist — or a multidisciplinary team." },
@@ -418,13 +417,17 @@ const SYMPTOMS = [
   },
 ];
 
-const SymptomsSection = ({ speak, stop, speaking }) => {
+const SymptomsSection = ({ speak, stop, speaking, scores, setScores, primarySymptom, setPrimarySymptom }) => {
+  const [showScores, setShowScores] = useState(false);
   const [open, setOpen] = useState(null);
   return (
     <div>
-      <SectionHeader title="Symptom Explorer" subtitle="Tap any symptom to learn more about what it means and when to seek care." />
+      <SectionHeader title="Symptoms & My Score" subtitle="Explore your symptoms, then see how you score with our validated questionnaire." />
+      <SpeakBtn speaking={speaking} onSpeak={() => speak(document.getElementById("section-content")?.innerText || "")} />
       <Callout body="Millions of people live with these symptoms — and most never talk about them. You're not alone in what you're experiencing." icon="💙" />
-      {SYMPTOMS.map(s => (
+      {!showScores ? (
+        <div>
+          {SYMPTOMS.map(s => (
         <div key={s.id}>
           <button onClick={() => setOpen(open === s.id ? null : s.id)}
                         style={{ background: open === s.id ? C.tealLight : C.card, border: `1.5px solid ${open === s.id ? C.teal : C.border}` }}>
@@ -440,7 +443,7 @@ const SymptomsSection = ({ speak, stop, speaking }) => {
               <div style={{ color: C.navy, fontWeight: 700, fontSize: 17, marginBottom: 4 }}>Lifestyle factors</div>
               <div style={{ color: C.slate, fontSize: 17, lineHeight: 1.6, marginBottom: 12 }}>{s.lifestyle}</div>
               {s.animationId && <VimeoEmbed videoId={s.animationId} title={s.animationTitle} />}
-              <div  style={{ background: s.redFlag ? C.redLt : C.warnLt, border: `1px solid ${s.redFlag ? C.red : C.warn}44` }}>
+              <div style={{ background: s.redFlag ? C.redLt : C.warnLt, border: `1px solid ${s.redFlag ? C.red : C.warn}44`, borderRadius: 10, padding: 14 }}>
                 <div style={{ color: s.redFlag ? C.red : C.coral, fontWeight: 700, fontSize: 17, marginBottom: 4 }}>
                   {s.redFlag ? "🚨 When to seek care — promptly" : "🩺 When to call your doctor"}
                 </div>
@@ -449,7 +452,29 @@ const SymptomsSection = ({ speak, stop, speaking }) => {
             </Card>
           )}
         </div>
-      ))}
+          ))}
+          {/* My Score prompt */}
+          <div style={{ background: `linear-gradient(135deg, ${C.teal}, ${C.navyMid})`, borderRadius: 20, padding: 24, marginTop: 16, textAlign: "center" }}>
+            <div style={{ fontSize: 32, marginBottom: 10 }}>📊</div>
+            <div style={{ color: "#fff", fontWeight: 700, fontSize: 20, marginBottom: 8 }}>Would you like to see how your symptoms score?</div>
+            <div style={{ color: "rgba(255,255,255,0.85)", fontSize: 16, lineHeight: 1.6, marginBottom: 20 }}>
+              Our validated questionnaire takes about 5 minutes and gives your healthcare team a clear picture of your symptom burden — in your own words.
+            </div>
+            <button onClick={() => setShowScores(true)}
+              style={{ background: "#fff", color: C.teal, border: "none", borderRadius: 14, padding: "16px 32px", fontSize: 17, fontWeight: 700, cursor: "pointer", width: "100%" }}>
+              Yes — show me my score →
+            </button>
+          </div>
+        </div>
+      ) : (
+        <div>
+          <button onClick={() => setShowScores(false)}
+            style={{ background: "none", border: "none", color: C.teal, fontSize: 16, fontWeight: 600, cursor: "pointer", marginBottom: 16, display: "flex", alignItems: "center", gap: 6 }}>
+            ← Back to Symptom Explorer
+          </button>
+          <CalculatorsSection scores={scores} setScores={setScores} primarySymptom={primarySymptom} setPrimarySymptom={setPrimarySymptom} />
+        </div>
+      )}
     </div>
   );
 };
@@ -493,7 +518,7 @@ const ImagingSection = ({ speak, stop, speaking }) => {
   const [probeOpen, setProbeOpen] = useState(null);
   return (
     <div>
-      <SectionHeader title="Imaging Guide" subtitle="Understanding what each test involves helps reduce anxiety and helps you prepare." />
+      <SectionHeader title="Pelvic Floor Testing" subtitle="Understanding what each test involves helps reduce anxiety and helps you prepare." />
       <Callout body="Imaging tests for pelvic floor and bowel problems can feel unfamiliar or even embarrassing. Knowing what to expect makes the experience much easier." icon="💙" />
       {IMAGING.map(s => (
         <div key={s.id}>
@@ -808,19 +833,39 @@ const impactSummaryText = (ans) => {
 // Option button component
 const OptBtn = ({ label, selected, onClick, color = C.teal }) => (
   <button onClick={onClick}
-        style={{ background: selected ? color : C.tealLight, border: `1.5px solid ${selected ? color : C.border}`, minHeight: 52 }}>
-    <div  style={{ width: 18, height: 18, border: `2px solid ${selected ? "#fff" : color}`, background: selected ? "#fff" : "transparent" }} />
-    <span style={{ color: selected ? "#fff" : C.navy, fontSize: 13 }}>{label}</span>
+    style={{
+      width: "100%", textAlign: "left", display: "flex", alignItems: "center", gap: 14,
+      background: selected ? color : C.tealLight,
+      border: `2px solid ${selected ? color : C.border}`,
+      borderRadius: 12, padding: "14px 16px", marginBottom: 10,
+      minHeight: 54, cursor: "pointer",
+    }}>
+    <div style={{
+      width: 22, height: 22, borderRadius: "50%", flexShrink: 0,
+      border: `2.5px solid ${selected ? "#fff" : color}`,
+      background: selected ? "#fff" : "transparent",
+      display: "flex", alignItems: "center", justifyContent: "center",
+    }}>
+      {selected && <div style={{ width: 10, height: 10, borderRadius: "50%", background: color }} />}
+    </div>
+    <span style={{ color: selected ? "#fff" : C.navy, fontSize: 16, lineHeight: 1.4, flex: 1 }}>{label}</span>
   </button>
 );
 
 const YesNoGate = ({ question, value, onChange }) => (
   <div style={{ marginBottom: 16 }}>
-    <div style={{ color: C.navy, fontWeight: 600, fontSize: 16, marginBottom: 8 }}>{question}</div>
+    {question ? <div style={{ color: C.navy, fontWeight: 600, fontSize: 16, marginBottom: 8 }}>{question}</div> : null}
     <div style={{ display: "flex", gap: 12 }}>
       {["yes","no"].map(v => (
         <button key={v} onClick={() => onChange(v)}
-                    style={{ background: value === v ? C.teal : C.tealLight, color: value === v ? "#fff" : C.navy, border: `1.5px solid ${value === v ? C.teal : C.border}`, fontWeight: 600, fontSize: 17, minHeight: 52 }}>
+          style={{
+            flex: 1, padding: "14px 0", borderRadius: 12, cursor: "pointer",
+            background: value === v ? C.teal : C.tealLight,
+            color: value === v ? "#fff" : C.navy,
+            border: `2px solid ${value === v ? C.teal : C.border}`,
+            fontWeight: 700, fontSize: 18, minHeight: 54,
+            fontFamily: "Georgia, serif",
+          }}>
           {v === "yes" ? "YES" : "NO"}
         </button>
       ))}
@@ -1264,7 +1309,7 @@ const ScoreResult = ({ label, score, max, band, msg }) => (
       <div style={{ color: C.muted, fontSize: 17, marginBottom: 4 }}>{label}</div>
       <div style={{ color: band.color, fontSize: 48, fontWeight: 900, lineHeight: 1 }}>{score}</div>
       <div style={{ color: C.muted, fontSize: 12 }}>out of {max}</div>
-      <div style={{ display: "inline-block", borderRadius: 20, padding: "4px 12px", marginTop: 8 }} style={{ background: band.color, color: "#fff", fontSize: 16, fontWeight: 700 }}>{band.label}</div>
+      <div style={{ display: "inline-block", borderRadius: 20, padding: "4px 12px", marginTop: 8, background: band.color, color: "#fff", fontSize: 16, fontWeight: 700 }}>{band.label}</div>
     </div>
     <div style={{ color: C.navy, fontSize: 17, lineHeight: 1.6, marginBottom: 10 }}>{msg}</div>
     <Callout icon="💬" body="This score is a starting point for conversation — not a diagnosis. Share it with your healthcare team." color={C.slate} bg="#f0f4f8" />
@@ -1556,138 +1601,219 @@ const CalculatorsSection = ({ scores, setScores, primarySymptom, setPrimarySympt
   );
 };
 
-// ─── SURGICAL ────────────────────────────────────────────────────────────────
+// ─── CONSIDERING SURGERY ─────────────────────────────────────────────────────
 const SurgicalSection = ({ speak, stop, speaking }) => {
-  const [tab, setTab] = useState("rectopexy");
+  const [open, setOpen] = useState(null);
   const [meshPref, setMeshPref] = useState(null);
-  const tabs = [
-    { id: "rectopexy", label: "Rectopexy" },
-    { id: "expectations", label: "What to Expect" },
-    { id: "mesh", label: "Mesh Education" },
-    { id: "questions", label: "Questions to Ask" },
+  const [surgRisk, setSurgRisk] = useState([]);
+  const [recRisk, setRecRisk] = useState([]);
+
+  const toggle = (id) => setOpen(open === id ? null : id);
+
+  const SURG_RISKS = [
+    "Age over 75", "Active heart disease or recent cardiac event",
+    "Poorly controlled diabetes", "BMI over 35", "Active smoking",
+    "Severe lung disease (COPD, requiring oxygen)", "Kidney disease",
+    "Prior pelvic or abdominal radiation", "Blood thinning medications",
+    "Prior abdominal surgery with complications",
   ];
 
-  return (
-    <div>
-      <SectionHeader title="Surgical Education" subtitle="If surgery has been recommended, understanding what's involved helps you feel prepared and ask better questions." />
-      <TabBar tabs={tabs} active={tab} onChange={setTab} />
+  const REC_RISKS = [
+    { id: "prior", label: "Prior rectal prolapse repair", why: "Previous repair is one of the strongest predictors of recurrence. Scar tissue affects tissue quality and repair durability." },
+    { id: "age80", label: "Age over 80", why: "Connective tissue weakens with age; supporting structures are less able to hold a repair long-term." },
+    { id: "hyper", label: "Connective tissue disorder / joint hypermobility", why: "People with generalized connective tissue laxity have higher recurrence risk." },
+    { id: "straining", label: "Chronic straining / constipation", why: "⭐ Modifiable. Optimizing bowel habits before surgery significantly improves outcomes." },
+    { id: "obesity", label: "BMI ≥ 30", why: "⭐ Modifiable. Even modest weight loss can meaningfully reduce intra-abdominal pressure on the repair." },
+  ];
 
-      {tab === "rectopexy" && (
+  const sections = [
+    {
+      id: "what",
+      q: "What is the surgery?",
+      content: (
         <div>
-          <Callout body="If your surgeon has recommended surgery for rectal prolapse, understanding what's involved can help you feel more prepared and ask better questions." icon="🏥" />
-          <div style={{ color: C.navy, fontSize: 16, lineHeight: 1.7, marginBottom: 16 }}>
-            <strong>Rectopexy</strong> is one of the most common surgical approaches to rectal prolapse. The rectum is secured (fixed) to the sacrum (tailbone) to prevent it from prolapsing. It can usually be done laparoscopically (keyhole surgery) or robotically.
+          <div style={{ color: C.navy, fontSize: 17, lineHeight: 1.7, marginBottom: 16 }}>
+            The most common surgery for rectal prolapse is called <strong>rectopexy</strong> — the rectum is secured to the tailbone (sacrum) to stop it from prolapsing. It is usually done laparoscopically (keyhole surgery) or robotically, with small incisions.
           </div>
-          <p style={{ color: C.navy, fontSize: 17, fontWeight: 700, marginBottom: 8 }}>▶ Watch this animation</p>
           <VimeoEmbed videoId="1180494424" title="Rectopexy Surgical Animation" />
           <Card>
-            <div style={{ color: C.teal, fontWeight: 700, fontSize: 16, marginBottom: 8 }}>General recovery themes</div>
-            {["Hospital stay varies by approach and individual", "Bowel function may be temporarily altered after surgery", "Pelvic floor PT is often recommended post-operatively", "Lifestyle optimization (fiber, straining avoidance) remains important after repair", "Symptoms should be reassessed at follow-up — improvement may be gradual"].map((t, i) => (
-              <div key={i} style={{ display: "flex", gap: 8, marginBottom: 8 }}>
-                <div style={{ color: C.teal }}>→</div>
-                <div style={{ color: C.navy, fontSize: 17, lineHeight: 1.6 }}>{t}</div>
+            <div style={{ color: C.teal, fontWeight: 700, fontSize: 16, marginBottom: 10 }}>What to expect in recovery</div>
+            {["Hospital stay varies — often 1–3 days depending on approach", "Bowel function may be temporarily altered in the weeks after surgery", "Pelvic floor PT is often recommended post-operatively", "Fiber, hydration, and straining avoidance remain important after repair", "Symptom improvement may be gradual — allow time for full assessment"].map((t, i) => (
+              <div key={i} style={{ display: "flex", gap: 10, marginBottom: 10 }}>
+                <span style={{ color: C.teal, flexShrink: 0 }}>→</span>
+                <span style={{ color: C.navy, fontSize: 16, lineHeight: 1.6 }}>{t}</span>
               </div>
             ))}
           </Card>
-          <div style={{ color: C.muted, fontSize: 16, textAlign: "center" }}>This app does not recommend which approach is right for any individual. That decision is made with your surgical team.</div>
         </div>
-      )}
-
-      {tab === "expectations" && (
+      ),
+    },
+    {
+      id: "happen",
+      q: "What will happen to my symptoms?",
+      content: (
         <div>
-          <Callout icon="⭐" title="One of the most important things to understand" color={C.coral} bg={C.coralLt} body="Fixing the anatomy does not guarantee fixing the function. This is something your surgical team should discuss with you openly before any procedure." />
+          <Callout icon="⭐" color={C.coral} bg={C.coralLt} title="The most important thing to understand" body="Fixing the anatomy does not guarantee fixing the function. This is something your surgical team should discuss with you openly before any procedure." />
           {[
-            { title: "Fecal Incontinence", icon: "💧", good: true, body: "Surgery for rectal prolapse is more likely to result in meaningful improvement in fecal incontinence symptoms. If leakage, urgency, or inability to control gas or stool is your most bothersome symptom, repair has a stronger track record of helping." },
-            { title: "Constipation & Difficult Evacuation", icon: "🚽", good: false, body: "Improvement in constipation and obstructed defecation after prolapse repair is less predictable. Approximately 60–70% of patients see improvement — which means 30–40% may not, and some may find these symptoms unchanged or even temporarily worse after surgery. If straining or incomplete evacuation is your primary complaint, it is essential to discuss this honestly with your surgeon before proceeding." },
+            { title: "Fecal Incontinence & Leakage", icon: "💧", good: true, body: "Surgery for rectal prolapse is more likely to improve leakage and incontinence. If this is your most bothersome symptom, the evidence is more reassuring." },
+            { title: "Constipation & Difficult Evacuation", icon: "🚽", good: false, body: "Improvement is less predictable — around 60–70% of patients see improvement, meaning 30–40% may not. If straining is your primary complaint, discuss this honestly with your surgeon first." },
           ].map(s => (
             <Card key={s.title} style={{ border: `2px solid ${s.good ? C.teal : C.warn}` }}>
-              <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 12 }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 10 }}>
                 <span style={{ fontSize: 22 }}>{s.icon}</span>
-                <div style={{ color: C.navy, fontWeight: 700, fontSize: 15 }}>{s.title}</div>
-                <div style={{ background: s.good ? C.tealLight : C.warnLt, color: s.good ? C.teal : C.warn, fontSize: 15, fontWeight: 700 }}>{s.good ? "More predictable" : "Less predictable"}</div>
+                <span style={{ color: C.navy, fontWeight: 700, fontSize: 16, flex: 1 }}>{s.title}</span>
+                <span style={{ background: s.good ? C.tealLight : C.warnLt, color: s.good ? C.teal : C.warn, borderRadius: 20, padding: "3px 10px", fontSize: 13, fontWeight: 700 }}>{s.good ? "More predictable" : "Less predictable"}</span>
               </div>
-              <div style={{ color: C.navy, fontSize: 17, lineHeight: 1.7 }}>{s.body}</div>
+              <div style={{ color: C.navy, fontSize: 16, lineHeight: 1.7 }}>{s.body}</div>
             </Card>
           ))}
-          <Card style={{ background: C.tealLight, border: `2px solid ${C.teal}` }}>
-            <div style={{ color: C.teal, fontWeight: 700, fontSize: 16, marginBottom: 8 }}>⭐ Before surgery, make sure you have discussed:</div>
-            {["Which symptom bothers you most (incontinence vs. constipation vs. prolapse sensation)", "What the realistic likelihood of improvement is for that specific symptom", "What happens if symptoms don't improve after repair", "What non-surgical options remain available if surgery is not fully effective"].map((t, i) => (
-              <div key={i} style={{ display: "flex", gap: 8, marginBottom: 8 }}>
-                <div style={{ color: C.teal, flexShrink: 0 }}>✓</div>
-                <div style={{ color: C.navy, fontSize: 17, lineHeight: 1.6 }}>{t}</div>
-              </div>
-            ))}
-          </Card>
-          <Callout body="If your repair doesn't completely resolve symptoms, that is not a failure — it means your body needs additional support. Pelvic floor PT, lifestyle optimization, and follow-up care all remain part of the picture." icon="💙" />
+          <Callout icon="💙" body="If surgery doesn't resolve everything, that is not a failure. Pelvic floor PT, lifestyle changes, and follow-up care all remain part of the picture." />
         </div>
-      )}
-
-      {tab === "mesh" && (
+      ),
+    },
+    {
+      id: "mesh",
+      q: "Will I need mesh?",
+      content: (
         <div>
-          <Callout body="Not all rectopexy procedures use mesh. Your surgeon will explain which approach is being recommended for you and why. The information below supports an informed conversation." icon="ℹ️" />
-          <Card>
-            <div style={{ color: C.teal, fontWeight: 700, fontSize: 16, marginBottom: 8 }}>What is mesh and why is it used?</div>
-            <div style={{ color: C.navy, fontSize: 17, lineHeight: 1.7 }}>Mesh is a material used in some rectopexy procedures to reinforce the repair and secure the rectum in its correct position. Mesh used in rectal prolapse surgery is different from mesh used in vaginal prolapse repair. The complication profile and evidence base are distinct and should be discussed specifically with your surgical team.</div>
-          </Card>
+          <Callout body="Not all rectopexy procedures use mesh. Your surgeon will explain what they recommend and why. The information below supports an informed conversation." icon="ℹ️" />
           {[
-            { type: "Synthetic Mesh", icon: "🔩", desc: "Made from permanent synthetic material (such as polypropylene). Durable and widely used.", erosion: "~1.8% erosion rate in large studies", recurrence: "~3.7% at follow-up", color: C.navyMid },
-            { type: "Biologic Mesh", icon: "🧬", desc: "Made from processed animal or human tissue. Gradually absorbed and replaced by the body's own tissue over time.", erosion: "~0.7% erosion rate in large studies", recurrence: "~4.0% at follow-up", color: C.teal },
-            { type: "Suture Rectopexy (No Mesh)", icon: "🪡", desc: "The rectum is secured using sutures alone — no mesh material is implanted. A valid surgical option for many patients.", erosion: "No mesh — no erosion risk", recurrence: "Comparable outcomes in many studies", color: C.sage },
+            { type: "Synthetic Mesh", icon: "🔩", desc: "Permanent synthetic material (polypropylene). Durable and widely used.", erosion: "~1.8% erosion rate", rec: "~3.7% recurrence" },
+            { type: "Biologic Mesh", icon: "🧬", desc: "Processed animal or human tissue. Gradually absorbed over time.", erosion: "~0.7% erosion rate", rec: "~4.0% recurrence" },
+            { type: "Suture Only — No Mesh", icon: "🪡", desc: "Rectum secured with sutures alone. A valid option for many patients.", erosion: "No mesh — no erosion risk", rec: "Comparable outcomes" },
           ].map(m => (
             <Card key={m.type}>
-              <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 12 }}>
+              <div style={{ display: "flex", gap: 10, alignItems: "center", marginBottom: 8 }}>
                 <span style={{ fontSize: 22 }}>{m.icon}</span>
-                <div style={{ color: m.color, fontWeight: 700, fontSize: 14 }}>{m.type}</div>
+                <span style={{ color: C.navy, fontWeight: 700, fontSize: 16 }}>{m.type}</span>
               </div>
-              <div style={{ color: C.navy, fontSize: 17, lineHeight: 1.6, marginBottom: 8 }}>{m.desc}</div>
-              <div>
-                <div><div style={{ color: C.muted, fontSize: 15, textTransform: "uppercase" }}>Erosion</div><div style={{ color: C.navy, fontSize: 16, fontWeight: 600 }}>{m.erosion}</div></div>
-                <div><div style={{ color: C.muted, fontSize: 15, textTransform: "uppercase" }}>Recurrence</div><div style={{ color: C.navy, fontSize: 16, fontWeight: 600 }}>{m.recurrence}</div></div>
+              <div style={{ color: C.navy, fontSize: 16, lineHeight: 1.6, marginBottom: 10 }}>{m.desc}</div>
+              <div style={{ display: "flex", gap: 24 }}>
+                <div><div style={{ color: C.muted, fontSize: 13, textTransform: "uppercase" }}>Erosion</div><div style={{ color: C.navy, fontSize: 15, fontWeight: 600 }}>{m.erosion}</div></div>
+                <div><div style={{ color: C.muted, fontSize: 13, textTransform: "uppercase" }}>Recurrence</div><div style={{ color: C.navy, fontSize: 15, fontWeight: 600 }}>{m.rec}</div></div>
               </div>
             </Card>
           ))}
-          <Callout icon="⏰" color={C.warn} bg={C.warnLt} title="Important timing note" body="When mesh erosion does occur, it typically appears years after surgery — requiring long-term follow-up with your surgical team." />
-          <div style={{ color: C.navy, fontWeight: 700, fontSize: 16, marginBottom: 8 }}>My mesh preference for discussion:</div>
+          <div style={{ color: C.navy, fontWeight: 700, fontSize: 16, marginBottom: 10 }}>My preference to discuss with my surgeon:</div>
           {[
-            { id: "discuss", label: "I would like to discuss mesh options with my surgeon" },
-            { id: "avoid", label: "I would prefer to discuss suture rectopexy (no mesh) as an option" },
-            { id: "open", label: "I am open to whatever my surgeon recommends" },
+            { id: "discuss", label: "I'd like to discuss mesh options" },
+            { id: "avoid", label: "I'd prefer to discuss suture rectopexy (no mesh)" },
+            { id: "open", label: "I'm open to whatever my surgeon recommends" },
           ].map(o => (
-            <button key={o.id} onClick={() => setMeshPref(o.id)}
-                            style={{ background: meshPref === o.id ? C.tealLight : C.card, border: `1.5px solid ${meshPref === o.id ? C.teal : C.border}`, minHeight: 54 }}>
-              <div  style={{ width: 20, height: 20, border: `2px solid ${meshPref === o.id ? C.teal : C.border}`, background: meshPref === o.id ? C.teal : "transparent" }} />
-              <span style={{ color: C.navy, fontSize: 13 }}>{o.label}</span>
-            </button>
+            <OptionCard key={o.id} label={o.label} selected={meshPref === o.id} onClick={() => setMeshPref(o.id)} />
           ))}
-          {meshPref && <Callout body="This preference will be noted for your appointment discussion." icon="📋" />}
         </div>
-      )}
-
-      {tab === "questions" && (
+      ),
+    },
+    {
+      id: "risk",
+      q: "Am I a good candidate for surgery?",
+      content: (
         <div>
-          <div style={{ color: C.navy, fontSize: 16, lineHeight: 1.7, marginBottom: 16 }}>Empowered patients get better care. Use this list to prepare for your surgical consultation:</div>
+          <div style={{ color: C.slate, fontSize: 16, lineHeight: 1.6, marginBottom: 16 }}>Select any factors that apply to you. This helps you start an informed conversation with your surgeon about surgical risk.</div>
+          {SURG_RISKS.map(r => (
+            <CheckCard key={r} label={r} checked={surgRisk.includes(r)} onClick={() => setSurgRisk(prev => prev.includes(r) ? prev.filter(x => x !== r) : [...prev, r])} />
+          ))}
+          <Card style={{ background: C.tealLight, marginTop: 4 }}>
+            <div style={{ color: C.teal, fontWeight: 700, fontSize: 16, marginBottom: 4 }}>
+              {surgRisk.length === 0 ? "✅ No risk factors identified" : `${surgRisk.length} factor${surgRisk.length > 1 ? "s" : ""} to discuss`}
+            </div>
+            <div style={{ color: C.navy, fontSize: 16, lineHeight: 1.6 }}>
+              {surgRisk.length === 0 ? "Reassuring — your team will do their own full pre-op assessment." : "Bring these to your surgical consultation. Your team can explain how they affect your individual risk."}
+            </div>
+          </Card>
+        </div>
+      ),
+    },
+    {
+      id: "recurrence",
+      q: "Could prolapse come back after surgery?",
+      content: (
+        <div>
+          <Callout body="Yes — rectal prolapse can recur after surgery. Knowing your risk factors helps you and your surgeon make the best plan. Some factors can be improved before surgery." icon="🔄" />
+          {REC_RISKS.map(r => (
+            <div key={r.id}>
+              <CheckCard label={r.label} checked={recRisk.includes(r.id)} onClick={() => setRecRisk(prev => prev.includes(r.id) ? prev.filter(x => x !== r.id) : [...prev, r.id])} color={C.coral} />
+              {recRisk.includes(r.id) && (
+                <div style={{ background: C.coralLt, borderRadius: 12, padding: "12px 16px", marginTop: -6, marginBottom: 10 }}>
+                  <div style={{ color: C.slate, fontSize: 15, lineHeight: 1.6 }}>{r.why}</div>
+                </div>
+              )}
+            </div>
+          ))}
+          {recRisk.length > 0 && (
+            <Card style={{ background: C.tealLight }}>
+              <div style={{ color: C.teal, fontWeight: 700, fontSize: 16, marginBottom: 6 }}>{recRisk.length} factor{recRisk.length > 1 ? "s" : ""} identified</div>
+              <div style={{ color: C.navy, fontSize: 16, lineHeight: 1.6 }}>Bring this to your appointment. The more your team knows, the better they can plan with you.</div>
+            </Card>
+          )}
+        </div>
+      ),
+    },
+    {
+      id: "questions",
+      q: "What should I ask my surgeon?",
+      content: (
+        <div>
+          <div style={{ color: C.slate, fontSize: 16, lineHeight: 1.6, marginBottom: 16 }}>Empowered patients get better care. Use this list to prepare for your consultation:</div>
           {[
             "What type of rectopexy are you recommending and why?",
-            "Will mesh be used? What are the implications of each option for my situation?",
-            "What is the expected recurrence rate for my specific situation?",
-            "My most bothersome symptom is [incontinence / constipation / prolapse] — how likely is surgery to improve this specifically?",
+            "Will mesh be used? What are the implications for my situation?",
+            "What is the expected recurrence rate for me specifically?",
+            "My most bothersome symptom is [leakage / constipation / prolapse] — how likely is surgery to improve this?",
             "What happens to my bowel function after surgery?",
-            "What if my bowel symptoms don't improve after repair — what options remain?",
+            "What if my symptoms don't improve — what options remain?",
             "What should I do before surgery to optimize my outcome?",
-            "What does recovery look like, and when can I return to normal activity?",
             "Should I see a pelvic floor physical therapist before or after surgery?",
             "What is your personal experience and complication rate with this procedure?",
           ].map((q, i) => (
             <Card key={i}>
-              <div style={{ display: "flex", gap: 12 }}>
-                <div style={{ flexShrink: 0, color: C.teal, fontWeight: 800, fontSize: 14 }}>Q{i + 1}</div>
-                <div style={{ color: C.navy, fontSize: 17, lineHeight: 1.6 }}>{q}</div>
+              <div style={{ display: "flex", gap: 14 }}>
+                <div style={{ color: C.teal, fontWeight: 800, fontSize: 17, flexShrink: 0, minWidth: 32 }}>Q{i + 1}</div>
+                <div style={{ color: C.navy, fontSize: 16, lineHeight: 1.6 }}>{q}</div>
               </div>
             </Card>
           ))}
-          <Callout body="Surgery is one part of the picture. The lifestyle work — fiber, movement, pelvic floor PT, stress management — remains important before and after any procedure." icon="🌿" />
+          <Callout body="Surgery is one part of the picture. Lifestyle work — fiber, movement, pelvic floor PT, stress management — remains important before and after any procedure." icon="🌿" />
         </div>
-      )}
+      ),
+    },
+  ];
+
+  return (
+    <div>
+      <SectionHeader title="Considering Surgery" subtitle="Honest, patient-friendly information to help you prepare and ask better questions." />
+      <SpeakBtn speaking={speaking} onSpeak={() => speak(document.getElementById("section-content")?.innerText || "")} />
+      <Callout body="Not sure if surgery is right for you? That's a completely normal place to be. This section helps you understand your options — at your own pace." icon="💙" />
+      {sections.map((s, i) => (
+        <div key={s.id} style={{ marginBottom: 4 }}>
+          <button
+            onClick={() => toggle(s.id)}
+            style={{
+              width: "100%", textAlign: "left", background: open === s.id ? C.tealLight : C.card,
+              border: `2px solid ${open === s.id ? C.teal : C.border}`,
+              borderRadius: 14, padding: "18px 20px", marginBottom: 2,
+              display: "flex", alignItems: "center", gap: 14, cursor: "pointer",
+            }}>
+            <div style={{
+              width: 34, height: 34, borderRadius: "50%", flexShrink: 0,
+              background: open === s.id ? C.teal : C.tealLight,
+              color: open === s.id ? "#fff" : C.teal,
+              display: "flex", alignItems: "center", justifyContent: "center",
+              fontWeight: 800, fontSize: 16,
+            }}>
+              {i + 1}
+            </div>
+            <span style={{ color: C.navy, fontWeight: 700, fontSize: 17, flex: 1, lineHeight: 1.3 }}>{s.q}</span>
+            <span style={{ color: C.muted, fontSize: 20 }}>{open === s.id ? "▲" : "▼"}</span>
+          </button>
+          {open === s.id && (
+            <div style={{ background: C.card, border: `2px solid ${C.teal}`, borderTop: "none", borderRadius: "0 0 14px 14px", padding: "16px 16px 20px", marginBottom: 12 }}>
+              {s.content}
+            </div>
+          )}
+        </div>
+      ))}
     </div>
   );
 };
@@ -1975,31 +2101,62 @@ export default function App() {
       <div style={{ padding: 18, paddingBottom: 120 }}>
         {section === "home" && <HomeSection onNav={setSection} />}
         {section === "prolapse" && <ProlapseSection speak={speak} stop={stop} speaking={speaking} />}
-        {section === "symptoms" && <SymptomsSection speak={speak} stop={stop} speaking={speaking} />}
+        {section === "symptoms" && <SymptomsSection speak={speak} stop={stop} speaking={speaking} scores={scores} setScores={setScores} primarySymptom={primarySymptom} setPrimarySymptom={setPrimarySymptom} />}
         {section === "imaging" && <ImagingSection speak={speak} stop={stop} speaking={speaking} />}
         {section === "lifestyle" && <LifestyleSection speak={speak} stop={stop} speaking={speaking} />}
-        {section === "calculators" && <CalculatorsSection scores={scores} setScores={setScores} primarySymptom={primarySymptom} setPrimarySymptom={setPrimarySymptom} />}
         {section === "surgical" && <SurgicalSection speak={speak} stop={stop} speaking={speaking} />}
         {section === "redflags" && <RedFlagsSection speak={speak} stop={stop} speaking={speaking} />}
       </div>
 
-      {/* BOTTOM NAV (key sections) */}
+      {/* FLOATING ASK OUR TEAM BUTTON */}
+      {!chatOpen && (
+        <button
+          onClick={() => setChatOpen(true)}
+          style={{
+            position: "fixed",
+            bottom: 90,
+            right: 20,
+            zIndex: 200,
+            background: C.teal,
+            color: "#fff",
+            border: "none",
+            borderRadius: 30,
+            padding: "14px 22px",
+            fontSize: 16,
+            fontWeight: 700,
+            fontFamily: "Georgia, serif",
+            boxShadow: "0 4px 20px rgba(45,125,111,0.4)",
+            display: "flex",
+            alignItems: "center",
+            gap: 10,
+            cursor: "pointer",
+            maxWidth: 220,
+          }}>
+          <span style={{ fontSize: 22 }}>💬</span>
+          <span>Ask Our Team</span>
+        </button>
+      )}
+
+      {/* BOTTOM NAV */}
       <div style={{ position: "fixed", bottom: 0, left: "50%", transform: "translateX(-50%)", width: "100%", maxWidth: 480, background: C.card, borderTop: `1px solid ${C.border}`, display: "flex", paddingBottom: "env(safe-area-inset-bottom, 0)" }}>
         {[
-          { id: "home", icon: "🏠", label: "Home" },
-          { id: "calculators", icon: "📊", label: "Scores" },
-          { id: "surgical", icon: "🏥", label: "Surgery" },
-          { id: "redflags", icon: "🚨", label: "Red Flags" },
+          { id: "home", label: "Home" },
+          { id: "symptoms", label: "Symptoms" },
+          { id: "surgical", label: "Surgery" },
+          { id: "redflags", label: "Red Flags" },
         ].map(n => (
-          <button key={n.id} onClick={() => setSection(n.id)} style={{ background: "none", border: "none", color: section === n.id ? C.teal : C.muted }}>
-            <span style={{ fontSize: 22 }}>{n.icon}</span>
-            <span style={{ fontSize: 10, fontWeight: section === n.id ? 700 : 400 }}>{n.label}</span>
+          <button key={n.id} onClick={() => setSection(n.id)}
+            style={{
+              flex: 1, display: "flex", alignItems: "center", justifyContent: "center",
+              padding: "12px 4px", background: "none", border: "none",
+              color: section === n.id ? C.teal : C.muted,
+              fontWeight: section === n.id ? 700 : 400,
+              fontSize: 14, fontFamily: "Georgia, serif",
+              borderTop: section === n.id ? `3px solid ${C.teal}` : "3px solid transparent",
+            }}>
+            {n.label}
           </button>
         ))}
-        <button onClick={() => setChatOpen(true)} style={{ background: "none", border: "none", color: C.coral }}>
-          <span style={{ fontSize: 22 }}>💬</span>
-          <span style={{ fontSize: 9, fontWeight: 700, color: C.teal, letterSpacing: 0.2 }}>Ask Our Team</span>
-        </button>
       </div>
 
       {/* CHATBOT */}
