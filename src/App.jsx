@@ -44,7 +44,7 @@ const VimeoEmbed = ({ videoId, title }) => (
           <span style={{ fontSize: 28, marginLeft: 4 }}>▶</span>
         </div>
         <div style={{ textAlign: "center" }}>
-          <div style={{ color: "#fff", fontWeight: 700, fontSize: 16, marginBottom: 4 }}>{title}</div>
+          <div style={{ color: "#fff", fontWeight: 700, fontSize: 17, marginBottom: 4 }}>{title}</div>
           <div style={{ color: "rgba(255,255,255,0.7)", fontSize: 12 }}>
             Tap to watch on Vimeo ↗
           </div>
@@ -82,51 +82,6 @@ const C = {
   redLt: "#fdf0ef",
 };
 
-
-// ─── READ ALOUD ──────────────────────────────────────────────────────────────
-const useReadAloud = () => {
-  const [speaking, setSpeaking] = useState(false);
-
-  const speak = (text) => {
-    if (!window.speechSynthesis) return;
-    window.speechSynthesis.cancel();
-    if (speaking) { setSpeaking(false); return; }
-    const clean = text.replace(/[🌿📖🔍🩺🥦📊🏥🚨💬🌱✓→•⭐🩸⚖️🔄🚫😣🌡️💧🚽⬇️⚡😣🫁🔬]/gu, '').replace(/\s+/g, ' ').trim();
-    const utt = new SpeechSynthesisUtterance(clean);
-    utt.rate = 0.9;
-    utt.pitch = 1;
-    utt.lang = 'en-US';
-    utt.onstart = () => setSpeaking(true);
-    utt.onend = () => setSpeaking(false);
-    utt.onerror = () => setSpeaking(false);
-    window.speechSynthesis.speak(utt);
-  };
-
-  const stop = () => {
-    window.speechSynthesis.cancel();
-    setSpeaking(false);
-  };
-
-  return { speak, stop, speaking };
-};
-
-const ReadAloudBtn = ({ getText, speaking, onSpeak }) => (
-  <button
-    onClick={onSpeak}
-    title={speaking ? "Stop reading" : "Read aloud"}
-    style={{
-      position: "fixed", bottom: 72, right: 16, zIndex: 50,
-      width: 48, height: 48, borderRadius: "50%",
-      background: speaking ? C.coral : C.teal,
-      color: "#fff", border: "none",
-      fontSize: 20, display: "flex", alignItems: "center", justifyContent: "center",
-      boxShadow: "0 4px 12px rgba(0,0,0,0.2)",
-      transition: "background 0.2s",
-    }}>
-    {speaking ? "⏹" : "🔊"}
-  </button>
-);
-
 // ─── SHARED COMPONENTS ───────────────────────────────────────────────────────
 const Card = ({ children, style = {}, className = "" }) => (
   <div style={{ ...style }}
@@ -145,7 +100,7 @@ const Callout = ({ icon, title, body, color = C.teal, bg = C.tealLight }) => (
 
 const SectionHeader = ({ title, subtitle }) => (
   <div style={{ marginBottom: 24 }}>
-    <h2 style={{ color: C.navy, fontSize: 26, fontWeight: 700, lineHeight: 1.2 }}>{title}</h2>
+    <h2 style={{ color: C.navy, fontSize: 22, fontWeight: 700, lineHeight: 1.2 }}>{title}</h2>
     {subtitle && <p style={{ color: C.muted, fontSize: 16, marginTop: 4 }}>{subtitle}</p>}
   </div>
 );
@@ -156,7 +111,7 @@ const Pill = ({ label, active, onClick }) => (
       background: active ? C.teal : "transparent",
       color: active ? "#fff" : C.slate,
       border: `1.5px solid ${active ? C.teal : C.border}`,
-      fontSize: 16,
+      fontSize: 17,
       whiteSpace: "nowrap",
     }}>
     {label}
@@ -184,7 +139,7 @@ const Btn = ({ children, onClick, variant = "primary", className = "", disabled 
   };
   return (
     <button onClick={onClick} disabled={disabled}
-            style={{ fontSize: 16, minHeight: 54, ...styles[variant], opacity: disabled ? 0.5 : 1 }}>
+            style={{ fontSize: 17, minHeight: 54, ...styles[variant], opacity: disabled ? 0.5 : 1 }}>
       {children}
     </button>
   );
@@ -202,13 +157,65 @@ const NAV = [
   { id: "redflags", label: "Red Flags", icon: "🚨" },
 ];
 
+
+// ── TEXT TO SPEECH ────────────────────────────────────────────────────────────
+const useSpeech = () => {
+  const [speaking, setSpeaking] = useState(false);
+
+  const speak = (text) => {
+    if (!window.speechSynthesis) return;
+    window.speechSynthesis.cancel();
+    if (speaking) { setSpeaking(false); return; }
+    const clean = text.replace(/[🌿📖🔍🩻🥦📊🏥🚨💬🌱💙⚠️🔄🚫😣🌡️🩸⚖️✓→•🔬💧🚽⬇️⚡😣🫁]/gu, '').replace(/\s+/g, ' ').trim();
+    const utterance = new SpeechSynthesisUtterance(clean);
+    utterance.rate = 0.9;
+    utterance.pitch = 1;
+    utterance.lang = 'en-US';
+    utterance.onend = () => setSpeaking(false);
+    utterance.onerror = () => setSpeaking(false);
+    setSpeaking(true);
+    window.speechSynthesis.speak(utterance);
+  };
+
+  const stop = () => {
+    window.speechSynthesis?.cancel();
+    setSpeaking(false);
+  };
+
+  return { speak, stop, speaking };
+};
+
+const SpeakBtn = ({ getText, speaking, onSpeak }) => (
+  <button
+    onClick={onSpeak}
+    title={speaking ? "Stop reading" : "Read aloud"}
+    style={{
+      background: speaking ? C.teal : C.tealLight,
+      color: speaking ? "#fff" : C.teal,
+      border: `1.5px solid ${C.teal}`,
+      borderRadius: 20,
+      padding: "6px 14px",
+      fontSize: 13,
+      fontFamily: "Georgia, serif",
+      fontWeight: 600,
+      cursor: "pointer",
+      display: "flex",
+      alignItems: "center",
+      gap: 6,
+      marginBottom: 16,
+    }}>
+    <span>{speaking ? "⏹" : "🔊"}</span>
+    <span>{speaking ? "Stop" : "Read aloud"}</span>
+  </button>
+);
+
 // ─── HOME ────────────────────────────────────────────────────────────────────
 const HomeSection = ({ onNav }) => (
   <div>
     <div  style={{ background: `linear-gradient(135deg, ${C.teal}, ${C.navyMid})` }}>
       <div style={{ fontSize: 42, marginBottom: 8 }}>🌿</div>
       <h1 style={{ color: "#fff", fontSize: 26, fontWeight: 800, marginBottom: 6 }}>REPAIR</h1>
-      <div style={{ color: "rgba(255,255,255,0.65)", fontSize: 13, letterSpacing: 1.2, textTransform: "uppercase", marginBottom: 10, fontWeight: 600 }}>
+      <div style={{ color: "rgba(255,255,255,0.65)", fontSize: 15, letterSpacing: 1.2, textTransform: "uppercase", marginBottom: 10, fontWeight: 600 }}>
         Rectal prolapse · Education · Patient Awareness · Information · Resource
       </div>
       <p style={{ color: "rgba(255,255,255,0.85)", fontSize: 16, lineHeight: 1.5 }}>
@@ -218,20 +225,20 @@ const HomeSection = ({ onNav }) => (
 
     <Callout icon="💬" title="You're not alone" body="Millions of people live with pelvic floor symptoms — and most never talk about them. This app is a safe, shame-free place to learn, prepare, and feel more in control." />
 
-    <div style={{ color: C.navy, fontSize: 16, fontWeight: 700, marginBottom: 12 }}>Explore</div>
+    <div style={{ color: C.navy, fontSize: 17, fontWeight: 700, marginBottom: 12 }}>Explore</div>
     <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 16 }}>
       {NAV.filter(n => n.id !== "home").map(n => (
         <button key={n.id} onClick={() => onNav(n.id)}
                     style={{ background: C.card, border: `1px solid ${C.border}`, minHeight: 90, boxShadow: "0 2px 6px rgba(0,0,0,0.04)" }}>
           <div style={{ fontSize: 24, marginBottom: 4 }}>{n.icon}</div>
-          <div style={{ color: C.navy, fontSize: 16, fontWeight: 600, lineHeight: 1.3 }}>{n.label}</div>
+          <div style={{ color: C.navy, fontSize: 17, fontWeight: 600, lineHeight: 1.3 }}>{n.label}</div>
         </button>
       ))}
     </div>
 
     <Card style={{ background: C.sageLt, border: `1px solid ${C.sage}22` }}>
       <div style={{ color: C.sage, fontSize: 16, fontWeight: 700, marginBottom: 4, textTransform: "uppercase", letterSpacing: 1 }}>Stanford Colorectal Surgery</div>
-      <div style={{ color: C.navy, fontSize: 16, lineHeight: 1.6, marginBottom: 8 }}>
+      <div style={{ color: C.navy, fontSize: 17, lineHeight: 1.6, marginBottom: 8 }}>
         Content created by Dr. Brooke Gurland and reviewed by a multidisciplinary team. This app educates — it does not diagnose or replace your healthcare team.
       </div>
       <div style={{ color: C.sage, fontSize: 16, lineHeight: 1.6, borderTop: `1px solid ${C.sage}33`, paddingTop: 8 }}>
@@ -242,7 +249,7 @@ const HomeSection = ({ onNav }) => (
 );
 
 // ─── PROLAPSE EXPLAINER ──────────────────────────────────────────────────────
-const ProlapseSection = () => {
+const ProlapseSection = ({ speak, stop, speaking }) => {
   const [tab, setTab] = useState("what");
   const tabs = [
     { id: "what", label: "What Is It?" },
@@ -263,10 +270,10 @@ const ProlapseSection = () => {
           <p style={{ color: C.navy, fontSize: 16, lineHeight: 1.7, marginBottom: 16 }}>
             Rectal prolapse occurs when part or all of the rectum slips out of its normal position and protrudes through the anal opening — or folds inward on itself. Think of the rectum like a sock: prolapse is like the sock starting to turn inside out.
           </p>
-          <p style={{ color: C.navy, fontSize: 16, fontWeight: 700, marginBottom: 8 }}>▶ Watch this animation first</p>
+          <p style={{ color: C.navy, fontSize: 17, fontWeight: 700, marginBottom: 8 }}>▶ Watch this animation first</p>
           <VimeoEmbed videoId="743819969" title="Rectal Prolapse & Rectocele" />
           <Card>
-            <div style={{ color: C.teal, fontWeight: 700, fontSize: 16, marginBottom: 8 }}>Internal vs External</div>
+            <div style={{ color: C.teal, fontWeight: 700, fontSize: 17, marginBottom: 8 }}>Internal vs External</div>
             <div style={{ color: C.navy, fontSize: 16, lineHeight: 1.7, marginBottom: 12 }}>
               <strong>Internal prolapse (intussusception):</strong> The rectum folds inward on itself but stays inside the body. Patients cannot see it — it's diagnosed through imaging or examination. Symptoms include incomplete evacuation, straining, and a feeling of blockage. <em>Internal prolapse is real and can significantly affect quality of life.</em>
             </div>
@@ -330,7 +337,7 @@ const ProlapseSection = () => {
                 <div  style={{ width: 32, height: 32, background: C.teal, color: "#fff", fontWeight: 800, fontSize: 14 }}>{s.step}</div>
                 <div>
                   <div style={{ color: C.navy, fontWeight: 700, fontSize: 16, marginBottom: 4 }}>{s.title}</div>
-                  <div style={{ color: C.slate, fontSize: 16, lineHeight: 1.6 }}>{s.body}</div>
+                  <div style={{ color: C.slate, fontSize: 17, lineHeight: 1.6 }}>{s.body}</div>
                 </div>
               </div>
             </Card>
@@ -351,12 +358,12 @@ const ProlapseSection = () => {
           ].map((t, i) => (
             <Card key={i}>
               <div style={{ color: C.teal, fontWeight: 700, fontSize: 16, marginBottom: 4 }}>{t.label}</div>
-              <div style={{ color: C.slate, fontSize: 16, lineHeight: 1.6 }}>{t.desc}</div>
+              <div style={{ color: C.slate, fontSize: 17, lineHeight: 1.6 }}>{t.desc}</div>
             </Card>
           ))}
           <Card style={{ background: C.coralLt, borderColor: `${C.coral}44` }}>
-            <div style={{ color: C.coral, fontWeight: 700, fontSize: 16, marginBottom: 4 }}>📸 Photo Guidance</div>
-            <div style={{ color: C.navy, fontSize: 16, lineHeight: 1.6 }}>If you have external prolapse, consider taking a photo when tissue is out and bringing it to your appointment. Look for concentric rings (full-thickness prolapse) vs. radial folds (mucosal prolapse). This helps your surgeon significantly.</div>
+            <div style={{ color: C.coral, fontWeight: 700, fontSize: 17, marginBottom: 4 }}>📸 Photo Guidance</div>
+            <div style={{ color: C.navy, fontSize: 17, lineHeight: 1.6 }}>If you have external prolapse, consider taking a photo when tissue is out and bringing it to your appointment. Look for concentric rings (full-thickness prolapse) vs. radial folds (mucosal prolapse). This helps your surgeon significantly.</div>
           </Card>
           <div style={{ color: C.muted, fontSize: 16, textAlign: "center" }}>This app does not recommend specific treatments. Your healthcare team will work with you to find the approach that fits your situation.</div>
         </div>
@@ -411,7 +418,7 @@ const SYMPTOMS = [
   },
 ];
 
-const SymptomsSection = () => {
+const SymptomsSection = ({ speak, stop, speaking }) => {
   const [open, setOpen] = useState(null);
   return (
     <div>
@@ -422,22 +429,22 @@ const SymptomsSection = () => {
           <button onClick={() => setOpen(open === s.id ? null : s.id)}
                         style={{ background: open === s.id ? C.tealLight : C.card, border: `1.5px solid ${open === s.id ? C.teal : C.border}` }}>
             <span style={{ fontSize: 24 }}>{s.icon}</span>
-            <span style={{ color: C.navy, fontWeight: 600, fontSize: 16, flex: 1 }}>{s.label}</span>
+            <span style={{ color: C.navy, fontWeight: 600, fontSize: 17, flex: 1 }}>{s.label}</span>
             <span style={{ color: C.muted, fontSize: 18 }}>{open === s.id ? "▲" : "▼"}</span>
           </button>
           {open === s.id && (
             <Card style={{ marginTop: -8, marginBottom: 16, borderTopLeftRadius: 0, borderTopRightRadius: 0 }}>
               <div style={{ color: C.slate, fontSize: 16, lineHeight: 1.7, marginBottom: 12 }}>{s.desc}</div>
-              <div style={{ color: C.navy, fontWeight: 700, fontSize: 16, marginBottom: 4 }}>Why it happens</div>
-              <div style={{ color: C.slate, fontSize: 16, lineHeight: 1.6, marginBottom: 12 }}>{s.why}</div>
-              <div style={{ color: C.navy, fontWeight: 700, fontSize: 16, marginBottom: 4 }}>Lifestyle factors</div>
-              <div style={{ color: C.slate, fontSize: 16, lineHeight: 1.6, marginBottom: 12 }}>{s.lifestyle}</div>
+              <div style={{ color: C.navy, fontWeight: 700, fontSize: 17, marginBottom: 4 }}>Why it happens</div>
+              <div style={{ color: C.slate, fontSize: 17, lineHeight: 1.6, marginBottom: 12 }}>{s.why}</div>
+              <div style={{ color: C.navy, fontWeight: 700, fontSize: 17, marginBottom: 4 }}>Lifestyle factors</div>
+              <div style={{ color: C.slate, fontSize: 17, lineHeight: 1.6, marginBottom: 12 }}>{s.lifestyle}</div>
               {s.animationId && <VimeoEmbed videoId={s.animationId} title={s.animationTitle} />}
               <div  style={{ background: s.redFlag ? C.redLt : C.warnLt, border: `1px solid ${s.redFlag ? C.red : C.warn}44` }}>
-                <div style={{ color: s.redFlag ? C.red : C.coral, fontWeight: 700, fontSize: 16, marginBottom: 4 }}>
+                <div style={{ color: s.redFlag ? C.red : C.coral, fontWeight: 700, fontSize: 17, marginBottom: 4 }}>
                   {s.redFlag ? "🚨 When to seek care — promptly" : "🩺 When to call your doctor"}
                 </div>
-                <div style={{ color: C.navy, fontSize: 16, lineHeight: 1.6 }}>{s.doctor}</div>
+                <div style={{ color: C.navy, fontSize: 17, lineHeight: 1.6 }}>{s.doctor}</div>
               </div>
             </Card>
           )}
@@ -481,7 +488,7 @@ const IMAGING = [
   { id: "transit", icon: "⏱️", label: "Colonic Transit Study", what: "A test measuring how long it takes stool to move through the colon.", why: "To determine whether slow colonic transit is contributing to constipation.", what_happens: "Sitz Marker Study: swallow a capsule with tiny radio-opaque markers; an X-ray is taken several days later to see where they are. SmartPill: a swallowable wireless capsule that transmits motility data as it travels through the GI tract.", prep: "You may need to stop laxatives and certain medications for several days. Follow your team's instructions carefully.", expect: "Straightforward. Beyond swallowing the capsule, the study itself requires no procedures." },
 ];
 
-const ImagingSection = () => {
+const ImagingSection = ({ speak, stop, speaking }) => {
   const [open, setOpen] = useState(null);
   const [probeOpen, setProbeOpen] = useState(null);
   return (
@@ -502,27 +509,27 @@ const ImagingSection = () => {
                 <div>
                   <div style={{ marginBottom: 12 }}>
                     <div style={{ color: C.teal, fontWeight: 700, fontSize: 16, textTransform: "uppercase", letterSpacing: 0.5, marginBottom: 2 }}>What it is</div>
-                    <div style={{ color: C.navy, fontSize: 16, lineHeight: 1.6 }}>{s.what}</div>
+                    <div style={{ color: C.navy, fontSize: 17, lineHeight: 1.6 }}>{s.what}</div>
                   </div>
                   <div style={{ marginBottom: 16 }}>
                     <div style={{ color: C.teal, fontWeight: 700, fontSize: 16, textTransform: "uppercase", letterSpacing: 0.5, marginBottom: 2 }}>Why it's ordered</div>
-                    <div style={{ color: C.navy, fontSize: 16, lineHeight: 1.6 }}>{s.why}</div>
+                    <div style={{ color: C.navy, fontSize: 17, lineHeight: 1.6 }}>{s.why}</div>
                   </div>
-                  <div style={{ color: C.navy, fontWeight: 700, fontSize: 16, marginBottom: 10 }}>Three probe approaches — tap each to learn more:</div>
+                  <div style={{ color: C.navy, fontWeight: 700, fontSize: 17, marginBottom: 10 }}>Three probe approaches — tap each to learn more:</div>
                   {ULTRASOUND_PROBES.map(p => (
                     <div key={p.label}>
                       <button onClick={() => setProbeOpen(probeOpen === p.label ? null : p.label)}
                                                 style={{ background: probeOpen === p.label ? C.tealLight : C.bg, border: `1.5px solid ${probeOpen === p.label ? C.teal : C.border}`, minHeight: 54 }}>
                         <span style={{ fontSize: 18 }}>{p.icon}</span>
-                        <span style={{ color: C.navy, fontWeight: 600, fontSize: 16, flex: 1 }}>{p.label}</span>
+                        <span style={{ color: C.navy, fontWeight: 600, fontSize: 17, flex: 1 }}>{p.label}</span>
                         <span style={{ color: C.muted, fontSize: 14 }}>{probeOpen === p.label ? "▲" : "▼"}</span>
                       </button>
                       {probeOpen === p.label && (
                         <div  style={{ background: C.bg, border: `1px solid ${C.border}` }}>
                           {[["What it is", p.what], ["Why it's ordered", p.why], ["What to expect", p.expect]].map(([k, v]) => (
                             <div key={k} style={{ marginBottom: 12 }}>
-                              <div style={{ color: C.teal, fontWeight: 700, fontSize: 13, textTransform: "uppercase", letterSpacing: 0.5, marginBottom: 2 }}>{k}</div>
-                              <div style={{ color: C.navy, fontSize: 16, lineHeight: 1.6 }}>{v}</div>
+                              <div style={{ color: C.teal, fontWeight: 700, fontSize: 15, textTransform: "uppercase", letterSpacing: 0.5, marginBottom: 2 }}>{k}</div>
+                              <div style={{ color: C.navy, fontSize: 17, lineHeight: 1.6 }}>{v}</div>
                             </div>
                           ))}
                         </div>
@@ -534,7 +541,7 @@ const ImagingSection = () => {
                 [["What it is", s.what], ["Why it's ordered", s.why], ["What happens", s.what_happens], ["Preparation", s.prep], ["What to expect", s.expect]].map(([k, v]) => (
                   <div key={k} style={{ marginBottom: 12 }}>
                     <div style={{ color: C.teal, fontWeight: 700, fontSize: 16, textTransform: "uppercase", letterSpacing: 0.5, marginBottom: 2 }}>{k}</div>
-                    <div style={{ color: C.navy, fontSize: 16, lineHeight: 1.6 }}>{v}</div>
+                    <div style={{ color: C.navy, fontSize: 17, lineHeight: 1.6 }}>{v}</div>
                   </div>
                 ))
               )}
@@ -556,7 +563,7 @@ const LIFESTYLE_PILLARS = [
   { id: "social", icon: "🤝", label: "Social Connection", color: "#2980b9", desc: "Pelvic floor disorders cause shame and isolation. Meaningful connection is genuinely therapeutic.", tips: ["Many people with prolapse feel isolated — you are not alone", "Peer support groups exist for pelvic floor disorders and can be deeply validating", "Involving a trusted person (partner, friend, family member) in your care journey improves outcomes", "If symptoms are causing depression or anxiety, please tell your healthcare team — support is available"] },
 ];
 
-const LifestyleSection = () => {
+const LifestyleSection = ({ speak, stop, speaking }) => {
   const [open, setOpen] = useState(null);
   return (
     <div>
@@ -566,7 +573,7 @@ const LifestyleSection = () => {
         <strong>Bowel habit training tips:</strong> Use the gastrocolic reflex — try sitting on the toilet 20–30 minutes after breakfast. Don't ignore the urge. Limit toilet time to 5–10 minutes. Raise your knees with a step stool to relax the anorectal angle.
       </div>
       <VimeoEmbed videoId="1175949349" title="Constipation & Dyssynergic Defecation" />
-      <div style={{ color: C.navy, fontSize: 16, fontWeight: 700, marginBottom: 12, marginTop: 8 }}>The 6 Lifestyle Medicine Pillars</div>
+      <div style={{ color: C.navy, fontSize: 17, fontWeight: 700, marginBottom: 12, marginTop: 8 }}>The 6 Lifestyle Medicine Pillars</div>
       {LIFESTYLE_PILLARS.map(p => (
         <div key={p.id}>
           <button onClick={() => setOpen(open === p.id ? null : p.id)}
@@ -584,7 +591,7 @@ const LifestyleSection = () => {
               {p.tips.map((t, i) => (
                 <div key={i} style={{ display: "flex", gap: 8, marginBottom: 8 }}>
                   <div style={{ color: p.color, fontSize: 16, marginTop: 2, flexShrink: 0 }}>✓</div>
-                  <div style={{ color: C.slate, fontSize: 16, lineHeight: 1.6 }}>{t}</div>
+                  <div style={{ color: C.slate, fontSize: 17, lineHeight: 1.6 }}>{t}</div>
                 </div>
               ))}
             </Card>
@@ -593,7 +600,7 @@ const LifestyleSection = () => {
       ))}
       <Card style={{ background: C.tealLight }}>
         <div style={{ color: C.teal, fontWeight: 700, fontSize: 16, marginBottom: 6 }}>🏋️ Pelvic Floor Physical Therapy</div>
-        <div style={{ color: C.navy, fontSize: 16, lineHeight: 1.6 }}>
+        <div style={{ color: C.navy, fontSize: 17, lineHeight: 1.6 }}>
           PT is one of the most effective interventions for bowel and bladder dysfunction. Important: for some people the pelvic floor is too tight (not too weak) — a PT can assess your specific needs and give tailored exercises. Always ask for a referral if you haven't seen one.
         </div>
       </Card>
@@ -813,7 +820,7 @@ const YesNoGate = ({ question, value, onChange }) => (
     <div style={{ display: "flex", gap: 12 }}>
       {["yes","no"].map(v => (
         <button key={v} onClick={() => onChange(v)}
-                    style={{ background: value === v ? C.teal : C.tealLight, color: value === v ? "#fff" : C.navy, border: `1.5px solid ${value === v ? C.teal : C.border}`, fontWeight: 600, fontSize: 16, minHeight: 52 }}>
+                    style={{ background: value === v ? C.teal : C.tealLight, color: value === v ? "#fff" : C.navy, border: `1.5px solid ${value === v ? C.teal : C.border}`, fontWeight: 600, fontSize: 17, minHeight: 52 }}>
           {v === "yes" ? "YES" : "NO"}
         </button>
       ))}
@@ -822,7 +829,7 @@ const YesNoGate = ({ question, value, onChange }) => (
 );
 
 const SubLabel = ({ text }) => (
-  <div style={{ color: C.teal, fontWeight: 700, fontSize: 13, textTransform: "uppercase", letterSpacing: 0.5, marginBottom: 6, marginTop: 14 }}>{text}</div>
+  <div style={{ color: C.teal, fontWeight: 700, fontSize: 15, textTransform: "uppercase", letterSpacing: 0.5, marginBottom: 6, marginTop: 14 }}>{text}</div>
 );
 
 // ─── IMPACT SURVEY COMPONENT ─────────────────────────────────────────────────
@@ -895,13 +902,13 @@ const IMPACTSurvey = ({ onComplete }) => {
     <div>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
         <div style={{ color: C.muted, fontSize: 12 }}>Question {step} of {totalSteps}</div>
-        <div  style={{ background: C.tealLight, color: C.teal, fontSize: 13, fontWeight: 700 }}>IMPACT Bowel Survey</div>
+        <div  style={{ background: C.tealLight, color: C.teal, fontSize: 15, fontWeight: 700 }}>IMPACT Bowel Survey</div>
       </div>
       <ProgressBar value={step} max={totalSteps} />
 
       {step === 1 && (
         <Card>
-          <div style={{ color: C.navy, fontWeight: 700, fontSize: 16, marginBottom: 4 }}>Q1. What does your stool usually look like?</div>
+          <div style={{ color: C.navy, fontWeight: 700, fontSize: 17, marginBottom: 4 }}>Q1. What does your stool usually look like?</div>
           <div style={{ color: C.muted, fontSize: 16, marginBottom: 12 }}>Please think about your typical bowel movements over the last 3 months.</div>
           {BRISTOL_TYPES.map(t => (
             <OptBtn key={t.type} label={`${t.label}: ${t.desc}`} selected={ans.bristol === t.type} onClick={() => set("bristol", t.type)} />
@@ -911,7 +918,7 @@ const IMPACTSurvey = ({ onComplete }) => {
 
       {step === 2 && (
         <Card>
-          <div style={{ color: C.navy, fontWeight: 700, fontSize: 16, marginBottom: 4 }}>Q2. How often do you have an uncomfortable or difficult bowel movement?</div>
+          <div style={{ color: C.navy, fontWeight: 700, fontSize: 17, marginBottom: 4 }}>Q2. How often do you have an uncomfortable or difficult bowel movement?</div>
           <div style={{ color: C.muted, fontSize: 16, marginBottom: 12 }}>During a typical month.</div>
           {[
             { label: "Never", value: "never" },
@@ -926,7 +933,7 @@ const IMPACTSurvey = ({ onComplete }) => {
 
       {step === 3 && (
         <Card>
-          <div style={{ color: C.navy, fontWeight: 700, fontSize: 16, marginBottom: 4 }}>Q3. Do you have difficulty with infrequent bowel movements?</div>
+          <div style={{ color: C.navy, fontWeight: 700, fontSize: 17, marginBottom: 4 }}>Q3. Do you have difficulty with infrequent bowel movements?</div>
           <div style={{ color: C.muted, fontSize: 16, marginBottom: 12 }}>(Less than 1 bowel movement every 3 days)</div>
           <YesNoGate question="" value={ans.q3} onChange={v => set("q3", v)} />
           {ans.q3 === "yes" && (
@@ -944,7 +951,7 @@ const IMPACTSurvey = ({ onComplete }) => {
 
       {step === 4 && (
         <Card>
-          <div style={{ color: C.navy, fontWeight: 700, fontSize: 16, marginBottom: 12 }}>Q4. Do you ever lack the urge to have a bowel movement?</div>
+          <div style={{ color: C.navy, fontWeight: 700, fontSize: 17, marginBottom: 12 }}>Q4. Do you ever lack the urge to have a bowel movement?</div>
           <YesNoGate question="" value={ans.q4} onChange={v => set("q4", v)} />
           {ans.q4 === "yes" && (
             <div>
@@ -959,7 +966,7 @@ const IMPACTSurvey = ({ onComplete }) => {
 
       {step === 5 && (
         <Card>
-          <div style={{ color: C.navy, fontWeight: 700, fontSize: 16, marginBottom: 12 }}>Q5. Do you feel you need to strain too hard to have a bowel movement?</div>
+          <div style={{ color: C.navy, fontWeight: 700, fontSize: 17, marginBottom: 12 }}>Q5. Do you feel you need to strain too hard to have a bowel movement?</div>
           <YesNoGate question="" value={ans.q5} onChange={v => set("q5", v)} />
           {ans.q5 === "yes" && (
             <div>
@@ -976,7 +983,7 @@ const IMPACTSurvey = ({ onComplete }) => {
 
       {step === 6 && (
         <Card>
-          <div style={{ color: C.navy, fontWeight: 700, fontSize: 16, marginBottom: 12 }}>Q6. Do you feel you have not completely emptied your bowels after a bowel movement?</div>
+          <div style={{ color: C.navy, fontWeight: 700, fontSize: 17, marginBottom: 12 }}>Q6. Do you feel you have not completely emptied your bowels after a bowel movement?</div>
           <YesNoGate question="" value={ans.q6} onChange={v => set("q6", v)} />
           {ans.q6 === "yes" && (
             <div>
@@ -993,14 +1000,14 @@ const IMPACTSurvey = ({ onComplete }) => {
 
       {step === 7 && (
         <Card>
-          <div style={{ color: C.navy, fontWeight: 700, fontSize: 16, marginBottom: 4 }}>Q7. Do you sometimes have symptoms of constipation?</div>
+          <div style={{ color: C.navy, fontWeight: 700, fontSize: 17, marginBottom: 4 }}>Q7. Do you sometimes have symptoms of constipation?</div>
           <div style={{ color: C.muted, fontSize: 16, marginBottom: 12 }}>If yes, please rate how severe these have been in the past 2 weeks.</div>
           <YesNoGate question="" value={ans.q7} onChange={v => set("q7", v)} />
           {ans.q7 === "yes" && (
             <div>
               {CONSTIP_ITEMS.map(it => (
                 <div key={it.key} style={{ marginBottom: 16 }}>
-                  <div style={{ color: C.navy, fontSize: 16, fontWeight: 600, marginBottom: 6 }}>{it.label}</div>
+                  <div style={{ color: C.navy, fontSize: 17, fontWeight: 600, marginBottom: 6 }}>{it.label}</div>
                   <div >
                     {SEV_4.map(o => (
                       <button key={o.value} onClick={() => set(it.key, o.value)}
@@ -1018,13 +1025,13 @@ const IMPACTSurvey = ({ onComplete }) => {
 
       {step === 8 && (
         <Card>
-          <div style={{ color: C.navy, fontWeight: 700, fontSize: 16, marginBottom: 12 }}>Q8. Do you sometimes have accidental gas or bowel leakage?</div>
+          <div style={{ color: C.navy, fontWeight: 700, fontSize: 17, marginBottom: 12 }}>Q8. Do you sometimes have accidental gas or bowel leakage?</div>
           <YesNoGate question="" value={ans.q8} onChange={v => set("q8", v)} />
           {ans.q8 === "yes" && (
             <div>
               <Callout body="Many people with pelvic floor conditions experience some leakage. Your honest answers help your team understand your needs." icon="💙" />
 
-              <div style={{ color: C.navy, fontWeight: 600, fontSize: 16, marginBottom: 6, marginTop: 8 }}>8A. Do you usually lose well-formed stool beyond your control?</div>
+              <div style={{ color: C.navy, fontWeight: 600, fontSize: 17, marginBottom: 6, marginTop: 8 }}>8A. Do you usually lose well-formed stool beyond your control?</div>
               <YesNoGate question="" value={ans.q8a} onChange={v => set("q8a", v)} />
               {ans.q8a === "yes" && (
                 <div style={{ paddingLeft: 8, borderLeft: `3px solid ${C.teal}`, marginBottom: 12 }}>
@@ -1037,7 +1044,7 @@ const IMPACTSurvey = ({ onComplete }) => {
                 </div>
               )}
 
-              <div style={{ color: C.navy, fontWeight: 600, fontSize: 16, marginBottom: 6 }}>8B. Do you usually lose loose or liquid stool beyond your control?</div>
+              <div style={{ color: C.navy, fontWeight: 600, fontSize: 17, marginBottom: 6 }}>8B. Do you usually lose loose or liquid stool beyond your control?</div>
               <YesNoGate question="" value={ans.q8b} onChange={v => set("q8b", v)} />
               {ans.q8b === "yes" && (
                 <div style={{ paddingLeft: 8, borderLeft: `3px solid ${C.teal}`, marginBottom: 12 }}>
@@ -1050,7 +1057,7 @@ const IMPACTSurvey = ({ onComplete }) => {
                 </div>
               )}
 
-              <div style={{ color: C.navy, fontWeight: 600, fontSize: 16, marginBottom: 6 }}>8C. Do you usually lose gas from the rectum beyond your control?</div>
+              <div style={{ color: C.navy, fontWeight: 600, fontSize: 17, marginBottom: 6 }}>8C. Do you usually lose gas from the rectum beyond your control?</div>
               <YesNoGate question="" value={ans.q8c} onChange={v => set("q8c", v)} />
               {ans.q8c === "yes" && (
                 <div style={{ paddingLeft: 8, borderLeft: `3px solid ${C.teal}`, marginBottom: 12 }}>
@@ -1067,7 +1074,7 @@ const IMPACTSurvey = ({ onComplete }) => {
 
       {step === 9 && (
         <Card>
-          <div style={{ color: C.navy, fontWeight: 700, fontSize: 16, marginBottom: 12 }}>Q9. Do you experience a strong sense of urgency and have to rush to the bathroom for a bowel movement?</div>
+          <div style={{ color: C.navy, fontWeight: 700, fontSize: 17, marginBottom: 12 }}>Q9. Do you experience a strong sense of urgency and have to rush to the bathroom for a bowel movement?</div>
           <YesNoGate question="" value={ans.q9} onChange={v => set("q9", v)} />
           {ans.q9 === "yes" && (
             <div>
@@ -1080,7 +1087,7 @@ const IMPACTSurvey = ({ onComplete }) => {
 
       {step === 10 && (
         <Card>
-          <div style={{ color: C.navy, fontWeight: 700, fontSize: 16, marginBottom: 12 }}>Q10. Do you usually have pain when you pass your stool?</div>
+          <div style={{ color: C.navy, fontWeight: 700, fontSize: 17, marginBottom: 12 }}>Q10. Do you usually have pain when you pass your stool?</div>
           <YesNoGate question="" value={ans.q10} onChange={v => set("q10", v)} />
           {ans.q10 === "yes" && (
             <div>
@@ -1103,7 +1110,7 @@ const IMPACTSurvey = ({ onComplete }) => {
 
       {step === 11 && (
         <Card>
-          <div style={{ color: C.navy, fontWeight: 700, fontSize: 16, marginBottom: 4 }}>Q11. Does part of your bowel ever pass through the rectum and bulge outside during or after a bowel movement?</div>
+          <div style={{ color: C.navy, fontWeight: 700, fontSize: 17, marginBottom: 4 }}>Q11. Does part of your bowel ever pass through the rectum and bulge outside during or after a bowel movement?</div>
           <div style={{ color: C.muted, fontSize: 16, marginBottom: 12 }}>This is known as rectal prolapse — tissue that comes out of the rectum.</div>
           <YesNoGate question="" value={ans.q11} onChange={v => set("q11", v)} />
           {ans.q11 === "yes" && (
@@ -1117,7 +1124,7 @@ const IMPACTSurvey = ({ onComplete }) => {
 
       {step === 12 && (
         <Card>
-          <div style={{ color: C.navy, fontWeight: 700, fontSize: 16, marginBottom: 4 }}>Q12. During the past month, how often have you had bleeding during or after a bowel movement?</div>
+          <div style={{ color: C.navy, fontWeight: 700, fontSize: 17, marginBottom: 4 }}>Q12. During the past month, how often have you had bleeding during or after a bowel movement?</div>
           <div style={{ color: C.muted, fontSize: 16, marginBottom: 12 }}>Due to your bowel habits.</div>
           {BLEED_FREQ.map(o => <OptBtn key={o.value} label={o.label} selected={ans.q12 === o.value} onClick={() => set("q12", o.value)} />)}
           {ans.q12 && ans.q12 !== "never" && (
@@ -1127,7 +1134,7 @@ const IMPACTSurvey = ({ onComplete }) => {
       )}
 
       <button onClick={next} disabled={!canProceed()}
-                style={{ background: canProceed() ? C.teal : C.border, color: "#fff", border: "none", fontSize: 16, opacity: canProceed() ? 1 : 0.5 }}>
+                style={{ background: canProceed() ? C.teal : C.border, color: "#fff", border: "none", fontSize: 17, opacity: canProceed() ? 1 : 0.5 }}>
         {step < totalSteps ? "Next question →" : "Complete survey ✓"}
       </button>
       {step > 1 && (
@@ -1148,8 +1155,8 @@ const DomainBar = ({ label, icon, score, detail }) => {
   return (
     <div style={{ marginBottom: 16 }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 }}>
-        <div style={{ color: C.navy, fontSize: 16, fontWeight: 600 }}>{icon} {label}</div>
-        <div style={{ borderRadius: 20, padding: "3px 10px", background: band.bg, color: band.color, fontSize: 13, fontWeight: 700 }}>{band.label}</div>
+        <div style={{ color: C.navy, fontSize: 17, fontWeight: 600 }}>{icon} {label}</div>
+        <div style={{ borderRadius: 20, padding: "3px 10px", background: band.bg, color: band.color, fontSize: 15, fontWeight: 700 }}>{band.label}</div>
       </div>
       <div style={{ height: 10, background: C.border, borderRadius: 5, overflow: "hidden", marginBottom: 4 }}>
         <div style={{ width: `${pct}%`, height: "100%", background: band.color, borderRadius: 5, transition: "width 0.5s" }} />
@@ -1175,11 +1182,11 @@ const IMPACTResults = ({ ans, onRetake }) => {
 
       {/* Bristol stool type */}
       <Card style={{ border: `2px solid ${bristol?.color || C.border}` }}>
-        <div style={{ color: C.muted, fontSize: 13, textTransform: "uppercase", letterSpacing: 0.5, marginBottom: 4 }}>Stool Type (Bristol Scale)</div>
-        <div style={{ color: bristol?.color || C.navy, fontWeight: 700, fontSize: 16, marginBottom: 4 }}>
+        <div style={{ color: C.muted, fontSize: 15, textTransform: "uppercase", letterSpacing: 0.5, marginBottom: 4 }}>Stool Type (Bristol Scale)</div>
+        <div style={{ color: bristol?.color || C.navy, fontWeight: 700, fontSize: 17, marginBottom: 4 }}>
           Type {ans.bristol} — {BRISTOL_TYPES.find(t => t.type === ans.bristol)?.desc}
         </div>
-        {bristol && <div style={{ color: C.slate, fontSize: 16, lineHeight: 1.5 }}>{bristol.note}</div>}
+        {bristol && <div style={{ color: C.slate, fontSize: 17, lineHeight: 1.5 }}>{bristol.note}</div>}
       </Card>
 
       {/* Domain bother scores — visual bars */}
@@ -1196,7 +1203,7 @@ const IMPACTResults = ({ ans, onRetake }) => {
           <DomainBar label="Urgency" icon="⚡" score={urgScore} />
           <DomainBar label="Rectal / Anal Pain" icon="😣" score={painScore} />
           <DomainBar label="Prolapse Sensation" icon="⬇️" score={prolapseScore} />
-          <div style={{ color: C.muted, fontSize: 13, marginTop: 8, lineHeight: 1.5 }}>
+          <div style={{ color: C.muted, fontSize: 15, marginTop: 8, lineHeight: 1.5 }}>
             These domain scores are based on your bother ratings. They are not diagnostic — share them with your healthcare team.
           </div>
         </Card>
@@ -1206,8 +1213,8 @@ const IMPACTResults = ({ ans, onRetake }) => {
       {hasLeakage && (
         <Card style={{ border: `2px solid ${C.coral}` }}>
           <div style={{ color: C.coral, fontWeight: 700, fontSize: 16, marginBottom: 6 }}>💧 Leakage Detail</div>
-          {ans.q8a === "yes" && <div style={{ color: C.navy, fontSize: 16, marginBottom: 4 }}>• Solid stool — {ans.q8a_freq} / bother: {ans.q8a_bother}</div>}
-          {ans.q8b === "yes" && <div style={{ color: C.navy, fontSize: 16, marginBottom: 4 }}>• Liquid stool — {ans.q8b_freq} / bother: {ans.q8b_bother}</div>}
+          {ans.q8a === "yes" && <div style={{ color: C.navy, fontSize: 17, marginBottom: 4 }}>• Solid stool — {ans.q8a_freq} / bother: {ans.q8a_bother}</div>}
+          {ans.q8b === "yes" && <div style={{ color: C.navy, fontSize: 17, marginBottom: 4 }}>• Liquid stool — {ans.q8b_freq} / bother: {ans.q8b_bother}</div>}
           {ans.q8c === "yes" && <div style={{ color: C.navy, fontSize: 13 }}>• Gas — {ans.q8c_freq} / bother: {ans.q8c_bother}</div>}
         </Card>
       )}
@@ -1216,18 +1223,18 @@ const IMPACTResults = ({ ans, onRetake }) => {
       {ans.q12 && ans.q12 !== "never" && (
         <Card style={{ border: `2px solid ${C.red}` }}>
           <div style={{ color: C.red, fontWeight: 700, fontSize: 16, marginBottom: 4 }}>🩸 Rectal Bleeding</div>
-          <div style={{ color: C.navy, fontSize: 16, marginBottom: 6 }}>Frequency: {ans.q12}</div>
-          <div style={{ color: C.red, fontSize: 16, fontWeight: 600 }}>Please make sure to mention this to your healthcare team at your appointment.</div>
+          <div style={{ color: C.navy, fontSize: 17, marginBottom: 6 }}>Frequency: {ans.q12}</div>
+          <div style={{ color: C.red, fontSize: 17, fontWeight: 600 }}>Please make sure to mention this to your healthcare team at your appointment.</div>
         </Card>
       )}
 
       {/* Summary for team */}
       <Card style={{ background: C.tealLight, border: `2px solid ${C.teal}` }}>
         <div style={{ color: C.teal, fontWeight: 700, fontSize: 16, marginBottom: 6 }}>💬 Summary for your healthcare team</div>
-        <div style={{ color: C.navy, fontSize: 16, lineHeight: 1.6 }}>{summaryText}</div>
+        <div style={{ color: C.navy, fontSize: 17, lineHeight: 1.6 }}>{summaryText}</div>
       </Card>
 
-      <div style={{ color: C.muted, fontSize: 13, textAlign: "center", marginBottom: 12 }}>
+      <div style={{ color: C.muted, fontSize: 15, textAlign: "center", marginBottom: 12 }}>
         IMPACT Bowel Function Short Form — Endorsed by ASCRS, AUGS, ICS, SUFU (Bordeianou et al., Dis Colon Rectum 2020)
       </div>
 
@@ -1254,154 +1261,303 @@ const CalculatorShell = ({ title, total, max, children }) => (
 const ScoreResult = ({ label, score, max, band, msg }) => (
   <Card style={{ background: C.tealLight, border: `2px solid ${band.color}` }}>
     <div style={{ textAlign: "center", marginBottom: 12 }}>
-      <div style={{ color: C.muted, fontSize: 16, marginBottom: 4 }}>{label}</div>
+      <div style={{ color: C.muted, fontSize: 17, marginBottom: 4 }}>{label}</div>
       <div style={{ color: band.color, fontSize: 48, fontWeight: 900, lineHeight: 1 }}>{score}</div>
       <div style={{ color: C.muted, fontSize: 12 }}>out of {max}</div>
       <div style={{ display: "inline-block", borderRadius: 20, padding: "4px 12px", marginTop: 8 }} style={{ background: band.color, color: "#fff", fontSize: 16, fontWeight: 700 }}>{band.label}</div>
     </div>
-    <div style={{ color: C.navy, fontSize: 16, lineHeight: 1.6, marginBottom: 10 }}>{msg}</div>
+    <div style={{ color: C.navy, fontSize: 17, lineHeight: 1.6, marginBottom: 10 }}>{msg}</div>
     <Callout icon="💬" body="This score is a starting point for conversation — not a diagnosis. Share it with your healthcare team." color={C.slate} bg="#f0f4f8" />
   </Card>
 );
 
+// ── VERTICAL STEPPER ─────────────────────────────────────────────────────────
+const StepHeader = ({ number, title, subtitle, done, active, onClick }) => (
+  <button
+    onClick={onClick}
+    style={{
+      width: "100%", textAlign: "left", background: "none", border: "none",
+      display: "flex", alignItems: "flex-start", gap: 16, padding: "12px 0",
+      cursor: "pointer",
+    }}>
+    <div style={{
+      width: 40, height: 40, borderRadius: "50%", flexShrink: 0,
+      background: done ? C.teal : active ? C.teal : C.border,
+      color: done || active ? "#fff" : C.muted,
+      display: "flex", alignItems: "center", justifyContent: "center",
+      fontSize: done ? 18 : 17, fontWeight: 700,
+    }}>
+      {done ? "✓" : number}
+    </div>
+    <div style={{ flex: 1, paddingTop: 4 }}>
+      <div style={{ color: active || done ? C.navy : C.muted, fontWeight: 700, fontSize: 17, lineHeight: 1.2 }}>{title}</div>
+      {subtitle && <div style={{ color: C.muted, fontSize: 14, marginTop: 3 }}>{subtitle}</div>}
+    </div>
+  </button>
+);
+
+const StepConnector = ({ done }) => (
+  <div style={{ width: 40, display: "flex", justifyContent: "center", marginLeft: 0, flexShrink: 0 }}>
+    <div style={{ width: 2, height: 16, background: done ? C.teal : C.border }} />
+  </div>
+);
+
+// Large tap-friendly option card
+const OptionCard = ({ label, selected, onClick, color = C.teal }) => (
+  <button
+    onClick={onClick}
+    style={{
+      width: "100%", textAlign: "left", border: `2px solid ${selected ? color : C.border}`,
+      borderRadius: 14, padding: "16px 18px", marginBottom: 10,
+      background: selected ? (color === C.teal ? C.tealLight : C.coralLt) : C.card,
+      display: "flex", alignItems: "center", gap: 14, minHeight: 60,
+      cursor: "pointer",
+    }}>
+    <div style={{
+      width: 26, height: 26, borderRadius: "50%", flexShrink: 0,
+      border: `2.5px solid ${selected ? color : C.border}`,
+      background: selected ? color : "transparent",
+      display: "flex", alignItems: "center", justifyContent: "center",
+    }}>
+      {selected && <span style={{ color: "#fff", fontSize: 14, fontWeight: 700 }}>✓</span>}
+    </div>
+    <span style={{ color: C.navy, fontSize: 16, lineHeight: 1.4, flex: 1 }}>{label}</span>
+  </button>
+);
+
+// Large tap-friendly checkbox card
+const CheckCard = ({ label, checked, onClick, color = C.teal }) => (
+  <button
+    onClick={onClick}
+    style={{
+      width: "100%", textAlign: "left", border: `2px solid ${checked ? color : C.border}`,
+      borderRadius: 14, padding: "16px 18px", marginBottom: 10,
+      background: checked ? (color === C.teal ? C.tealLight : C.coralLt) : C.card,
+      display: "flex", alignItems: "center", gap: 14, minHeight: 60,
+      cursor: "pointer",
+    }}>
+    <div style={{
+      width: 26, height: 26, borderRadius: 6, flexShrink: 0,
+      border: `2.5px solid ${checked ? color : C.border}`,
+      background: checked ? color : "transparent",
+      display: "flex", alignItems: "center", justifyContent: "center",
+    }}>
+      {checked && <span style={{ color: "#fff", fontSize: 14, fontWeight: 700 }}>✓</span>}
+    </div>
+    <span style={{ color: C.navy, fontSize: 16, lineHeight: 1.4, flex: 1 }}>{label}</span>
+  </button>
+);
+
 const CalculatorsSection = ({ scores, setScores, primarySymptom, setPrimarySymptom }) => {
-  const [active, setActive] = useState("primary");
-  const [impactAnswers, setImpactAnswers] = useState(null); // null = not started, {} = in progress, completed = has answers
+  const [step, setStep] = useState(1); // 1=symptom, 2=survey, 3=surgical, 4=recurrence
+  const [impactAnswers, setImpactAnswers] = useState(null);
   const [impactDone, setImpactDone] = useState(false);
   const [surgRisk, setSurgRisk] = useState([]);
   const [recRisk, setRecRisk] = useState([]);
 
-  const SURG_RISKS = ["Age over 75", "Active heart disease or recent cardiac event", "Poorly controlled diabetes", "BMI over 35", "Active smoking", "Severe lung disease (COPD, requiring oxygen)", "Kidney disease", "Prior pelvic or abdominal radiation", "Blood thinning medications", "Prior abdominal surgery with complications"];
+  const SURG_RISKS = [
+    "Age over 75",
+    "Active heart disease or recent cardiac event",
+    "Poorly controlled diabetes",
+    "BMI over 35",
+    "Active smoking",
+    "Severe lung disease (COPD, requiring oxygen)",
+    "Kidney disease",
+    "Prior pelvic or abdominal radiation",
+    "Blood thinning medications",
+    "Prior abdominal surgery with complications",
+  ];
+
   const REC_RISKS = [
     { id: "prior", label: "Prior rectal prolapse repair", why: "Previous repair is one of the strongest predictors of recurrence. Scar tissue affects tissue quality and repair durability." },
     { id: "age80", label: "Age over 80", why: "Connective tissue weakens with age; supporting structures are less able to hold a repair long-term." },
-    { id: "hypermobility", label: "Connective tissue disorder / joint hypermobility", why: "People with generalized connective tissue laxity (Ehlers-Danlos, etc.) have higher recurrence risk — not due to anything they did, but a biological difference in tissue quality." },
-    { id: "straining", label: "Chronic straining / constipation", why: "Ongoing straining puts direct mechanical pressure on the surgical site. This is one of the most modifiable recurrence risk factors. Optimizing bowel habits before surgery significantly improves outcomes." },
-    { id: "obesity", label: "BMI ≥ 30", why: "Excess intra-abdominal pressure works against the repair over time. Even modest weight loss before surgery can meaningfully reduce pressure." },
+    { id: "hypermobility", label: "Connective tissue disorder / joint hypermobility", why: "People with generalized connective tissue laxity (Ehlers-Danlos, etc.) have higher recurrence risk — not due to biology they can control, but tissue quality." },
+    { id: "straining", label: "Chronic straining / constipation", why: "⭐ Modifiable. Optimizing bowel habits before surgery significantly improves outcomes." },
+    { id: "obesity", label: "BMI ≥ 30", why: "⭐ Modifiable. Even modest weight loss can meaningfully reduce intra-abdominal pressure on the repair." },
   ];
 
   const SYMPTOM_OPTS = [
-    { id: "incontinence", label: "💧 Leakage or inability to control stool or gas (fecal incontinence)" },
-    { id: "ods", label: "🚽 Difficulty emptying / straining / incomplete evacuation (obstructed defecation)" },
-    { id: "constipation", label: "📉 Infrequent bowel movements / constipation" },
-    { id: "prolapse", label: "⬇️ Sensation of bulging, pressure, or tissue coming out" },
-    { id: "multiple", label: "⚖️ Multiple symptoms equally — hard to pick one" },
+    { id: "incontinence", label: "Leakage or inability to control stool or gas" },
+    { id: "ods", label: "Difficulty emptying / straining / incomplete evacuation" },
+    { id: "constipation", label: "Infrequent bowel movements / constipation" },
+    { id: "prolapse", label: "Sensation of bulging, pressure, or tissue coming out" },
+    { id: "multiple", label: "Multiple symptoms equally — hard to pick one" },
   ];
 
-  const tabs = [
-    { id: "primary", label: "Primary Symptom" },
-    { id: "impact", label: "Bowel Survey" },
-    { id: "surgical", label: "Surgical Risk" },
-    { id: "recurrence", label: "Recurrence Risk" },
-  ];
+  const sympDone = !!primarySymptom;
+  const surveyDone = impactDone;
+  const surgDone = surgRisk.length > 0 || step > 3;
+  const recDone = recRisk.length > 0 || step > 4;
 
   const handleImpactComplete = (ans) => {
     setImpactAnswers(ans);
     setImpactDone(true);
     setScores(prev => ({ ...prev, impact: ans, impactDone: true }));
+    setStep(3);
   };
+
+  const sympCallout = primarySymptom === "incontinence"
+    ? "Leakage symptoms respond well to surgical repair — an important point for your pre-op conversation."
+    : primarySymptom === "ods" || primarySymptom === "constipation"
+    ? "Constipation and difficult evacuation improve in ~60–70% of patients after repair. A frank conversation about expectations is essential."
+    : primarySymptom === "prolapse"
+    ? "Surgical repair directly addresses the structural problem. Functional symptoms may follow their own trajectory."
+    : "You're experiencing several symptoms. The survey will capture your full picture.";
 
   return (
     <div>
-      <SectionHeader title="My Symptom Scores" subtitle="These validated tools help you and your team understand your symptoms." />
-      <Callout icon="📋" body="Complete these questionnaires before your appointment. Your answers give your healthcare team a clear, objective picture of your symptom burden — and help you have a more productive conversation." />
-      <TabBar tabs={tabs} active={active} onChange={setActive} />
+      <SectionHeader title="My Symptom Scores" subtitle="Complete each step before your appointment." />
+      <Callout icon="📋" body="Your answers give your healthcare team a clear picture of your symptoms — and help you have a more productive conversation." />
 
-      {active === "primary" && (
-        <div>
-          <div style={{ color: C.navy, fontWeight: 700, fontSize: 16, marginBottom: 8 }}>What bothers you most?</div>
-          <div style={{ color: C.slate, fontSize: 16, lineHeight: 1.6, marginBottom: 16 }}>
-            Before completing the questionnaires, it helps to identify which symptom is affecting your quality of life the most. Your most bothersome symptom matters — especially if you're considering surgery.
+      {/* ── STEP 1: PRIMARY SYMPTOM ── */}
+      <div style={{ display: "flex", gap: 0 }}>
+        <div style={{ display: "flex", flexDirection: "column", alignItems: "center", width: 40, flexShrink: 0 }}>
+          <div style={{ width: 40, height: 40, borderRadius: "50%", background: sympDone ? C.teal : step === 1 ? C.teal : C.border, color: sympDone || step === 1 ? "#fff" : C.muted, display: "flex", alignItems: "center", justifyContent: "center", fontSize: sympDone ? 18 : 17, fontWeight: 700, flexShrink: 0 }}>
+            {sympDone ? "✓" : "1"}
           </div>
-          {SYMPTOM_OPTS.map(o => (
-            <button key={o.id} onClick={() => setPrimarySymptom(o.id)}
-                            style={{ background: primarySymptom === o.id ? C.tealLight : C.card, border: `2px solid ${primarySymptom === o.id ? C.teal : C.border}` }}>
-              <div  style={{ width: 22, height: 22, border: `2px solid ${primarySymptom === o.id ? C.teal : C.border}`, background: primarySymptom === o.id ? C.teal : "transparent" }} />
-              <span style={{ color: C.navy, fontSize: 16, lineHeight: 1.4 }}>{o.label}</span>
-            </button>
-          ))}
-          {primarySymptom && (
-            <Callout icon="💡" title="Why this matters" color={C.teal} bg={C.tealLight} body={
-              primarySymptom === "incontinence" ? "Leakage and incontinence symptoms have a stronger response to surgical repair. This is an important framing for your pre-op conversation."
-              : primarySymptom === "ods" || primarySymptom === "constipation" ? "Constipation and difficult evacuation improve in approximately 60–70% of patients after surgical repair — meaning some patients may not see improvement. A frank conversation about realistic expectations is essential."
-              : primarySymptom === "prolapse" ? "Surgical repair directly addresses the structural problem of prolapse. Functional symptoms (bowel habits, continence) may follow their own trajectory."
-              : "You're experiencing several significant symptoms. The survey below will help capture your full picture — bringing these results to your appointment gives your team a comprehensive view."
-            } />
-          )}
-          {primarySymptom && (
-            <button onClick={() => setActive("impact")}
-                            style={{ background: C.teal, color: "#fff", border: "none", fontSize: 14 }}>
-              Continue to Bowel Survey →
-            </button>
-          )}
+          <div style={{ width: 2, flex: 1, minHeight: 16, background: sympDone ? C.teal : C.border, marginTop: 4 }} />
         </div>
-      )}
-
-      {active === "impact" && (
-        <div>
-          <Callout body="This is the IMPACT Bowel Function Short Form — the same validated questionnaire used in research and endorsed by the Pelvic Floor Disorders Consortium. Your answers will be private and shared only when you choose." icon="🔬" />
-          {impactDone && impactAnswers
-            ? <IMPACTResults ans={impactAnswers} onRetake={() => { setImpactDone(false); setImpactAnswers(null); }} />
-            : <IMPACTSurvey onComplete={handleImpactComplete} />
-          }
-        </div>
-      )}
-
-      {active === "surgical" && (
-        <div>
-          <div style={{ color: C.navy, fontWeight: 700, fontSize: 16, marginBottom: 8 }}>Pre-Op Surgical Risk Checklist</div>
-          <div style={{ color: C.slate, fontSize: 16, lineHeight: 1.6, marginBottom: 16 }}>Select any factors that apply to you. This is not a validated risk score — it's an educational checklist to help you start an informed conversation with your surgeon.</div>
-          {SURG_RISKS.map(r => (
-            <button key={r} onClick={() => setSurgRisk(prev => prev.includes(r) ? prev.filter(x => x !== r) : [...prev, r])}
-                            style={{ background: surgRisk.includes(r) ? C.tealLight : C.card, border: `1.5px solid ${surgRisk.includes(r) ? C.teal : C.border}`, minHeight: 54 }}>
-              <div style={{ width: 20, height: 20, border: `2px solid ${surgRisk.includes(r) ? C.teal : C.border}`, background: surgRisk.includes(r) ? C.teal : "transparent", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                {surgRisk.includes(r) && <span style={{ color: "#fff", fontSize: 12 }}>✓</span>}
+        <div style={{ flex: 1, paddingLeft: 16, paddingBottom: 8 }}>
+          <button onClick={() => setStep(1)} style={{ background: "none", border: "none", padding: 0, cursor: "pointer", textAlign: "left", marginBottom: step === 1 ? 16 : 8 }}>
+            <div style={{ color: C.navy, fontWeight: 700, fontSize: 18, lineHeight: 1.2 }}>What bothers you most?</div>
+            {sympDone && step !== 1 && <div style={{ color: C.teal, fontSize: 15, marginTop: 4 }}>✓ {SYMPTOM_OPTS.find(o => o.id === primarySymptom)?.label}</div>}
+          </button>
+          {step === 1 && (
+            <div>
+              <div style={{ color: C.slate, fontSize: 16, lineHeight: 1.6, marginBottom: 16 }}>
+                Which symptom is affecting your quality of life the most? This matters especially if you're considering surgery.
               </div>
-              <span style={{ color: C.navy, fontSize: 13 }}>{r}</span>
-            </button>
-          ))}
-          <Card style={{ background: C.tealLight, marginTop: 8 }}>
-            <div style={{ color: C.teal, fontWeight: 700, fontSize: 16, marginBottom: 4 }}>{surgRisk.length === 0 ? "✅ No risk factors identified" : `${surgRisk.length} factor${surgRisk.length > 1 ? "s" : ""} identified`}</div>
-            <div style={{ color: C.navy, fontSize: 16, lineHeight: 1.6 }}>
-              {surgRisk.length === 0 ? "Reassuring — your team will do their own full assessment." : surgRisk.length <= 2 ? "These are worth discussing with your surgical team so they can plan accordingly." : "Your surgeon will want to know about these and may recommend additional pre-operative preparation."}
-            </div>
-          </Card>
-          <Callout body='Your surgeon uses the ACS NSQIP Surgical Risk Calculator to estimate your personal complication risk. Sharing this checklist with them is a great way to start that conversation.' icon="🏥" />
-        </div>
-      )}
-
-      {active === "recurrence" && (
-        <div>
-          <Callout body="Rectal prolapse can come back after surgery — and knowing your risk factors helps you and your surgeon make the best plan. Some factors can be improved before surgery." icon="🔄" />
-          {REC_RISKS.map(r => (
-            <div key={r.id}>
-              <button onClick={() => setRecRisk(prev => prev.includes(r.id) ? prev.filter(x => x !== r.id) : [...prev, r.id])}
-                                style={{ background: recRisk.includes(r.id) ? C.coralLt : C.card, border: `1.5px solid ${recRisk.includes(r.id) ? C.coral : C.border}`, minHeight: 54 }}>
-                <div style={{ width: 20, height: 20, border: `2px solid ${recRisk.includes(r.id) ? C.coral : C.border}`, background: recRisk.includes(r.id) ? C.coral : "transparent", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                  {recRisk.includes(r.id) && <span style={{ color: "#fff", fontSize: 12 }}>✓</span>}
-                </div>
-                <span style={{ color: C.navy, fontSize: 13 }}>{r.label}</span>
-              </button>
-              {recRisk.includes(r.id) && (
-                <div style={{ background: C.coralLt, border: `1px solid ${C.coral}44` }}>
-                  <div style={{ color: C.slate, fontSize: 16, lineHeight: 1.6 }}>{r.why}</div>
-                  {(r.id === "straining" || r.id === "obesity") && <div style={{ color: C.coral, fontSize: 16, fontWeight: 700, marginTop: 4 }}>⭐ This factor may be improvable before surgery. Ask your team.</div>}
+              {SYMPTOM_OPTS.map(o => (
+                <OptionCard key={o.id} label={o.label} selected={primarySymptom === o.id} onClick={() => setPrimarySymptom(o.id)} />
+              ))}
+              {primarySymptom && (
+                <div>
+                  <Callout icon="💡" body={sympCallout} />
+                  <button onClick={() => setStep(2)} style={{ width: "100%", borderRadius: 14, padding: "16px 0", background: C.teal, color: "#fff", border: "none", fontSize: 17, fontWeight: 700, cursor: "pointer", marginTop: 4 }}>
+                    Next: Bowel Survey →
+                  </button>
                 </div>
               )}
             </div>
-          ))}
-          <Card style={{ background: C.tealLight }}>
-            <div style={{ color: C.teal, fontWeight: 700, fontSize: 16, marginBottom: 6 }}>{recRisk.length} factor{recRisk.length !== 1 ? "s" : ""} identified</div>
-            <div style={{ color: C.navy, fontSize: 16, lineHeight: 1.6 }}>Every person's recurrence risk is different. Bring this checklist to your appointment — the more your team knows, the better they can plan with you.</div>
-          </Card>
+          )}
         </div>
-      )}
+      </div>
+
+      {/* ── STEP 2: BOWEL SURVEY ── */}
+      <div style={{ display: "flex", gap: 0 }}>
+        <div style={{ display: "flex", flexDirection: "column", alignItems: "center", width: 40, flexShrink: 0 }}>
+          <div style={{ width: 40, height: 40, borderRadius: "50%", background: surveyDone ? C.teal : step === 2 ? C.teal : C.border, color: surveyDone || step === 2 ? "#fff" : C.muted, display: "flex", alignItems: "center", justifyContent: "center", fontSize: surveyDone ? 18 : 17, fontWeight: 700, flexShrink: 0 }}>
+            {surveyDone ? "✓" : "2"}
+          </div>
+          <div style={{ width: 2, flex: 1, minHeight: 16, background: surveyDone ? C.teal : C.border, marginTop: 4 }} />
+        </div>
+        <div style={{ flex: 1, paddingLeft: 16, paddingBottom: 8 }}>
+          <button onClick={() => sympDone && setStep(2)} style={{ background: "none", border: "none", padding: 0, cursor: sympDone ? "pointer" : "default", textAlign: "left", marginBottom: step === 2 ? 16 : 8 }}>
+            <div style={{ color: sympDone || step >= 2 ? C.navy : C.muted, fontWeight: 700, fontSize: 18, lineHeight: 1.2 }}>Bowel Survey (IMPACT)</div>
+            {surveyDone && step !== 2 && <div style={{ color: C.teal, fontSize: 15, marginTop: 4 }}>✓ Completed</div>}
+            {!sympDone && <div style={{ color: C.muted, fontSize: 14, marginTop: 3 }}>Complete Step 1 first</div>}
+          </button>
+          {step === 2 && (
+            <div>
+              <Callout body="This is the IMPACT Bowel Function Short Form — validated and endorsed by the Pelvic Floor Disorders Consortium." icon="🔬" />
+              {surveyDone && impactAnswers
+                ? <IMPACTResults ans={impactAnswers} onRetake={() => { setImpactDone(false); setImpactAnswers(null); }} />
+                : <IMPACTSurvey onComplete={handleImpactComplete} />
+              }
+              {surveyDone && (
+                <button onClick={() => setStep(3)} style={{ width: "100%", borderRadius: 14, padding: "16px 0", background: C.teal, color: "#fff", border: "none", fontSize: 17, fontWeight: 700, cursor: "pointer", marginTop: 8 }}>
+                  Next: Surgical Risk →
+                </button>
+              )}
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* ── STEP 3: SURGICAL RISK ── */}
+      <div style={{ display: "flex", gap: 0 }}>
+        <div style={{ display: "flex", flexDirection: "column", alignItems: "center", width: 40, flexShrink: 0 }}>
+          <div style={{ width: 40, height: 40, borderRadius: "50%", background: step > 3 ? C.teal : step === 3 ? C.teal : C.border, color: step >= 3 ? "#fff" : C.muted, display: "flex", alignItems: "center", justifyContent: "center", fontSize: step > 3 ? 18 : 17, fontWeight: 700, flexShrink: 0 }}>
+            {step > 3 ? "✓" : "3"}
+          </div>
+          <div style={{ width: 2, flex: 1, minHeight: 16, background: step > 3 ? C.teal : C.border, marginTop: 4 }} />
+        </div>
+        <div style={{ flex: 1, paddingLeft: 16, paddingBottom: 8 }}>
+          <button onClick={() => surveyDone && setStep(3)} style={{ background: "none", border: "none", padding: 0, cursor: surveyDone ? "pointer" : "default", textAlign: "left", marginBottom: step === 3 ? 16 : 8 }}>
+            <div style={{ color: step >= 3 ? C.navy : C.muted, fontWeight: 700, fontSize: 18, lineHeight: 1.2 }}>Surgical Risk Checklist</div>
+            {step > 3 && <div style={{ color: C.teal, fontSize: 15, marginTop: 4 }}>✓ {surgRisk.length === 0 ? "No factors identified" : `${surgRisk.length} factor${surgRisk.length > 1 ? "s" : ""} identified`}</div>}
+            {step < 3 && <div style={{ color: C.muted, fontSize: 14, marginTop: 3 }}>Complete Steps 1 & 2 first</div>}
+          </button>
+          {step === 3 && (
+            <div>
+              <div style={{ color: C.slate, fontSize: 16, lineHeight: 1.6, marginBottom: 16 }}>Select any factors that apply. This helps you start an informed conversation with your surgeon.</div>
+              {SURG_RISKS.map(r => (
+                <CheckCard key={r} label={r} checked={surgRisk.includes(r)} onClick={() => setSurgRisk(prev => prev.includes(r) ? prev.filter(x => x !== r) : [...prev, r])} />
+              ))}
+              <Card style={{ background: C.tealLight, marginTop: 4 }}>
+                <div style={{ color: C.teal, fontWeight: 700, fontSize: 16, marginBottom: 4 }}>
+                  {surgRisk.length === 0 ? "✅ No risk factors identified" : `${surgRisk.length} factor${surgRisk.length > 1 ? "s" : ""} identified`}
+                </div>
+                <div style={{ color: C.navy, fontSize: 16, lineHeight: 1.6 }}>
+                  {surgRisk.length === 0 ? "Reassuring — your team will do their own full assessment." : surgRisk.length <= 2 ? "Worth discussing with your surgical team so they can plan accordingly." : "Your surgeon will want to know about these and may recommend additional pre-operative preparation."}
+                </div>
+              </Card>
+              <button onClick={() => setStep(4)} style={{ width: "100%", borderRadius: 14, padding: "16px 0", background: C.teal, color: "#fff", border: "none", fontSize: 17, fontWeight: 700, cursor: "pointer", marginTop: 4 }}>
+                Next: Recurrence Risk →
+              </button>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* ── STEP 4: RECURRENCE RISK ── */}
+      <div style={{ display: "flex", gap: 0 }}>
+        <div style={{ display: "flex", flexDirection: "column", alignItems: "center", width: 40, flexShrink: 0 }}>
+          <div style={{ width: 40, height: 40, borderRadius: "50%", background: step === 4 ? C.teal : C.border, color: step === 4 ? "#fff" : C.muted, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 17, fontWeight: 700, flexShrink: 0 }}>
+            4
+          </div>
+        </div>
+        <div style={{ flex: 1, paddingLeft: 16, paddingBottom: 24 }}>
+          <button onClick={() => step >= 3 && setStep(4)} style={{ background: "none", border: "none", padding: 0, cursor: step >= 3 ? "pointer" : "default", textAlign: "left", marginBottom: step === 4 ? 16 : 8 }}>
+            <div style={{ color: step >= 4 ? C.navy : C.muted, fontWeight: 700, fontSize: 18, lineHeight: 1.2 }}>Recurrence Risk Factors</div>
+            {step < 4 && <div style={{ color: C.muted, fontSize: 14, marginTop: 3 }}>Complete Steps 1–3 first</div>}
+          </button>
+          {step === 4 && (
+            <div>
+              <Callout body="Rectal prolapse can come back after surgery. Knowing your risk factors helps you and your surgeon make the best plan — some can be improved before surgery." icon="🔄" />
+              {REC_RISKS.map(r => (
+                <div key={r.id}>
+                  <CheckCard label={r.label} checked={recRisk.includes(r.id)} onClick={() => setRecRisk(prev => prev.includes(r.id) ? prev.filter(x => x !== r.id) : [...prev, r.id])} color={C.coral} />
+                  {recRisk.includes(r.id) && (
+                    <div style={{ background: C.coralLt, borderRadius: 12, padding: "12px 16px", marginTop: -6, marginBottom: 10, marginLeft: 4 }}>
+                      <div style={{ color: C.slate, fontSize: 15, lineHeight: 1.6 }}>{r.why}</div>
+                    </div>
+                  )}
+                </div>
+              ))}
+              <Card style={{ background: C.tealLight }}>
+                <div style={{ color: C.teal, fontWeight: 700, fontSize: 16, marginBottom: 6 }}>
+                  {recRisk.length} factor{recRisk.length !== 1 ? "s" : ""} identified
+                </div>
+                <div style={{ color: C.navy, fontSize: 16, lineHeight: 1.6 }}>
+                  Bring this checklist to your appointment — the more your team knows, the better they can plan with you.
+                </div>
+              </Card>
+              <div style={{ background: C.tealLight, borderRadius: 14, padding: 20, textAlign: "center", marginTop: 8 }}>
+                <div style={{ fontSize: 28, marginBottom: 8 }}>🎉</div>
+                <div style={{ color: C.teal, fontWeight: 700, fontSize: 18, marginBottom: 6 }}>All steps complete!</div>
+                <div style={{ color: C.navy, fontSize: 16, lineHeight: 1.6 }}>Your responses are ready to share with your healthcare team at your next appointment.</div>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
     </div>
   );
 };
 
 // ─── SURGICAL ────────────────────────────────────────────────────────────────
-const SurgicalSection = () => {
+const SurgicalSection = ({ speak, stop, speaking }) => {
   const [tab, setTab] = useState("rectopexy");
   const [meshPref, setMeshPref] = useState(null);
   const tabs = [
@@ -1422,14 +1578,14 @@ const SurgicalSection = () => {
           <div style={{ color: C.navy, fontSize: 16, lineHeight: 1.7, marginBottom: 16 }}>
             <strong>Rectopexy</strong> is one of the most common surgical approaches to rectal prolapse. The rectum is secured (fixed) to the sacrum (tailbone) to prevent it from prolapsing. It can usually be done laparoscopically (keyhole surgery) or robotically.
           </div>
-          <p style={{ color: C.navy, fontSize: 16, fontWeight: 700, marginBottom: 8 }}>▶ Watch this animation</p>
+          <p style={{ color: C.navy, fontSize: 17, fontWeight: 700, marginBottom: 8 }}>▶ Watch this animation</p>
           <VimeoEmbed videoId="1180494424" title="Rectopexy Surgical Animation" />
           <Card>
             <div style={{ color: C.teal, fontWeight: 700, fontSize: 16, marginBottom: 8 }}>General recovery themes</div>
             {["Hospital stay varies by approach and individual", "Bowel function may be temporarily altered after surgery", "Pelvic floor PT is often recommended post-operatively", "Lifestyle optimization (fiber, straining avoidance) remains important after repair", "Symptoms should be reassessed at follow-up — improvement may be gradual"].map((t, i) => (
               <div key={i} style={{ display: "flex", gap: 8, marginBottom: 8 }}>
                 <div style={{ color: C.teal }}>→</div>
-                <div style={{ color: C.navy, fontSize: 16, lineHeight: 1.6 }}>{t}</div>
+                <div style={{ color: C.navy, fontSize: 17, lineHeight: 1.6 }}>{t}</div>
               </div>
             ))}
           </Card>
@@ -1448,9 +1604,9 @@ const SurgicalSection = () => {
               <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 12 }}>
                 <span style={{ fontSize: 22 }}>{s.icon}</span>
                 <div style={{ color: C.navy, fontWeight: 700, fontSize: 15 }}>{s.title}</div>
-                <div style={{ background: s.good ? C.tealLight : C.warnLt, color: s.good ? C.teal : C.warn, fontSize: 13, fontWeight: 700 }}>{s.good ? "More predictable" : "Less predictable"}</div>
+                <div style={{ background: s.good ? C.tealLight : C.warnLt, color: s.good ? C.teal : C.warn, fontSize: 15, fontWeight: 700 }}>{s.good ? "More predictable" : "Less predictable"}</div>
               </div>
-              <div style={{ color: C.navy, fontSize: 16, lineHeight: 1.7 }}>{s.body}</div>
+              <div style={{ color: C.navy, fontSize: 17, lineHeight: 1.7 }}>{s.body}</div>
             </Card>
           ))}
           <Card style={{ background: C.tealLight, border: `2px solid ${C.teal}` }}>
@@ -1458,7 +1614,7 @@ const SurgicalSection = () => {
             {["Which symptom bothers you most (incontinence vs. constipation vs. prolapse sensation)", "What the realistic likelihood of improvement is for that specific symptom", "What happens if symptoms don't improve after repair", "What non-surgical options remain available if surgery is not fully effective"].map((t, i) => (
               <div key={i} style={{ display: "flex", gap: 8, marginBottom: 8 }}>
                 <div style={{ color: C.teal, flexShrink: 0 }}>✓</div>
-                <div style={{ color: C.navy, fontSize: 16, lineHeight: 1.6 }}>{t}</div>
+                <div style={{ color: C.navy, fontSize: 17, lineHeight: 1.6 }}>{t}</div>
               </div>
             ))}
           </Card>
@@ -1471,7 +1627,7 @@ const SurgicalSection = () => {
           <Callout body="Not all rectopexy procedures use mesh. Your surgeon will explain which approach is being recommended for you and why. The information below supports an informed conversation." icon="ℹ️" />
           <Card>
             <div style={{ color: C.teal, fontWeight: 700, fontSize: 16, marginBottom: 8 }}>What is mesh and why is it used?</div>
-            <div style={{ color: C.navy, fontSize: 16, lineHeight: 1.7 }}>Mesh is a material used in some rectopexy procedures to reinforce the repair and secure the rectum in its correct position. Mesh used in rectal prolapse surgery is different from mesh used in vaginal prolapse repair. The complication profile and evidence base are distinct and should be discussed specifically with your surgical team.</div>
+            <div style={{ color: C.navy, fontSize: 17, lineHeight: 1.7 }}>Mesh is a material used in some rectopexy procedures to reinforce the repair and secure the rectum in its correct position. Mesh used in rectal prolapse surgery is different from mesh used in vaginal prolapse repair. The complication profile and evidence base are distinct and should be discussed specifically with your surgical team.</div>
           </Card>
           {[
             { type: "Synthetic Mesh", icon: "🔩", desc: "Made from permanent synthetic material (such as polypropylene). Durable and widely used.", erosion: "~1.8% erosion rate in large studies", recurrence: "~3.7% at follow-up", color: C.navyMid },
@@ -1483,10 +1639,10 @@ const SurgicalSection = () => {
                 <span style={{ fontSize: 22 }}>{m.icon}</span>
                 <div style={{ color: m.color, fontWeight: 700, fontSize: 14 }}>{m.type}</div>
               </div>
-              <div style={{ color: C.navy, fontSize: 16, lineHeight: 1.6, marginBottom: 8 }}>{m.desc}</div>
+              <div style={{ color: C.navy, fontSize: 17, lineHeight: 1.6, marginBottom: 8 }}>{m.desc}</div>
               <div>
-                <div><div style={{ color: C.muted, fontSize: 13, textTransform: "uppercase" }}>Erosion</div><div style={{ color: C.navy, fontSize: 16, fontWeight: 600 }}>{m.erosion}</div></div>
-                <div><div style={{ color: C.muted, fontSize: 13, textTransform: "uppercase" }}>Recurrence</div><div style={{ color: C.navy, fontSize: 16, fontWeight: 600 }}>{m.recurrence}</div></div>
+                <div><div style={{ color: C.muted, fontSize: 15, textTransform: "uppercase" }}>Erosion</div><div style={{ color: C.navy, fontSize: 16, fontWeight: 600 }}>{m.erosion}</div></div>
+                <div><div style={{ color: C.muted, fontSize: 15, textTransform: "uppercase" }}>Recurrence</div><div style={{ color: C.navy, fontSize: 16, fontWeight: 600 }}>{m.recurrence}</div></div>
               </div>
             </Card>
           ))}
@@ -1524,8 +1680,8 @@ const SurgicalSection = () => {
           ].map((q, i) => (
             <Card key={i}>
               <div style={{ display: "flex", gap: 12 }}>
-                <div style={{ flexShrink: 0 }} style={{ color: C.teal, fontWeight: 800, fontSize: 14 }}>Q{i + 1}</div>
-                <div style={{ color: C.navy, fontSize: 16, lineHeight: 1.6 }}>{q}</div>
+                <div style={{ flexShrink: 0, color: C.teal, fontWeight: 800, fontSize: 14 }}>Q{i + 1}</div>
+                <div style={{ color: C.navy, fontSize: 17, lineHeight: 1.6 }}>{q}</div>
               </div>
             </Card>
           ))}
@@ -1537,7 +1693,7 @@ const SurgicalSection = () => {
 };
 
 // ─── RED FLAGS ────────────────────────────────────────────────────────────────
-const RedFlagsSection = () => (
+const RedFlagsSection = ({ speak, stop, speaking }) => (
   <div>
     <SectionHeader title="Red Flags — When to Seek Care" subtitle="Calm and directive guidance for symptoms that need prompt attention." />
     <Callout icon="💙" body="This section is not meant to alarm you — it's meant to keep you safe. Most pelvic floor symptoms are not emergencies. But some warrant prompt attention, and knowing the difference matters." />
@@ -1554,7 +1710,7 @@ const RedFlagsSection = () => (
           <span style={{ fontSize: 26 }}>{f.icon}</span>
           <div style={{ color: C.red, fontWeight: 700, fontSize: 15 }}>{f.label}</div>
         </div>
-        <div style={{ color: C.navy, fontSize: 16, lineHeight: 1.6, marginBottom: 8 }}>{f.desc}</div>
+        <div style={{ color: C.navy, fontSize: 17, lineHeight: 1.6, marginBottom: 8 }}>{f.desc}</div>
         <div style={{ background: C.redLt }}>
           <div style={{ color: C.red, fontWeight: 700, fontSize: 12 }}>Action: {f.urgency}</div>
         </div>
@@ -1562,29 +1718,29 @@ const RedFlagsSection = () => (
     ))}
     <Card style={{ background: C.navyMid }}>
       <div style={{ color: "#fff", fontWeight: 700, fontSize: 16, marginBottom: 4 }}>When in doubt</div>
-      <div style={{ color: "rgba(255,255,255,0.85)", fontSize: 16, lineHeight: 1.6 }}>If you're unsure whether a symptom is a red flag, it's always better to contact your healthcare team than to wait. You know your body — trust that instinct.</div>
+      <div style={{ color: "rgba(255,255,255,0.85)", fontSize: 17, lineHeight: 1.6 }}>If you're unsure whether a symptom is a red flag, it's always better to contact your healthcare team than to wait. You know your body — trust that instinct.</div>
     </Card>
   </div>
 );
 
 // ─── CHATBOT ─────────────────────────────────────────────────────────────────
-const SYSTEM_PROMPT = `You are a warm, knowledgeable patient education assistant for a pelvic floor health app created by a colorectal surgeon specializing in rectal prolapse, bowel dysfunction, and pelvic floor health at Stanford.
+const SYSTEM_PROMPT = `You are a warm patient education assistant for a pelvic floor health app from Stanford Colorectal Surgery.
 
-Your role is to educate patients about pelvic floor health, bowel dysfunction, rectal prolapse, fecal incontinence, constipation, obstructed defecation, imaging tests, lifestyle medicine, and surgical options in general terms. Help patients prepare thoughtful questions for their appointments.
+CRITICAL LENGTH RULE — THIS IS NON-NEGOTIABLE:
+Every single response MUST be exactly 2-3 sentences. Never more. This is a mobile app — long responses break the experience. If you write more than 3 sentences you are failing at your primary job.
 
-This app uses the IMPACT Bowel Function Short Form — the validated questionnaire endorsed by the Pelvic Floor Disorders Consortium (ASCRS, AUGS, ICS, SUFU). It captures Bristol Stool type, constipation symptoms, fecal incontinence, urgency, pain, prolapse sensation, and bleeding. You can explain what this survey measures if patients ask.
+After your 2-3 sentence answer, end with exactly ONE short follow-up question.
 
-Use warm, plain, empowering language. Normalize symptoms. Never use jargon without explanation.
+Example of a correct response:
+"Internal prolapse means the rectum folds inward but stays inside the body, while external prolapse means rectal tissue actually comes out through the anal opening. The key difference is whether you can see or feel tissue outside your body. Which type did your doctor mention?"
 
-You must NEVER diagnose any individual patient, recommend specific medications by name, recommend a specific surgical procedure for an individual, or interpret a patient's own test results.
+Example of a wrong response: anything longer than 3 sentences.
 
-For all clinical decisions, close with: "This is something your healthcare team can help you with — they know your full picture."
-
-If a patient describes urgent symptoms (rectal bleeding, severe pain, tissue that won't go back in, fever with anorectal symptoms), immediately say: "These symptoms deserve prompt attention. Please contact your healthcare team or seek care today — don't wait."
-
-Keep responses concise — 2–4 sentences for most answers. Then ask: "Would you like to know more?" to invite follow-up.
-
-Tone: warm, knowledgeable, unhurried, empowering, never shaming or condescending.`;
+CONTENT RULES:
+- Never diagnose, name medications, or recommend a specific procedure for an individual.
+- For urgent symptoms (bleeding, severe pain, tissue stuck outside, fever with anorectal symptoms): say "That needs prompt attention — please contact your healthcare team today or go to an ER." Then stop.
+- Close clinical answers with: "Your healthcare team will have the full picture."
+- Tone: warm, plain language, never shaming.`;
 
 const RED_FLAG_KEYWORDS = ["bleeding", "blood", "can't push back", "stuck outside", "severe pain", "fever", "emergency", "purple", "dark", "not going back"];
 
@@ -1666,7 +1822,7 @@ const Chatbot = ({ appState, onClose }) => {
                 maxWidth: "85%",
                 background: m.role === "user" ? C.teal : C.tealLight,
                 color: m.role === "user" ? "#fff" : C.navy,
-                fontSize: 16, lineHeight: 1.7,
+                fontSize: 17, lineHeight: 1.7,
                 borderBottomRightRadius: m.role === "user" ? 4 : 16,
                 borderBottomLeftRadius: m.role === "user" ? 16 : 4,
               }}>{m.content}</div>
@@ -1711,7 +1867,7 @@ const PrintSummary = ({ scores, primarySymptom, surgRisk = [], recRisk = [] }) =
         <div style={{ fontSize: 16, fontWeight: 700, color: "#2d7d6f", textTransform: "uppercase", letterSpacing: 1, marginBottom: 8 }}>2. My Bowel Survey (IMPACT)</div>
         {scores.impactDone
           ? <div>
-              <div style={{ fontSize: 16, color: "#1a2e3b", lineHeight: 1.6, marginBottom: 10 }}>{impactSummaryText(scores.impact)}</div>
+              <div style={{ fontSize: 17, color: "#1a2e3b", lineHeight: 1.6, marginBottom: 10 }}>{impactSummaryText(scores.impact)}</div>
               {(() => {
                 const d = calcIMPACTDomains(scores.impact);
                 const rows = [
@@ -1738,7 +1894,7 @@ const PrintSummary = ({ scores, primarySymptom, surgRisk = [], recRisk = [] }) =
           : <div style={{ color: "#7a8fa6", fontSize: 13 }}>IMPACT Bowel Function Survey not yet completed. Complete it in the 'Scores' section.</div>
         }
       </div>
-      <div style={{ fontSize: 13, color: "#7a8fa6", textAlign: "center", marginTop: 32, borderTop: "1px solid #dde7ef", paddingTop: 16 }}>
+      <div style={{ fontSize: 15, color: "#7a8fa6", textAlign: "center", marginTop: 32, borderTop: "1px solid #dde7ef", paddingTop: 16 }}>
         This document was generated by REPAIR, a patient education app from Stanford Colorectal Surgery. It is for educational purposes only and does not constitute medical advice or a medical record.
       </div>
     </div>
@@ -1752,13 +1908,8 @@ export default function App() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [scores, setScores] = useState({});
   const [primarySymptom, setPrimarySymptom] = useState(null);
+  const { speak, stop, speaking } = useSpeech();
   const [showPDF, setShowPDF] = useState(false);
-  const { speak, stop, speaking } = useReadAloud();
-
-  const getPageText = () => {
-    const el = document.getElementById("main-content");
-    return el ? el.innerText : "";
-  };
 
   const currentNav = NAV.find(n => n.id === section);
 
@@ -1823,13 +1974,13 @@ export default function App() {
       {/* MAIN CONTENT */}
       <div style={{ padding: 18, paddingBottom: 120 }}>
         {section === "home" && <HomeSection onNav={setSection} />}
-        {section === "prolapse" && <ProlapseSection />}
-        {section === "symptoms" && <SymptomsSection />}
-        {section === "imaging" && <ImagingSection />}
-        {section === "lifestyle" && <LifestyleSection />}
+        {section === "prolapse" && <ProlapseSection speak={speak} stop={stop} speaking={speaking} />}
+        {section === "symptoms" && <SymptomsSection speak={speak} stop={stop} speaking={speaking} />}
+        {section === "imaging" && <ImagingSection speak={speak} stop={stop} speaking={speaking} />}
+        {section === "lifestyle" && <LifestyleSection speak={speak} stop={stop} speaking={speaking} />}
         {section === "calculators" && <CalculatorsSection scores={scores} setScores={setScores} primarySymptom={primarySymptom} setPrimarySymptom={setPrimarySymptom} />}
-        {section === "surgical" && <SurgicalSection />}
-        {section === "redflags" && <RedFlagsSection />}
+        {section === "surgical" && <SurgicalSection speak={speak} stop={stop} speaking={speaking} />}
+        {section === "redflags" && <RedFlagsSection speak={speak} stop={stop} speaking={speaking} />}
       </div>
 
       {/* BOTTOM NAV (key sections) */}
@@ -1850,14 +2001,6 @@ export default function App() {
           <span style={{ fontSize: 9, fontWeight: 700, color: C.teal, letterSpacing: 0.2 }}>Ask Our Team</span>
         </button>
       </div>
-
-      {/* READ ALOUD BUTTON */}
-      {!chatOpen && !menuOpen && !showPDF && (
-        <ReadAloudBtn
-          speaking={speaking}
-          onSpeak={() => speaking ? stop() : speak(getPageText())}
-        />
-      )}
 
       {/* CHATBOT */}
       {chatOpen && <Chatbot appState={appState} onClose={() => setChatOpen(false)} />}
