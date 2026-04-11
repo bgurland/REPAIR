@@ -13,7 +13,7 @@ const VIMEO_URLS = {
 };
 
 const VimeoEmbed = ({ videoId, title }) => (
-  <div className="my-4">
+  <div style={{ margin: "16px 0" }}>
     <a
       href={VIMEO_URLS[videoId] || `https://vimeo.com/${videoId}`}
       target="_blank"
@@ -21,7 +21,7 @@ const VimeoEmbed = ({ videoId, title }) => (
       style={{ display: "block", textDecoration: "none" }}
     >
       <div
-        className="rounded-2xl flex flex-col items-center justify-center gap-3"
+        style={{ borderRadius: 16, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 12 }}
         style={{
           background: "linear-gradient(135deg, #1a2e3b, #2d7d6f)",
           padding: "32px 16px",
@@ -53,13 +53,10 @@ const VimeoEmbed = ({ videoId, title }) => (
           background: "rgba(255,255,255,0.12)", borderRadius: 20,
           padding: "6px 16px", border: "1px solid rgba(255,255,255,0.2)",
         }}>
-          <span style={{ color: "#fff", fontSize: 12, fontWeight: 600 }}>Open video</span>
+          <span style={{ color: "#fff", fontSize: 14, fontWeight: 600 }}>Open video</span>
         </div>
       </div>
     </a>
-    <p className="text-xs text-center mt-2" style={{ color: "#7a8fa6" }}>
-      ℹ️ On Netlify, this video will play inline
-    </p>
   </div>
 );
 
@@ -87,22 +84,22 @@ const C = {
 
 // ─── SHARED COMPONENTS ───────────────────────────────────────────────────────
 const Card = ({ children, style = {}, className = "" }) => (
-  <div className={`rounded-2xl p-4 mb-4 ${className}`}
+  <div style={{ ...style }}
     style={{ background: C.card, border: `1px solid ${C.border}`, boxShadow: "0 2px 8px rgba(0,0,0,0.04)", ...style }}>
     {children}
   </div>
 );
 
 const Callout = ({ icon, title, body, color = C.teal, bg = C.tealLight }) => (
-  <div className="rounded-xl p-4 mb-4" style={{ background: bg, borderLeft: `4px solid ${color}` }}>
-    {icon && <div className="text-xl mb-1">{icon}</div>}
-    {title && <div className="font-semibold mb-1" style={{ color, fontSize: 14 }}>{title}</div>}
+  <div  style={{ background: bg, borderLeft: `4px solid ${color}` }}>
+    {icon && <div style={{ fontSize: 20, marginBottom: 4 }}>{icon}</div>}
+    {title && <div style={{ fontWeight: 600, marginBottom: 4 }} style={{ color, fontSize: 14 }}>{title}</div>}
     <div style={{ color: C.navy, fontSize: 14, lineHeight: 1.6 }}>{body}</div>
   </div>
 );
 
 const SectionHeader = ({ title, subtitle }) => (
-  <div className="mb-6">
+  <div style={{ marginBottom: 24 }}>
     <h2 style={{ color: C.navy, fontSize: 22, fontWeight: 700, lineHeight: 1.2 }}>{title}</h2>
     {subtitle && <p style={{ color: C.muted, fontSize: 14, marginTop: 4 }}>{subtitle}</p>}
   </div>
@@ -110,12 +107,11 @@ const SectionHeader = ({ title, subtitle }) => (
 
 const Pill = ({ label, active, onClick }) => (
   <button onClick={onClick}
-    className="px-3 py-1 rounded-full text-sm font-medium transition-all"
-    style={{
+        style={{
       background: active ? C.teal : "transparent",
       color: active ? "#fff" : C.slate,
       border: `1.5px solid ${active ? C.teal : C.border}`,
-      fontSize: 13,
+      fontSize: 15,
       whiteSpace: "nowrap",
     }}>
     {label}
@@ -123,14 +119,14 @@ const Pill = ({ label, active, onClick }) => (
 );
 
 const TabBar = ({ tabs, active, onChange }) => (
-  <div className="flex gap-2 overflow-x-auto pb-2 mb-4" style={{ scrollbarWidth: "none" }}>
+  <div  style={{ scrollbarWidth: "none" }}>
     {tabs.map(t => <Pill key={t.id} label={t.label} active={active === t.id} onClick={() => onChange(t.id)} />)}
   </div>
 );
 
 const ProgressBar = ({ value, max, color = C.teal }) => (
-  <div className="rounded-full overflow-hidden mb-3" style={{ height: 8, background: C.border }}>
-    <div className="h-full rounded-full transition-all" style={{ width: `${(value / max) * 100}%`, background: color }} />
+  <div  style={{ height: 8, background: C.border }}>
+    <div  style={{ width: `${(value / max) * 100}%`, background: color }} />
   </div>
 );
 
@@ -143,8 +139,7 @@ const Btn = ({ children, onClick, variant = "primary", className = "", disabled 
   };
   return (
     <button onClick={onClick} disabled={disabled}
-      className={`rounded-xl py-3 px-5 font-semibold transition-all ${className}`}
-      style={{ fontSize: 15, minHeight: 48, ...styles[variant], opacity: disabled ? 0.5 : 1 }}>
+            style={{ fontSize: 15, minHeight: 54, ...styles[variant], opacity: disabled ? 0.5 : 1 }}>
       {children}
     </button>
   );
@@ -165,10 +160,10 @@ const NAV = [
 // ─── HOME ────────────────────────────────────────────────────────────────────
 const HomeSection = ({ onNav }) => (
   <div>
-    <div className="rounded-2xl p-6 mb-6 text-center" style={{ background: `linear-gradient(135deg, ${C.teal}, ${C.navyMid})` }}>
+    <div  style={{ background: `linear-gradient(135deg, ${C.teal}, ${C.navyMid})` }}>
       <div style={{ fontSize: 42, marginBottom: 8 }}>🌿</div>
       <h1 style={{ color: "#fff", fontSize: 26, fontWeight: 800, marginBottom: 6 }}>REPAIR</h1>
-      <div style={{ color: "rgba(255,255,255,0.65)", fontSize: 11, letterSpacing: 1.2, textTransform: "uppercase", marginBottom: 10, fontWeight: 600 }}>
+      <div style={{ color: "rgba(255,255,255,0.65)", fontSize: 13, letterSpacing: 1.2, textTransform: "uppercase", marginBottom: 10, fontWeight: 600 }}>
         Rectal prolapse · Education · Patient Awareness · Information · Resource
       </div>
       <p style={{ color: "rgba(255,255,255,0.85)", fontSize: 14, lineHeight: 1.5 }}>
@@ -179,23 +174,22 @@ const HomeSection = ({ onNav }) => (
     <Callout icon="💬" title="You're not alone" body="Millions of people live with pelvic floor symptoms — and most never talk about them. This app is a safe, shame-free place to learn, prepare, and feel more in control." />
 
     <div style={{ color: C.navy, fontSize: 15, fontWeight: 700, marginBottom: 12 }}>Explore</div>
-    <div className="grid grid-cols-2 gap-3 mb-4">
+    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 16 }}>
       {NAV.filter(n => n.id !== "home").map(n => (
         <button key={n.id} onClick={() => onNav(n.id)}
-          className="rounded-2xl p-4 text-left transition-all"
-          style={{ background: C.card, border: `1px solid ${C.border}`, minHeight: 80, boxShadow: "0 2px 6px rgba(0,0,0,0.04)" }}>
+                    style={{ background: C.card, border: `1px solid ${C.border}`, minHeight: 90, boxShadow: "0 2px 6px rgba(0,0,0,0.04)" }}>
           <div style={{ fontSize: 24, marginBottom: 4 }}>{n.icon}</div>
-          <div style={{ color: C.navy, fontSize: 13, fontWeight: 600, lineHeight: 1.3 }}>{n.label}</div>
+          <div style={{ color: C.navy, fontSize: 15, fontWeight: 600, lineHeight: 1.3 }}>{n.label}</div>
         </button>
       ))}
     </div>
 
     <Card style={{ background: C.sageLt, border: `1px solid ${C.sage}22` }}>
-      <div style={{ color: C.sage, fontSize: 12, fontWeight: 700, marginBottom: 4, textTransform: "uppercase", letterSpacing: 1 }}>Stanford Colorectal Surgery</div>
-      <div style={{ color: C.navy, fontSize: 13, lineHeight: 1.6, marginBottom: 8 }}>
+      <div style={{ color: C.sage, fontSize: 14, fontWeight: 700, marginBottom: 4, textTransform: "uppercase", letterSpacing: 1 }}>Stanford Colorectal Surgery</div>
+      <div style={{ color: C.navy, fontSize: 15, lineHeight: 1.6, marginBottom: 8 }}>
         Content created by Dr. Brooke Gurland and reviewed by a multidisciplinary team. This app educates — it does not diagnose or replace your healthcare team.
       </div>
-      <div style={{ color: C.sage, fontSize: 12, lineHeight: 1.6, borderTop: `1px solid ${C.sage}33`, paddingTop: 8 }}>
+      <div style={{ color: C.sage, fontSize: 14, lineHeight: 1.6, borderTop: `1px solid ${C.sage}33`, paddingTop: 8 }}>
         <strong>REPAIR</strong> — <span style={{ fontStyle: "italic" }}>Rectal prolapse Education and Patient Awareness Information Resource</span>
       </div>
     </Card>
@@ -251,8 +245,8 @@ const ProlapseSection = () => {
             { grade: "V", desc: "Full external prolapse — rectum protrudes completely outside the body", sig: "Visible externally; requires clinical evaluation" },
           ].map(r => (
             <Card key={r.grade}>
-              <div className="flex gap-3 items-start">
-                <div className="rounded-full flex items-center justify-center flex-shrink-0" style={{ width: 36, height: 36, background: C.tealLight, color: C.teal, fontWeight: 800, fontSize: 15 }}>G{r.grade}</div>
+              <div style={{ display: "flex", gap: 12, alignItems: "flex-start" }}>
+                <div  style={{ width: 36, height: 36, background: C.tealLight, color: C.teal, fontWeight: 800, fontSize: 15 }}>G{r.grade}</div>
                 <div>
                   <div style={{ color: C.navy, fontSize: 14, fontWeight: 600, marginBottom: 4 }}>{r.desc}</div>
                   <div style={{ color: C.muted, fontSize: 13 }}>{r.sig}</div>
@@ -268,7 +262,7 @@ const ProlapseSection = () => {
         <div>
           <p style={{ color: C.navy, fontSize: 14, lineHeight: 1.7, marginBottom: 16 }}>Prolapse develops when the structures that hold the rectum in place are weakened or stretched. Common contributing factors:</p>
           {["Chronic constipation and long-term straining", "Weakened pelvic floor muscles (from childbirth, aging, or other causes)", "Prior pelvic surgery", "Connective tissue disorders or joint hypermobility", "Neurological conditions affecting pelvic nerves", "Long-term laxative use or repeated enemas"].map((f, i) => (
-            <div key={i} className="flex gap-3 items-start mb-3">
+            <div key={i} style={{ display: "flex", gap: 12, alignItems: "flex-start", marginBottom: 12 }}>
               <div style={{ color: C.teal, fontSize: 18, marginTop: 2 }}>•</div>
               <div style={{ color: C.navy, fontSize: 14, lineHeight: 1.6 }}>{f}</div>
             </div>
@@ -287,11 +281,11 @@ const ProlapseSection = () => {
             { step: "4", title: "Specialist Referral", body: "You may be referred to a colorectal surgeon, urogynecologist, pelvic floor PT, or gastroenterologist — or a multidisciplinary team." },
           ].map(s => (
             <Card key={s.step}>
-              <div className="flex gap-3">
-                <div className="rounded-full flex items-center justify-center flex-shrink-0" style={{ width: 32, height: 32, background: C.teal, color: "#fff", fontWeight: 800, fontSize: 14 }}>{s.step}</div>
+              <div style={{ display: "flex", gap: 12 }}>
+                <div  style={{ width: 32, height: 32, background: C.teal, color: "#fff", fontWeight: 800, fontSize: 14 }}>{s.step}</div>
                 <div>
                   <div style={{ color: C.navy, fontWeight: 700, fontSize: 14, marginBottom: 4 }}>{s.title}</div>
-                  <div style={{ color: C.slate, fontSize: 13, lineHeight: 1.6 }}>{s.body}</div>
+                  <div style={{ color: C.slate, fontSize: 15, lineHeight: 1.6 }}>{s.body}</div>
                 </div>
               </div>
             </Card>
@@ -312,14 +306,14 @@ const ProlapseSection = () => {
           ].map((t, i) => (
             <Card key={i}>
               <div style={{ color: C.teal, fontWeight: 700, fontSize: 14, marginBottom: 4 }}>{t.label}</div>
-              <div style={{ color: C.slate, fontSize: 13, lineHeight: 1.6 }}>{t.desc}</div>
+              <div style={{ color: C.slate, fontSize: 15, lineHeight: 1.6 }}>{t.desc}</div>
             </Card>
           ))}
           <Card style={{ background: C.coralLt, borderColor: `${C.coral}44` }}>
-            <div style={{ color: C.coral, fontWeight: 700, fontSize: 13, marginBottom: 4 }}>📸 Photo Guidance</div>
-            <div style={{ color: C.navy, fontSize: 13, lineHeight: 1.6 }}>If you have external prolapse, consider taking a photo when tissue is out and bringing it to your appointment. Look for concentric rings (full-thickness prolapse) vs. radial folds (mucosal prolapse). This helps your surgeon significantly.</div>
+            <div style={{ color: C.coral, fontWeight: 700, fontSize: 15, marginBottom: 4 }}>📸 Photo Guidance</div>
+            <div style={{ color: C.navy, fontSize: 15, lineHeight: 1.6 }}>If you have external prolapse, consider taking a photo when tissue is out and bringing it to your appointment. Look for concentric rings (full-thickness prolapse) vs. radial folds (mucosal prolapse). This helps your surgeon significantly.</div>
           </Card>
-          <div style={{ color: C.muted, fontSize: 12, textAlign: "center" }}>This app does not recommend specific treatments. Your healthcare team will work with you to find the approach that fits your situation.</div>
+          <div style={{ color: C.muted, fontSize: 14, textAlign: "center" }}>This app does not recommend specific treatments. Your healthcare team will work with you to find the approach that fits your situation.</div>
         </div>
       )}
     </div>
@@ -381,8 +375,7 @@ const SymptomsSection = () => {
       {SYMPTOMS.map(s => (
         <div key={s.id}>
           <button onClick={() => setOpen(open === s.id ? null : s.id)}
-            className="w-full text-left rounded-2xl p-4 mb-3 flex items-center gap-3 transition-all"
-            style={{ background: open === s.id ? C.tealLight : C.card, border: `1.5px solid ${open === s.id ? C.teal : C.border}` }}>
+                        style={{ background: open === s.id ? C.tealLight : C.card, border: `1.5px solid ${open === s.id ? C.teal : C.border}` }}>
             <span style={{ fontSize: 24 }}>{s.icon}</span>
             <span style={{ color: C.navy, fontWeight: 600, fontSize: 15, flex: 1 }}>{s.label}</span>
             <span style={{ color: C.muted, fontSize: 18 }}>{open === s.id ? "▲" : "▼"}</span>
@@ -390,16 +383,16 @@ const SymptomsSection = () => {
           {open === s.id && (
             <Card style={{ marginTop: -8, marginBottom: 16, borderTopLeftRadius: 0, borderTopRightRadius: 0 }}>
               <div style={{ color: C.slate, fontSize: 14, lineHeight: 1.7, marginBottom: 12 }}>{s.desc}</div>
-              <div style={{ color: C.navy, fontWeight: 700, fontSize: 13, marginBottom: 4 }}>Why it happens</div>
-              <div style={{ color: C.slate, fontSize: 13, lineHeight: 1.6, marginBottom: 12 }}>{s.why}</div>
-              <div style={{ color: C.navy, fontWeight: 700, fontSize: 13, marginBottom: 4 }}>Lifestyle factors</div>
-              <div style={{ color: C.slate, fontSize: 13, lineHeight: 1.6, marginBottom: 12 }}>{s.lifestyle}</div>
+              <div style={{ color: C.navy, fontWeight: 700, fontSize: 15, marginBottom: 4 }}>Why it happens</div>
+              <div style={{ color: C.slate, fontSize: 15, lineHeight: 1.6, marginBottom: 12 }}>{s.why}</div>
+              <div style={{ color: C.navy, fontWeight: 700, fontSize: 15, marginBottom: 4 }}>Lifestyle factors</div>
+              <div style={{ color: C.slate, fontSize: 15, lineHeight: 1.6, marginBottom: 12 }}>{s.lifestyle}</div>
               {s.animationId && <VimeoEmbed videoId={s.animationId} title={s.animationTitle} />}
-              <div className="rounded-xl p-3 mt-2" style={{ background: s.redFlag ? C.redLt : C.warnLt, border: `1px solid ${s.redFlag ? C.red : C.warn}44` }}>
-                <div style={{ color: s.redFlag ? C.red : C.coral, fontWeight: 700, fontSize: 13, marginBottom: 4 }}>
+              <div  style={{ background: s.redFlag ? C.redLt : C.warnLt, border: `1px solid ${s.redFlag ? C.red : C.warn}44` }}>
+                <div style={{ color: s.redFlag ? C.red : C.coral, fontWeight: 700, fontSize: 15, marginBottom: 4 }}>
                   {s.redFlag ? "🚨 When to seek care — promptly" : "🩺 When to call your doctor"}
                 </div>
-                <div style={{ color: C.navy, fontSize: 13, lineHeight: 1.6 }}>{s.doctor}</div>
+                <div style={{ color: C.navy, fontSize: 15, lineHeight: 1.6 }}>{s.doctor}</div>
               </div>
             </Card>
           )}
@@ -453,8 +446,7 @@ const ImagingSection = () => {
       {IMAGING.map(s => (
         <div key={s.id}>
           <button onClick={() => setOpen(open === s.id ? null : s.id)}
-            className="w-full text-left rounded-2xl p-4 mb-3 flex items-center gap-3"
-            style={{ background: open === s.id ? C.tealLight : C.card, border: `1.5px solid ${open === s.id ? C.teal : C.border}` }}>
+                        style={{ background: open === s.id ? C.tealLight : C.card, border: `1.5px solid ${open === s.id ? C.teal : C.border}` }}>
             <span style={{ fontSize: 22 }}>{s.icon}</span>
             <span style={{ color: C.navy, fontWeight: 600, fontSize: 14, flex: 1, lineHeight: 1.3 }}>{s.label}</span>
             <span style={{ color: C.muted }}>{open === s.id ? "▲" : "▼"}</span>
@@ -463,30 +455,29 @@ const ImagingSection = () => {
             <Card style={{ marginTop: -8, marginBottom: 16 }}>
               {s.isUltrasound ? (
                 <div>
-                  <div className="mb-3">
-                    <div style={{ color: C.teal, fontWeight: 700, fontSize: 12, textTransform: "uppercase", letterSpacing: 0.5, marginBottom: 2 }}>What it is</div>
-                    <div style={{ color: C.navy, fontSize: 13, lineHeight: 1.6 }}>{s.what}</div>
+                  <div style={{ marginBottom: 12 }}>
+                    <div style={{ color: C.teal, fontWeight: 700, fontSize: 14, textTransform: "uppercase", letterSpacing: 0.5, marginBottom: 2 }}>What it is</div>
+                    <div style={{ color: C.navy, fontSize: 15, lineHeight: 1.6 }}>{s.what}</div>
                   </div>
-                  <div className="mb-4">
-                    <div style={{ color: C.teal, fontWeight: 700, fontSize: 12, textTransform: "uppercase", letterSpacing: 0.5, marginBottom: 2 }}>Why it's ordered</div>
-                    <div style={{ color: C.navy, fontSize: 13, lineHeight: 1.6 }}>{s.why}</div>
+                  <div style={{ marginBottom: 16 }}>
+                    <div style={{ color: C.teal, fontWeight: 700, fontSize: 14, textTransform: "uppercase", letterSpacing: 0.5, marginBottom: 2 }}>Why it's ordered</div>
+                    <div style={{ color: C.navy, fontSize: 15, lineHeight: 1.6 }}>{s.why}</div>
                   </div>
-                  <div style={{ color: C.navy, fontWeight: 700, fontSize: 13, marginBottom: 10 }}>Three probe approaches — tap each to learn more:</div>
+                  <div style={{ color: C.navy, fontWeight: 700, fontSize: 15, marginBottom: 10 }}>Three probe approaches — tap each to learn more:</div>
                   {ULTRASOUND_PROBES.map(p => (
                     <div key={p.label}>
                       <button onClick={() => setProbeOpen(probeOpen === p.label ? null : p.label)}
-                        className="w-full text-left rounded-xl p-3 mb-2 flex items-center gap-3"
-                        style={{ background: probeOpen === p.label ? C.tealLight : C.bg, border: `1.5px solid ${probeOpen === p.label ? C.teal : C.border}`, minHeight: 48 }}>
+                                                style={{ background: probeOpen === p.label ? C.tealLight : C.bg, border: `1.5px solid ${probeOpen === p.label ? C.teal : C.border}`, minHeight: 54 }}>
                         <span style={{ fontSize: 18 }}>{p.icon}</span>
-                        <span style={{ color: C.navy, fontWeight: 600, fontSize: 13, flex: 1 }}>{p.label}</span>
+                        <span style={{ color: C.navy, fontWeight: 600, fontSize: 15, flex: 1 }}>{p.label}</span>
                         <span style={{ color: C.muted, fontSize: 14 }}>{probeOpen === p.label ? "▲" : "▼"}</span>
                       </button>
                       {probeOpen === p.label && (
-                        <div className="rounded-xl p-3 mb-3 mx-1" style={{ background: C.bg, border: `1px solid ${C.border}` }}>
+                        <div  style={{ background: C.bg, border: `1px solid ${C.border}` }}>
                           {[["What it is", p.what], ["Why it's ordered", p.why], ["What to expect", p.expect]].map(([k, v]) => (
-                            <div key={k} className="mb-3">
-                              <div style={{ color: C.teal, fontWeight: 700, fontSize: 11, textTransform: "uppercase", letterSpacing: 0.5, marginBottom: 2 }}>{k}</div>
-                              <div style={{ color: C.navy, fontSize: 13, lineHeight: 1.6 }}>{v}</div>
+                            <div key={k} style={{ marginBottom: 12 }}>
+                              <div style={{ color: C.teal, fontWeight: 700, fontSize: 13, textTransform: "uppercase", letterSpacing: 0.5, marginBottom: 2 }}>{k}</div>
+                              <div style={{ color: C.navy, fontSize: 15, lineHeight: 1.6 }}>{v}</div>
                             </div>
                           ))}
                         </div>
@@ -496,9 +487,9 @@ const ImagingSection = () => {
                 </div>
               ) : (
                 [["What it is", s.what], ["Why it's ordered", s.why], ["What happens", s.what_happens], ["Preparation", s.prep], ["What to expect", s.expect]].map(([k, v]) => (
-                  <div key={k} className="mb-3">
-                    <div style={{ color: C.teal, fontWeight: 700, fontSize: 12, textTransform: "uppercase", letterSpacing: 0.5, marginBottom: 2 }}>{k}</div>
-                    <div style={{ color: C.navy, fontSize: 13, lineHeight: 1.6 }}>{v}</div>
+                  <div key={k} style={{ marginBottom: 12 }}>
+                    <div style={{ color: C.teal, fontWeight: 700, fontSize: 14, textTransform: "uppercase", letterSpacing: 0.5, marginBottom: 2 }}>{k}</div>
+                    <div style={{ color: C.navy, fontSize: 15, lineHeight: 1.6 }}>{v}</div>
                   </div>
                 ))
               )}
@@ -534,12 +525,11 @@ const LifestyleSection = () => {
       {LIFESTYLE_PILLARS.map(p => (
         <div key={p.id}>
           <button onClick={() => setOpen(open === p.id ? null : p.id)}
-            className="w-full text-left rounded-2xl p-4 mb-3 flex items-center gap-3"
-            style={{ background: open === p.id ? "#f0f7f5" : C.card, border: `1.5px solid ${open === p.id ? p.color : C.border}` }}>
+                        style={{ background: open === p.id ? "#f0f7f5" : C.card, border: `1.5px solid ${open === p.id ? p.color : C.border}` }}>
             <span style={{ fontSize: 24 }}>{p.icon}</span>
             <div style={{ flex: 1 }}>
               <div style={{ color: C.navy, fontWeight: 600, fontSize: 14 }}>{p.label}</div>
-              <div style={{ color: C.muted, fontSize: 12, marginTop: 2 }}>{p.desc.substring(0, 60)}...</div>
+              <div style={{ color: C.muted, fontSize: 14, marginTop: 2 }}>{p.desc.substring(0, 60)}...</div>
             </div>
             <span style={{ color: C.muted }}>{open === p.id ? "▲" : "▼"}</span>
           </button>
@@ -547,9 +537,9 @@ const LifestyleSection = () => {
             <Card style={{ marginTop: -8, marginBottom: 16, borderLeft: `4px solid ${p.color}` }}>
               <div style={{ color: C.navy, fontSize: 14, lineHeight: 1.7, marginBottom: 12 }}>{p.desc}</div>
               {p.tips.map((t, i) => (
-                <div key={i} className="flex gap-2 mb-2">
+                <div key={i} style={{ display: "flex", gap: 8, marginBottom: 8 }}>
                   <div style={{ color: p.color, fontSize: 16, marginTop: 2, flexShrink: 0 }}>✓</div>
-                  <div style={{ color: C.slate, fontSize: 13, lineHeight: 1.6 }}>{t}</div>
+                  <div style={{ color: C.slate, fontSize: 15, lineHeight: 1.6 }}>{t}</div>
                 </div>
               ))}
             </Card>
@@ -558,7 +548,7 @@ const LifestyleSection = () => {
       ))}
       <Card style={{ background: C.tealLight }}>
         <div style={{ color: C.teal, fontWeight: 700, fontSize: 14, marginBottom: 6 }}>🏋️ Pelvic Floor Physical Therapy</div>
-        <div style={{ color: C.navy, fontSize: 13, lineHeight: 1.6 }}>
+        <div style={{ color: C.navy, fontSize: 15, lineHeight: 1.6 }}>
           PT is one of the most effective interventions for bowel and bladder dysfunction. Important: for some people the pelvic floor is too tight (not too weak) — a PT can assess your specific needs and give tailored exercises. Always ask for a referral if you haven't seen one.
         </div>
       </Card>
@@ -766,21 +756,19 @@ const impactSummaryText = (ans) => {
 // Option button component
 const OptBtn = ({ label, selected, onClick, color = C.teal }) => (
   <button onClick={onClick}
-    className="w-full text-left rounded-xl px-3 py-2 mb-2 flex items-center gap-2"
-    style={{ background: selected ? color : C.tealLight, border: `1.5px solid ${selected ? color : C.border}`, minHeight: 44 }}>
-    <div className="rounded-full flex-shrink-0" style={{ width: 18, height: 18, border: `2px solid ${selected ? "#fff" : color}`, background: selected ? "#fff" : "transparent" }} />
+        style={{ background: selected ? color : C.tealLight, border: `1.5px solid ${selected ? color : C.border}`, minHeight: 52 }}>
+    <div  style={{ width: 18, height: 18, border: `2px solid ${selected ? "#fff" : color}`, background: selected ? "#fff" : "transparent" }} />
     <span style={{ color: selected ? "#fff" : C.navy, fontSize: 13 }}>{label}</span>
   </button>
 );
 
 const YesNoGate = ({ question, value, onChange }) => (
-  <div className="mb-4">
+  <div style={{ marginBottom: 16 }}>
     <div style={{ color: C.navy, fontWeight: 600, fontSize: 14, marginBottom: 8 }}>{question}</div>
-    <div className="flex gap-3">
+    <div style={{ display: "flex", gap: 12 }}>
       {["yes","no"].map(v => (
         <button key={v} onClick={() => onChange(v)}
-          className="rounded-xl px-6 py-2"
-          style={{ background: value === v ? C.teal : C.tealLight, color: value === v ? "#fff" : C.navy, border: `1.5px solid ${value === v ? C.teal : C.border}`, fontWeight: 600, fontSize: 13, minHeight: 44 }}>
+                    style={{ background: value === v ? C.teal : C.tealLight, color: value === v ? "#fff" : C.navy, border: `1.5px solid ${value === v ? C.teal : C.border}`, fontWeight: 600, fontSize: 15, minHeight: 52 }}>
           {v === "yes" ? "YES" : "NO"}
         </button>
       ))}
@@ -789,7 +777,7 @@ const YesNoGate = ({ question, value, onChange }) => (
 );
 
 const SubLabel = ({ text }) => (
-  <div style={{ color: C.teal, fontWeight: 700, fontSize: 11, textTransform: "uppercase", letterSpacing: 0.5, marginBottom: 6, marginTop: 14 }}>{text}</div>
+  <div style={{ color: C.teal, fontWeight: 700, fontSize: 13, textTransform: "uppercase", letterSpacing: 0.5, marginBottom: 6, marginTop: 14 }}>{text}</div>
 );
 
 // ─── IMPACT SURVEY COMPONENT ─────────────────────────────────────────────────
@@ -862,14 +850,14 @@ const IMPACTSurvey = ({ onComplete }) => {
     <div>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
         <div style={{ color: C.muted, fontSize: 12 }}>Question {step} of {totalSteps}</div>
-        <div className="rounded-full px-3 py-1" style={{ background: C.tealLight, color: C.teal, fontSize: 11, fontWeight: 700 }}>IMPACT Bowel Survey</div>
+        <div  style={{ background: C.tealLight, color: C.teal, fontSize: 13, fontWeight: 700 }}>IMPACT Bowel Survey</div>
       </div>
       <ProgressBar value={step} max={totalSteps} />
 
       {step === 1 && (
         <Card>
           <div style={{ color: C.navy, fontWeight: 700, fontSize: 15, marginBottom: 4 }}>Q1. What does your stool usually look like?</div>
-          <div style={{ color: C.muted, fontSize: 12, marginBottom: 12 }}>Please think about your typical bowel movements over the last 3 months.</div>
+          <div style={{ color: C.muted, fontSize: 14, marginBottom: 12 }}>Please think about your typical bowel movements over the last 3 months.</div>
           {BRISTOL_TYPES.map(t => (
             <OptBtn key={t.type} label={`${t.label}: ${t.desc}`} selected={ans.bristol === t.type} onClick={() => set("bristol", t.type)} />
           ))}
@@ -879,7 +867,7 @@ const IMPACTSurvey = ({ onComplete }) => {
       {step === 2 && (
         <Card>
           <div style={{ color: C.navy, fontWeight: 700, fontSize: 15, marginBottom: 4 }}>Q2. How often do you have an uncomfortable or difficult bowel movement?</div>
-          <div style={{ color: C.muted, fontSize: 12, marginBottom: 12 }}>During a typical month.</div>
+          <div style={{ color: C.muted, fontSize: 14, marginBottom: 12 }}>During a typical month.</div>
           {[
             { label: "Never", value: "never" },
             { label: "Daily", value: "daily" },
@@ -894,7 +882,7 @@ const IMPACTSurvey = ({ onComplete }) => {
       {step === 3 && (
         <Card>
           <div style={{ color: C.navy, fontWeight: 700, fontSize: 15, marginBottom: 4 }}>Q3. Do you have difficulty with infrequent bowel movements?</div>
-          <div style={{ color: C.muted, fontSize: 12, marginBottom: 12 }}>(Less than 1 bowel movement every 3 days)</div>
+          <div style={{ color: C.muted, fontSize: 14, marginBottom: 12 }}>(Less than 1 bowel movement every 3 days)</div>
           <YesNoGate question="" value={ans.q3} onChange={v => set("q3", v)} />
           {ans.q3 === "yes" && (
             <div>
@@ -961,18 +949,17 @@ const IMPACTSurvey = ({ onComplete }) => {
       {step === 7 && (
         <Card>
           <div style={{ color: C.navy, fontWeight: 700, fontSize: 15, marginBottom: 4 }}>Q7. Do you sometimes have symptoms of constipation?</div>
-          <div style={{ color: C.muted, fontSize: 12, marginBottom: 12 }}>If yes, please rate how severe these have been in the past 2 weeks.</div>
+          <div style={{ color: C.muted, fontSize: 14, marginBottom: 12 }}>If yes, please rate how severe these have been in the past 2 weeks.</div>
           <YesNoGate question="" value={ans.q7} onChange={v => set("q7", v)} />
           {ans.q7 === "yes" && (
             <div>
               {CONSTIP_ITEMS.map(it => (
-                <div key={it.key} className="mb-4">
-                  <div style={{ color: C.navy, fontSize: 13, fontWeight: 600, marginBottom: 6 }}>{it.label}</div>
-                  <div className="flex gap-2 flex-wrap">
+                <div key={it.key} style={{ marginBottom: 16 }}>
+                  <div style={{ color: C.navy, fontSize: 15, fontWeight: 600, marginBottom: 6 }}>{it.label}</div>
+                  <div >
                     {SEV_4.map(o => (
                       <button key={o.value} onClick={() => set(it.key, o.value)}
-                        className="rounded-xl px-3 py-1.5"
-                        style={{ background: ans[it.key] === o.value ? C.teal : C.tealLight, color: ans[it.key] === o.value ? "#fff" : C.navy, border: `1.5px solid ${ans[it.key] === o.value ? C.teal : C.border}`, fontSize: 12, fontWeight: ans[it.key] === o.value ? 700 : 400 }}>
+                                                style={{ background: ans[it.key] === o.value ? C.teal : C.tealLight, color: ans[it.key] === o.value ? "#fff" : C.navy, border: `1.5px solid ${ans[it.key] === o.value ? C.teal : C.border}`, fontSize: 14, fontWeight: ans[it.key] === o.value ? 700 : 400 }}>
                         {o.label}
                       </button>
                     ))}
@@ -992,7 +979,7 @@ const IMPACTSurvey = ({ onComplete }) => {
             <div>
               <Callout body="Many people with pelvic floor conditions experience some leakage. Your honest answers help your team understand your needs." icon="💙" />
 
-              <div style={{ color: C.navy, fontWeight: 600, fontSize: 13, marginBottom: 6, marginTop: 8 }}>8A. Do you usually lose well-formed stool beyond your control?</div>
+              <div style={{ color: C.navy, fontWeight: 600, fontSize: 15, marginBottom: 6, marginTop: 8 }}>8A. Do you usually lose well-formed stool beyond your control?</div>
               <YesNoGate question="" value={ans.q8a} onChange={v => set("q8a", v)} />
               {ans.q8a === "yes" && (
                 <div style={{ paddingLeft: 8, borderLeft: `3px solid ${C.teal}`, marginBottom: 12 }}>
@@ -1005,7 +992,7 @@ const IMPACTSurvey = ({ onComplete }) => {
                 </div>
               )}
 
-              <div style={{ color: C.navy, fontWeight: 600, fontSize: 13, marginBottom: 6 }}>8B. Do you usually lose loose or liquid stool beyond your control?</div>
+              <div style={{ color: C.navy, fontWeight: 600, fontSize: 15, marginBottom: 6 }}>8B. Do you usually lose loose or liquid stool beyond your control?</div>
               <YesNoGate question="" value={ans.q8b} onChange={v => set("q8b", v)} />
               {ans.q8b === "yes" && (
                 <div style={{ paddingLeft: 8, borderLeft: `3px solid ${C.teal}`, marginBottom: 12 }}>
@@ -1018,7 +1005,7 @@ const IMPACTSurvey = ({ onComplete }) => {
                 </div>
               )}
 
-              <div style={{ color: C.navy, fontWeight: 600, fontSize: 13, marginBottom: 6 }}>8C. Do you usually lose gas from the rectum beyond your control?</div>
+              <div style={{ color: C.navy, fontWeight: 600, fontSize: 15, marginBottom: 6 }}>8C. Do you usually lose gas from the rectum beyond your control?</div>
               <YesNoGate question="" value={ans.q8c} onChange={v => set("q8c", v)} />
               {ans.q8c === "yes" && (
                 <div style={{ paddingLeft: 8, borderLeft: `3px solid ${C.teal}`, marginBottom: 12 }}>
@@ -1072,7 +1059,7 @@ const IMPACTSurvey = ({ onComplete }) => {
       {step === 11 && (
         <Card>
           <div style={{ color: C.navy, fontWeight: 700, fontSize: 15, marginBottom: 4 }}>Q11. Does part of your bowel ever pass through the rectum and bulge outside during or after a bowel movement?</div>
-          <div style={{ color: C.muted, fontSize: 12, marginBottom: 12 }}>This is known as rectal prolapse — tissue that comes out of the rectum.</div>
+          <div style={{ color: C.muted, fontSize: 14, marginBottom: 12 }}>This is known as rectal prolapse — tissue that comes out of the rectum.</div>
           <YesNoGate question="" value={ans.q11} onChange={v => set("q11", v)} />
           {ans.q11 === "yes" && (
             <div>
@@ -1086,7 +1073,7 @@ const IMPACTSurvey = ({ onComplete }) => {
       {step === 12 && (
         <Card>
           <div style={{ color: C.navy, fontWeight: 700, fontSize: 15, marginBottom: 4 }}>Q12. During the past month, how often have you had bleeding during or after a bowel movement?</div>
-          <div style={{ color: C.muted, fontSize: 12, marginBottom: 12 }}>Due to your bowel habits.</div>
+          <div style={{ color: C.muted, fontSize: 14, marginBottom: 12 }}>Due to your bowel habits.</div>
           {BLEED_FREQ.map(o => <OptBtn key={o.value} label={o.label} selected={ans.q12 === o.value} onClick={() => set("q12", o.value)} />)}
           {ans.q12 && ans.q12 !== "never" && (
             <Callout icon="🩸" color={C.red} bg={C.redLt} body="Rectal bleeding should always be evaluated by your healthcare team — please mention this at your appointment or contact your provider." />
@@ -1095,14 +1082,12 @@ const IMPACTSurvey = ({ onComplete }) => {
       )}
 
       <button onClick={next} disabled={!canProceed()}
-        className="w-full rounded-xl py-3 mt-2 font-semibold"
-        style={{ background: canProceed() ? C.teal : C.border, color: "#fff", border: "none", fontSize: 15, opacity: canProceed() ? 1 : 0.5 }}>
+                style={{ background: canProceed() ? C.teal : C.border, color: "#fff", border: "none", fontSize: 15, opacity: canProceed() ? 1 : 0.5 }}>
         {step < totalSteps ? "Next question →" : "Complete survey ✓"}
       </button>
       {step > 1 && (
         <button onClick={() => setStep(s => s - 1)}
-          className="w-full rounded-xl py-2 mt-2"
-          style={{ background: "none", color: C.muted, border: `1px solid ${C.border}`, fontSize: 13 }}>
+                    style={{ background: "none", color: C.muted, border: `1px solid ${C.border}`, fontSize: 13 }}>
           ← Back
         </button>
       )}
@@ -1118,13 +1103,13 @@ const DomainBar = ({ label, icon, score, detail }) => {
   return (
     <div style={{ marginBottom: 16 }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 }}>
-        <div style={{ color: C.navy, fontSize: 13, fontWeight: 600 }}>{icon} {label}</div>
-        <div style={{ borderRadius: 20, padding: "3px 10px", background: band.bg, color: band.color, fontSize: 11, fontWeight: 700 }}>{band.label}</div>
+        <div style={{ color: C.navy, fontSize: 15, fontWeight: 600 }}>{icon} {label}</div>
+        <div style={{ borderRadius: 20, padding: "3px 10px", background: band.bg, color: band.color, fontSize: 13, fontWeight: 700 }}>{band.label}</div>
       </div>
       <div style={{ height: 10, background: C.border, borderRadius: 5, overflow: "hidden", marginBottom: 4 }}>
         <div style={{ width: `${pct}%`, height: "100%", background: band.color, borderRadius: 5, transition: "width 0.5s" }} />
       </div>
-      {detail && <div style={{ color: C.muted, fontSize: 12, lineHeight: 1.5 }}>{detail}</div>}
+      {detail && <div style={{ color: C.muted, fontSize: 14, lineHeight: 1.5 }}>{detail}</div>}
     </div>
   );
 };
@@ -1141,22 +1126,22 @@ const IMPACTResults = ({ ans, onRetake }) => {
   return (
     <div>
       <div style={{ color: C.teal, fontWeight: 800, fontSize: 17, marginBottom: 4 }}>Your IMPACT Bowel Survey Results</div>
-      <div style={{ color: C.muted, fontSize: 12, marginBottom: 16 }}>IMPACT Bowel Function Short Form — PFDC Consortium Endorsed</div>
+      <div style={{ color: C.muted, fontSize: 14, marginBottom: 16 }}>IMPACT Bowel Function Short Form — PFDC Consortium Endorsed</div>
 
       {/* Bristol stool type */}
       <Card style={{ border: `2px solid ${bristol?.color || C.border}` }}>
-        <div style={{ color: C.muted, fontSize: 11, textTransform: "uppercase", letterSpacing: 0.5, marginBottom: 4 }}>Stool Type (Bristol Scale)</div>
+        <div style={{ color: C.muted, fontSize: 13, textTransform: "uppercase", letterSpacing: 0.5, marginBottom: 4 }}>Stool Type (Bristol Scale)</div>
         <div style={{ color: bristol?.color || C.navy, fontWeight: 700, fontSize: 15, marginBottom: 4 }}>
           Type {ans.bristol} — {BRISTOL_TYPES.find(t => t.type === ans.bristol)?.desc}
         </div>
-        {bristol && <div style={{ color: C.slate, fontSize: 13, lineHeight: 1.5 }}>{bristol.note}</div>}
+        {bristol && <div style={{ color: C.slate, fontSize: 15, lineHeight: 1.5 }}>{bristol.note}</div>}
       </Card>
 
       {/* Domain bother scores — visual bars */}
       {hasDomainScores && (
         <Card>
           <div style={{ color: C.navy, fontWeight: 700, fontSize: 14, marginBottom: 4 }}>Symptom Bother by Domain</div>
-          <div style={{ color: C.muted, fontSize: 12, marginBottom: 16 }}>
+          <div style={{ color: C.muted, fontSize: 14, marginBottom: 16 }}>
             Based on your responses. Scale: Not bothersome → Extremely bothersome.
           </div>
           <DomainBar label="Constipation / Evacuation" icon="🚽" score={constipScore}
@@ -1166,7 +1151,7 @@ const IMPACTResults = ({ ans, onRetake }) => {
           <DomainBar label="Urgency" icon="⚡" score={urgScore} />
           <DomainBar label="Rectal / Anal Pain" icon="😣" score={painScore} />
           <DomainBar label="Prolapse Sensation" icon="⬇️" score={prolapseScore} />
-          <div style={{ color: C.muted, fontSize: 11, marginTop: 8, lineHeight: 1.5 }}>
+          <div style={{ color: C.muted, fontSize: 13, marginTop: 8, lineHeight: 1.5 }}>
             These domain scores are based on your bother ratings. They are not diagnostic — share them with your healthcare team.
           </div>
         </Card>
@@ -1176,8 +1161,8 @@ const IMPACTResults = ({ ans, onRetake }) => {
       {hasLeakage && (
         <Card style={{ border: `2px solid ${C.coral}` }}>
           <div style={{ color: C.coral, fontWeight: 700, fontSize: 14, marginBottom: 6 }}>💧 Leakage Detail</div>
-          {ans.q8a === "yes" && <div style={{ color: C.navy, fontSize: 13, marginBottom: 4 }}>• Solid stool — {ans.q8a_freq} / bother: {ans.q8a_bother}</div>}
-          {ans.q8b === "yes" && <div style={{ color: C.navy, fontSize: 13, marginBottom: 4 }}>• Liquid stool — {ans.q8b_freq} / bother: {ans.q8b_bother}</div>}
+          {ans.q8a === "yes" && <div style={{ color: C.navy, fontSize: 15, marginBottom: 4 }}>• Solid stool — {ans.q8a_freq} / bother: {ans.q8a_bother}</div>}
+          {ans.q8b === "yes" && <div style={{ color: C.navy, fontSize: 15, marginBottom: 4 }}>• Liquid stool — {ans.q8b_freq} / bother: {ans.q8b_bother}</div>}
           {ans.q8c === "yes" && <div style={{ color: C.navy, fontSize: 13 }}>• Gas — {ans.q8c_freq} / bother: {ans.q8c_bother}</div>}
         </Card>
       )}
@@ -1186,24 +1171,23 @@ const IMPACTResults = ({ ans, onRetake }) => {
       {ans.q12 && ans.q12 !== "never" && (
         <Card style={{ border: `2px solid ${C.red}` }}>
           <div style={{ color: C.red, fontWeight: 700, fontSize: 14, marginBottom: 4 }}>🩸 Rectal Bleeding</div>
-          <div style={{ color: C.navy, fontSize: 13, marginBottom: 6 }}>Frequency: {ans.q12}</div>
-          <div style={{ color: C.red, fontSize: 13, fontWeight: 600 }}>Please make sure to mention this to your healthcare team at your appointment.</div>
+          <div style={{ color: C.navy, fontSize: 15, marginBottom: 6 }}>Frequency: {ans.q12}</div>
+          <div style={{ color: C.red, fontSize: 15, fontWeight: 600 }}>Please make sure to mention this to your healthcare team at your appointment.</div>
         </Card>
       )}
 
       {/* Summary for team */}
       <Card style={{ background: C.tealLight, border: `2px solid ${C.teal}` }}>
         <div style={{ color: C.teal, fontWeight: 700, fontSize: 14, marginBottom: 6 }}>💬 Summary for your healthcare team</div>
-        <div style={{ color: C.navy, fontSize: 13, lineHeight: 1.6 }}>{summaryText}</div>
+        <div style={{ color: C.navy, fontSize: 15, lineHeight: 1.6 }}>{summaryText}</div>
       </Card>
 
-      <div style={{ color: C.muted, fontSize: 11, textAlign: "center", marginBottom: 12 }}>
+      <div style={{ color: C.muted, fontSize: 13, textAlign: "center", marginBottom: 12 }}>
         IMPACT Bowel Function Short Form — Endorsed by ASCRS, AUGS, ICS, SUFU (Bordeianou et al., Dis Colon Rectum 2020)
       </div>
 
       <button onClick={onRetake}
-        className="w-full rounded-xl py-3"
-        style={{ background: C.tealLight, color: C.teal, border: `1px solid ${C.teal}`, fontSize: 14, fontWeight: 600 }}>
+                style={{ background: C.tealLight, color: C.teal, border: `1px solid ${C.teal}`, fontSize: 14, fontWeight: 600 }}>
         ↩ Retake survey
       </button>
 
@@ -1217,7 +1201,7 @@ const CalculatorShell = ({ title, total, max, children }) => (
   <div>
     <div style={{ color: C.navy, fontWeight: 700, fontSize: 17, marginBottom: 4 }}>{title}</div>
     <ProgressBar value={total} max={max} />
-    <div style={{ color: C.muted, fontSize: 12, textAlign: "right", marginBottom: 16 }}>Score so far: {total}/{max}</div>
+    <div style={{ color: C.muted, fontSize: 14, textAlign: "right", marginBottom: 16 }}>Score so far: {total}/{max}</div>
     {children}
   </div>
 );
@@ -1225,12 +1209,12 @@ const CalculatorShell = ({ title, total, max, children }) => (
 const ScoreResult = ({ label, score, max, band, msg }) => (
   <Card style={{ background: C.tealLight, border: `2px solid ${band.color}` }}>
     <div style={{ textAlign: "center", marginBottom: 12 }}>
-      <div style={{ color: C.muted, fontSize: 13, marginBottom: 4 }}>{label}</div>
+      <div style={{ color: C.muted, fontSize: 15, marginBottom: 4 }}>{label}</div>
       <div style={{ color: band.color, fontSize: 48, fontWeight: 900, lineHeight: 1 }}>{score}</div>
       <div style={{ color: C.muted, fontSize: 12 }}>out of {max}</div>
-      <div className="inline-block rounded-full px-3 py-1 mt-2" style={{ background: band.color, color: "#fff", fontSize: 12, fontWeight: 700 }}>{band.label}</div>
+      <div style={{ display: "inline-block", borderRadius: 20, padding: "4px 12px", marginTop: 8 }} style={{ background: band.color, color: "#fff", fontSize: 14, fontWeight: 700 }}>{band.label}</div>
     </div>
-    <div style={{ color: C.navy, fontSize: 13, lineHeight: 1.6, marginBottom: 10 }}>{msg}</div>
+    <div style={{ color: C.navy, fontSize: 15, lineHeight: 1.6, marginBottom: 10 }}>{msg}</div>
     <Callout icon="💬" body="This score is a starting point for conversation — not a diagnosis. Share it with your healthcare team." color={C.slate} bg="#f0f4f8" />
   </Card>
 );
@@ -1281,15 +1265,14 @@ const CalculatorsSection = ({ scores, setScores, primarySymptom, setPrimarySympt
       {active === "primary" && (
         <div>
           <div style={{ color: C.navy, fontWeight: 700, fontSize: 16, marginBottom: 8 }}>What bothers you most?</div>
-          <div style={{ color: C.slate, fontSize: 13, lineHeight: 1.6, marginBottom: 16 }}>
+          <div style={{ color: C.slate, fontSize: 15, lineHeight: 1.6, marginBottom: 16 }}>
             Before completing the questionnaires, it helps to identify which symptom is affecting your quality of life the most. Your most bothersome symptom matters — especially if you're considering surgery.
           </div>
           {SYMPTOM_OPTS.map(o => (
             <button key={o.id} onClick={() => setPrimarySymptom(o.id)}
-              className="w-full text-left rounded-2xl p-4 mb-3 flex items-center gap-3"
-              style={{ background: primarySymptom === o.id ? C.tealLight : C.card, border: `2px solid ${primarySymptom === o.id ? C.teal : C.border}` }}>
-              <div className="rounded-full flex-shrink-0" style={{ width: 22, height: 22, border: `2px solid ${primarySymptom === o.id ? C.teal : C.border}`, background: primarySymptom === o.id ? C.teal : "transparent" }} />
-              <span style={{ color: C.navy, fontSize: 13, lineHeight: 1.4 }}>{o.label}</span>
+                            style={{ background: primarySymptom === o.id ? C.tealLight : C.card, border: `2px solid ${primarySymptom === o.id ? C.teal : C.border}` }}>
+              <div  style={{ width: 22, height: 22, border: `2px solid ${primarySymptom === o.id ? C.teal : C.border}`, background: primarySymptom === o.id ? C.teal : "transparent" }} />
+              <span style={{ color: C.navy, fontSize: 15, lineHeight: 1.4 }}>{o.label}</span>
             </button>
           ))}
           {primarySymptom && (
@@ -1302,8 +1285,7 @@ const CalculatorsSection = ({ scores, setScores, primarySymptom, setPrimarySympt
           )}
           {primarySymptom && (
             <button onClick={() => setActive("impact")}
-              className="w-full rounded-xl py-3 mt-2 font-semibold"
-              style={{ background: C.teal, color: "#fff", border: "none", fontSize: 14 }}>
+                            style={{ background: C.teal, color: "#fff", border: "none", fontSize: 14 }}>
               Continue to Bowel Survey →
             </button>
           )}
@@ -1323,12 +1305,11 @@ const CalculatorsSection = ({ scores, setScores, primarySymptom, setPrimarySympt
       {active === "surgical" && (
         <div>
           <div style={{ color: C.navy, fontWeight: 700, fontSize: 16, marginBottom: 8 }}>Pre-Op Surgical Risk Checklist</div>
-          <div style={{ color: C.slate, fontSize: 13, lineHeight: 1.6, marginBottom: 16 }}>Select any factors that apply to you. This is not a validated risk score — it's an educational checklist to help you start an informed conversation with your surgeon.</div>
+          <div style={{ color: C.slate, fontSize: 15, lineHeight: 1.6, marginBottom: 16 }}>Select any factors that apply to you. This is not a validated risk score — it's an educational checklist to help you start an informed conversation with your surgeon.</div>
           {SURG_RISKS.map(r => (
             <button key={r} onClick={() => setSurgRisk(prev => prev.includes(r) ? prev.filter(x => x !== r) : [...prev, r])}
-              className="w-full text-left rounded-xl p-3 mb-2 flex items-center gap-3"
-              style={{ background: surgRisk.includes(r) ? C.tealLight : C.card, border: `1.5px solid ${surgRisk.includes(r) ? C.teal : C.border}`, minHeight: 48 }}>
-              <div className="rounded flex-shrink-0" style={{ width: 20, height: 20, border: `2px solid ${surgRisk.includes(r) ? C.teal : C.border}`, background: surgRisk.includes(r) ? C.teal : "transparent", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                            style={{ background: surgRisk.includes(r) ? C.tealLight : C.card, border: `1.5px solid ${surgRisk.includes(r) ? C.teal : C.border}`, minHeight: 54 }}>
+              <div style={{ width: 20, height: 20, border: `2px solid ${surgRisk.includes(r) ? C.teal : C.border}`, background: surgRisk.includes(r) ? C.teal : "transparent", display: "flex", alignItems: "center", justifyContent: "center" }}>
                 {surgRisk.includes(r) && <span style={{ color: "#fff", fontSize: 12 }}>✓</span>}
               </div>
               <span style={{ color: C.navy, fontSize: 13 }}>{r}</span>
@@ -1336,7 +1317,7 @@ const CalculatorsSection = ({ scores, setScores, primarySymptom, setPrimarySympt
           ))}
           <Card style={{ background: C.tealLight, marginTop: 8 }}>
             <div style={{ color: C.teal, fontWeight: 700, fontSize: 14, marginBottom: 4 }}>{surgRisk.length === 0 ? "✅ No risk factors identified" : `${surgRisk.length} factor${surgRisk.length > 1 ? "s" : ""} identified`}</div>
-            <div style={{ color: C.navy, fontSize: 13, lineHeight: 1.6 }}>
+            <div style={{ color: C.navy, fontSize: 15, lineHeight: 1.6 }}>
               {surgRisk.length === 0 ? "Reassuring — your team will do their own full assessment." : surgRisk.length <= 2 ? "These are worth discussing with your surgical team so they can plan accordingly." : "Your surgeon will want to know about these and may recommend additional pre-operative preparation."}
             </div>
           </Card>
@@ -1350,24 +1331,23 @@ const CalculatorsSection = ({ scores, setScores, primarySymptom, setPrimarySympt
           {REC_RISKS.map(r => (
             <div key={r.id}>
               <button onClick={() => setRecRisk(prev => prev.includes(r.id) ? prev.filter(x => x !== r.id) : [...prev, r.id])}
-                className="w-full text-left rounded-xl p-3 mb-2 flex items-center gap-3"
-                style={{ background: recRisk.includes(r.id) ? C.coralLt : C.card, border: `1.5px solid ${recRisk.includes(r.id) ? C.coral : C.border}`, minHeight: 48 }}>
-                <div className="rounded flex-shrink-0" style={{ width: 20, height: 20, border: `2px solid ${recRisk.includes(r.id) ? C.coral : C.border}`, background: recRisk.includes(r.id) ? C.coral : "transparent", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                                style={{ background: recRisk.includes(r.id) ? C.coralLt : C.card, border: `1.5px solid ${recRisk.includes(r.id) ? C.coral : C.border}`, minHeight: 54 }}>
+                <div style={{ width: 20, height: 20, border: `2px solid ${recRisk.includes(r.id) ? C.coral : C.border}`, background: recRisk.includes(r.id) ? C.coral : "transparent", display: "flex", alignItems: "center", justifyContent: "center" }}>
                   {recRisk.includes(r.id) && <span style={{ color: "#fff", fontSize: 12 }}>✓</span>}
                 </div>
                 <span style={{ color: C.navy, fontSize: 13 }}>{r.label}</span>
               </button>
               {recRisk.includes(r.id) && (
-                <div className="rounded-xl p-3 mb-3 mx-2" style={{ background: C.coralLt, border: `1px solid ${C.coral}44` }}>
-                  <div style={{ color: C.slate, fontSize: 12, lineHeight: 1.6 }}>{r.why}</div>
-                  {(r.id === "straining" || r.id === "obesity") && <div style={{ color: C.coral, fontSize: 12, fontWeight: 700, marginTop: 4 }}>⭐ This factor may be improvable before surgery. Ask your team.</div>}
+                <div style={{ background: C.coralLt, border: `1px solid ${C.coral}44` }}>
+                  <div style={{ color: C.slate, fontSize: 14, lineHeight: 1.6 }}>{r.why}</div>
+                  {(r.id === "straining" || r.id === "obesity") && <div style={{ color: C.coral, fontSize: 14, fontWeight: 700, marginTop: 4 }}>⭐ This factor may be improvable before surgery. Ask your team.</div>}
                 </div>
               )}
             </div>
           ))}
           <Card style={{ background: C.tealLight }}>
             <div style={{ color: C.teal, fontWeight: 700, fontSize: 14, marginBottom: 6 }}>{recRisk.length} factor{recRisk.length !== 1 ? "s" : ""} identified</div>
-            <div style={{ color: C.navy, fontSize: 13, lineHeight: 1.6 }}>Every person's recurrence risk is different. Bring this checklist to your appointment — the more your team knows, the better they can plan with you.</div>
+            <div style={{ color: C.navy, fontSize: 15, lineHeight: 1.6 }}>Every person's recurrence risk is different. Bring this checklist to your appointment — the more your team knows, the better they can plan with you.</div>
           </Card>
         </div>
       )}
@@ -1402,13 +1382,13 @@ const SurgicalSection = () => {
           <Card>
             <div style={{ color: C.teal, fontWeight: 700, fontSize: 14, marginBottom: 8 }}>General recovery themes</div>
             {["Hospital stay varies by approach and individual", "Bowel function may be temporarily altered after surgery", "Pelvic floor PT is often recommended post-operatively", "Lifestyle optimization (fiber, straining avoidance) remains important after repair", "Symptoms should be reassessed at follow-up — improvement may be gradual"].map((t, i) => (
-              <div key={i} className="flex gap-2 mb-2">
+              <div key={i} style={{ display: "flex", gap: 8, marginBottom: 8 }}>
                 <div style={{ color: C.teal }}>→</div>
-                <div style={{ color: C.navy, fontSize: 13, lineHeight: 1.6 }}>{t}</div>
+                <div style={{ color: C.navy, fontSize: 15, lineHeight: 1.6 }}>{t}</div>
               </div>
             ))}
           </Card>
-          <div style={{ color: C.muted, fontSize: 12, textAlign: "center" }}>This app does not recommend which approach is right for any individual. That decision is made with your surgical team.</div>
+          <div style={{ color: C.muted, fontSize: 14, textAlign: "center" }}>This app does not recommend which approach is right for any individual. That decision is made with your surgical team.</div>
         </div>
       )}
 
@@ -1420,20 +1400,20 @@ const SurgicalSection = () => {
             { title: "Constipation & Difficult Evacuation", icon: "🚽", good: false, body: "Improvement in constipation and obstructed defecation after prolapse repair is less predictable. Approximately 60–70% of patients see improvement — which means 30–40% may not, and some may find these symptoms unchanged or even temporarily worse after surgery. If straining or incomplete evacuation is your primary complaint, it is essential to discuss this honestly with your surgeon before proceeding." },
           ].map(s => (
             <Card key={s.title} style={{ border: `2px solid ${s.good ? C.teal : C.warn}` }}>
-              <div className="flex items-center gap-2 mb-3">
+              <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 12 }}>
                 <span style={{ fontSize: 22 }}>{s.icon}</span>
                 <div style={{ color: C.navy, fontWeight: 700, fontSize: 15 }}>{s.title}</div>
-                <div className="ml-auto rounded-full px-2 py-0.5" style={{ background: s.good ? C.tealLight : C.warnLt, color: s.good ? C.teal : C.warn, fontSize: 11, fontWeight: 700 }}>{s.good ? "More predictable" : "Less predictable"}</div>
+                <div style={{ background: s.good ? C.tealLight : C.warnLt, color: s.good ? C.teal : C.warn, fontSize: 13, fontWeight: 700 }}>{s.good ? "More predictable" : "Less predictable"}</div>
               </div>
-              <div style={{ color: C.navy, fontSize: 13, lineHeight: 1.7 }}>{s.body}</div>
+              <div style={{ color: C.navy, fontSize: 15, lineHeight: 1.7 }}>{s.body}</div>
             </Card>
           ))}
           <Card style={{ background: C.tealLight, border: `2px solid ${C.teal}` }}>
             <div style={{ color: C.teal, fontWeight: 700, fontSize: 14, marginBottom: 8 }}>⭐ Before surgery, make sure you have discussed:</div>
             {["Which symptom bothers you most (incontinence vs. constipation vs. prolapse sensation)", "What the realistic likelihood of improvement is for that specific symptom", "What happens if symptoms don't improve after repair", "What non-surgical options remain available if surgery is not fully effective"].map((t, i) => (
-              <div key={i} className="flex gap-2 mb-2">
+              <div key={i} style={{ display: "flex", gap: 8, marginBottom: 8 }}>
                 <div style={{ color: C.teal, flexShrink: 0 }}>✓</div>
-                <div style={{ color: C.navy, fontSize: 13, lineHeight: 1.6 }}>{t}</div>
+                <div style={{ color: C.navy, fontSize: 15, lineHeight: 1.6 }}>{t}</div>
               </div>
             ))}
           </Card>
@@ -1446,7 +1426,7 @@ const SurgicalSection = () => {
           <Callout body="Not all rectopexy procedures use mesh. Your surgeon will explain which approach is being recommended for you and why. The information below supports an informed conversation." icon="ℹ️" />
           <Card>
             <div style={{ color: C.teal, fontWeight: 700, fontSize: 14, marginBottom: 8 }}>What is mesh and why is it used?</div>
-            <div style={{ color: C.navy, fontSize: 13, lineHeight: 1.7 }}>Mesh is a material used in some rectopexy procedures to reinforce the repair and secure the rectum in its correct position. Mesh used in rectal prolapse surgery is different from mesh used in vaginal prolapse repair. The complication profile and evidence base are distinct and should be discussed specifically with your surgical team.</div>
+            <div style={{ color: C.navy, fontSize: 15, lineHeight: 1.7 }}>Mesh is a material used in some rectopexy procedures to reinforce the repair and secure the rectum in its correct position. Mesh used in rectal prolapse surgery is different from mesh used in vaginal prolapse repair. The complication profile and evidence base are distinct and should be discussed specifically with your surgical team.</div>
           </Card>
           {[
             { type: "Synthetic Mesh", icon: "🔩", desc: "Made from permanent synthetic material (such as polypropylene). Durable and widely used.", erosion: "~1.8% erosion rate in large studies", recurrence: "~3.7% at follow-up", color: C.navyMid },
@@ -1454,14 +1434,14 @@ const SurgicalSection = () => {
             { type: "Suture Rectopexy (No Mesh)", icon: "🪡", desc: "The rectum is secured using sutures alone — no mesh material is implanted. A valid surgical option for many patients.", erosion: "No mesh — no erosion risk", recurrence: "Comparable outcomes in many studies", color: C.sage },
           ].map(m => (
             <Card key={m.type}>
-              <div className="flex items-center gap-2 mb-3">
+              <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 12 }}>
                 <span style={{ fontSize: 22 }}>{m.icon}</span>
                 <div style={{ color: m.color, fontWeight: 700, fontSize: 14 }}>{m.type}</div>
               </div>
-              <div style={{ color: C.navy, fontSize: 13, lineHeight: 1.6, marginBottom: 8 }}>{m.desc}</div>
-              <div className="flex gap-4">
-                <div><div style={{ color: C.muted, fontSize: 11, textTransform: "uppercase" }}>Erosion</div><div style={{ color: C.navy, fontSize: 12, fontWeight: 600 }}>{m.erosion}</div></div>
-                <div><div style={{ color: C.muted, fontSize: 11, textTransform: "uppercase" }}>Recurrence</div><div style={{ color: C.navy, fontSize: 12, fontWeight: 600 }}>{m.recurrence}</div></div>
+              <div style={{ color: C.navy, fontSize: 15, lineHeight: 1.6, marginBottom: 8 }}>{m.desc}</div>
+              <div>
+                <div><div style={{ color: C.muted, fontSize: 13, textTransform: "uppercase" }}>Erosion</div><div style={{ color: C.navy, fontSize: 14, fontWeight: 600 }}>{m.erosion}</div></div>
+                <div><div style={{ color: C.muted, fontSize: 13, textTransform: "uppercase" }}>Recurrence</div><div style={{ color: C.navy, fontSize: 14, fontWeight: 600 }}>{m.recurrence}</div></div>
               </div>
             </Card>
           ))}
@@ -1473,9 +1453,8 @@ const SurgicalSection = () => {
             { id: "open", label: "I am open to whatever my surgeon recommends" },
           ].map(o => (
             <button key={o.id} onClick={() => setMeshPref(o.id)}
-              className="w-full text-left rounded-xl p-3 mb-2 flex items-center gap-3"
-              style={{ background: meshPref === o.id ? C.tealLight : C.card, border: `1.5px solid ${meshPref === o.id ? C.teal : C.border}`, minHeight: 48 }}>
-              <div className="rounded-full flex-shrink-0" style={{ width: 20, height: 20, border: `2px solid ${meshPref === o.id ? C.teal : C.border}`, background: meshPref === o.id ? C.teal : "transparent" }} />
+                            style={{ background: meshPref === o.id ? C.tealLight : C.card, border: `1.5px solid ${meshPref === o.id ? C.teal : C.border}`, minHeight: 54 }}>
+              <div  style={{ width: 20, height: 20, border: `2px solid ${meshPref === o.id ? C.teal : C.border}`, background: meshPref === o.id ? C.teal : "transparent" }} />
               <span style={{ color: C.navy, fontSize: 13 }}>{o.label}</span>
             </button>
           ))}
@@ -1499,9 +1478,9 @@ const SurgicalSection = () => {
             "What is your personal experience and complication rate with this procedure?",
           ].map((q, i) => (
             <Card key={i}>
-              <div className="flex gap-3">
-                <div className="flex-shrink-0" style={{ color: C.teal, fontWeight: 800, fontSize: 14 }}>Q{i + 1}</div>
-                <div style={{ color: C.navy, fontSize: 13, lineHeight: 1.6 }}>{q}</div>
+              <div style={{ display: "flex", gap: 12 }}>
+                <div style={{ flexShrink: 0 }} style={{ color: C.teal, fontWeight: 800, fontSize: 14 }}>Q{i + 1}</div>
+                <div style={{ color: C.navy, fontSize: 15, lineHeight: 1.6 }}>{q}</div>
               </div>
             </Card>
           ))}
@@ -1526,19 +1505,19 @@ const RedFlagsSection = () => (
       { icon: "🌡️", label: "Fever with Anorectal Symptoms", desc: "Fever combined with anorectal pain, swelling, or discharge may indicate infection that requires urgent treatment.", urgency: "Seek emergency care or contact your team immediately" },
     ].map(f => (
       <Card key={f.label} style={{ border: `2px solid ${C.red}44` }}>
-        <div className="flex items-center gap-3 mb-3">
+        <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 12 }}>
           <span style={{ fontSize: 26 }}>{f.icon}</span>
           <div style={{ color: C.red, fontWeight: 700, fontSize: 15 }}>{f.label}</div>
         </div>
-        <div style={{ color: C.navy, fontSize: 13, lineHeight: 1.6, marginBottom: 8 }}>{f.desc}</div>
-        <div className="rounded-xl px-3 py-2" style={{ background: C.redLt }}>
+        <div style={{ color: C.navy, fontSize: 15, lineHeight: 1.6, marginBottom: 8 }}>{f.desc}</div>
+        <div style={{ background: C.redLt }}>
           <div style={{ color: C.red, fontWeight: 700, fontSize: 12 }}>Action: {f.urgency}</div>
         </div>
       </Card>
     ))}
     <Card style={{ background: C.navyMid }}>
       <div style={{ color: "#fff", fontWeight: 700, fontSize: 14, marginBottom: 4 }}>When in doubt</div>
-      <div style={{ color: "rgba(255,255,255,0.85)", fontSize: 13, lineHeight: 1.6 }}>If you're unsure whether a symptom is a red flag, it's always better to contact your healthcare team than to wait. You know your body — trust that instinct.</div>
+      <div style={{ color: "rgba(255,255,255,0.85)", fontSize: 15, lineHeight: 1.6 }}>If you're unsure whether a symptom is a red flag, it's always better to contact your healthcare team than to wait. You know your body — trust that instinct.</div>
     </Card>
   </div>
 );
@@ -1617,53 +1596,49 @@ const Chatbot = ({ appState, onClose }) => {
   return (
     <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.5)", zIndex: 1000, display: "flex", flexDirection: "column", justifyContent: "flex-end" }}>
       <div style={{ background: C.card, borderTopLeftRadius: 24, borderTopRightRadius: 24, maxHeight: "90vh", display: "flex", flexDirection: "column" }}>
-        <div className="flex items-center justify-between p-4" style={{ borderBottom: `1px solid ${C.border}` }}>
+        <div style={{ borderBottom: `1px solid ${C.border}` }}>
           <div>
             <div style={{ color: C.navy, fontWeight: 700, fontSize: 16 }}>Ask Our Team</div>
             <div style={{ color: C.muted, fontSize: 12 }}>Here to educate — not to diagnose</div>
           </div>
           <button onClick={onClose} style={{ fontSize: 22, color: C.muted, background: "none", border: "none" }}>✕</button>
         </div>
-        <div className="p-3" style={{ background: C.warnLt, borderBottom: `1px solid ${C.border}` }}>
+        <div style={{ background: C.warnLt, borderBottom: `1px solid ${C.border}` }}>
           <div style={{ color: C.slate, fontSize: 12 }}>I'm here to help you learn and prepare — not to diagnose or replace your healthcare team. For urgent symptoms, contact your provider directly.</div>
         </div>
-        <div className="flex-1 overflow-y-auto p-4" style={{ minHeight: 200 }}>
+        <div style={{ minHeight: 200 }}>
           {showStarters && messages.length === 0 && (
             <div>
-              <div style={{ color: C.muted, fontSize: 12, marginBottom: 12 }}>Ask me anything, or choose a topic:</div>
+              <div style={{ color: C.muted, fontSize: 14, marginBottom: 12 }}>Ask me anything, or choose a topic:</div>
               {starters.map((s, i) => (
-                <button key={i} onClick={() => send(s)} className="w-full text-left rounded-xl p-3 mb-2"
-                  style={{ background: C.tealLight, border: `1px solid ${C.teal}33`, color: C.teal, fontSize: 13 }}>{s}</button>
+                <button key={i} onClick={() => send(s)} style={{ background: C.tealLight, border: `1px solid ${C.teal}33`, color: C.teal, fontSize: 13 }}>{s}</button>
               ))}
             </div>
           )}
           {messages.map((m, i) => (
-            <div key={i} className={`mb-3 flex ${m.role === "user" ? "justify-end" : "justify-start"}`}>
-              <div className="rounded-2xl px-4 py-3" style={{
+            <div key={i} style={{ marginBottom: 12, display: "flex", justifyContent: m.role === "user" ? "flex-end" : "flex-start" }}>
+              <div style={{
                 maxWidth: "85%",
                 background: m.role === "user" ? C.teal : C.tealLight,
                 color: m.role === "user" ? "#fff" : C.navy,
-                fontSize: 13, lineHeight: 1.7,
+                fontSize: 15, lineHeight: 1.7,
                 borderBottomRightRadius: m.role === "user" ? 4 : 16,
                 borderBottomLeftRadius: m.role === "user" ? 16 : 4,
               }}>{m.content}</div>
             </div>
           ))}
           {loading && (
-            <div className="flex justify-start mb-3">
-              <div className="rounded-2xl px-4 py-3" style={{ background: C.tealLight, color: C.muted, fontSize: 13 }}>Thinking…</div>
+            <div>
+              <div style={{ background: C.tealLight, color: C.muted, fontSize: 13 }}>Thinking…</div>
             </div>
           )}
           <div ref={bottomRef} />
         </div>
-        <div className="p-4" style={{ borderTop: `1px solid ${C.border}` }}>
-          <div className="flex gap-2">
+        <div style={{ borderTop: `1px solid ${C.border}` }}>
+          <div style={{ display: "flex", gap: 8 }}>
             <input value={input} onChange={e => setInput(e.target.value)} onKeyDown={e => e.key === "Enter" && send(input)}
-              placeholder="Ask a question…" className="flex-1 rounded-xl px-4 py-3 outline-none"
-              style={{ background: C.bg, border: `1.5px solid ${C.border}`, fontSize: 14, color: C.navy, minHeight: 48 }} />
-            <button onClick={() => send(input)} disabled={!input.trim() || loading}
-              className="rounded-xl px-4 font-semibold"
-              style={{ background: C.teal, color: "#fff", border: "none", minHeight: 48, minWidth: 52, opacity: (!input.trim() || loading) ? 0.5 : 1, fontSize: 20 }}>↑</button>
+              placeholder="Ask a question…" style={{ background: C.bg, border: `1.5px solid ${C.border}`, fontSize: 14, color: C.navy, minHeight: 54 }} />
+            <button onClick={() => send(input)} disabled={!input.trim() || loading} style={{ background: C.teal, color: "#fff", border: "none", minHeight: 54, minWidth: 52, opacity: (!input.trim() || loading) ? 0.5 : 1, fontSize: 20 }}>↑</button>
           </div>
         </div>
       </div>
@@ -1679,7 +1654,7 @@ const PrintSummary = ({ scores, primarySymptom, surgRisk = [], recRisk = [] }) =
       <div style={{ textAlign: "center", marginBottom: 32, borderBottom: "2px solid #2d7d6f", paddingBottom: 16 }}>
         <div style={{ fontSize: 28, fontWeight: 800, color: "#2d7d6f" }}>REPAIR</div>
         <div style={{ fontSize: 16, color: "#4a6278" }}>Pre-Appointment Summary</div>
-        <div style={{ fontSize: 12, color: "#7a8fa6", marginTop: 4 }}>Prepared: {now} · For discussion with your healthcare team — not a medical record</div>
+        <div style={{ fontSize: 14, color: "#7a8fa6", marginTop: 4 }}>Prepared: {now} · For discussion with your healthcare team — not a medical record</div>
       </div>
       {primarySymptom && (
         <div style={{ marginBottom: 24 }}>
@@ -1691,7 +1666,7 @@ const PrintSummary = ({ scores, primarySymptom, surgRisk = [], recRisk = [] }) =
         <div style={{ fontSize: 14, fontWeight: 700, color: "#2d7d6f", textTransform: "uppercase", letterSpacing: 1, marginBottom: 8 }}>2. My Bowel Survey (IMPACT)</div>
         {scores.impactDone
           ? <div>
-              <div style={{ fontSize: 13, color: "#1a2e3b", lineHeight: 1.6, marginBottom: 10 }}>{impactSummaryText(scores.impact)}</div>
+              <div style={{ fontSize: 15, color: "#1a2e3b", lineHeight: 1.6, marginBottom: 10 }}>{impactSummaryText(scores.impact)}</div>
               {(() => {
                 const d = calcIMPACTDomains(scores.impact);
                 const rows = [
@@ -1704,9 +1679,9 @@ const PrintSummary = ({ scores, primarySymptom, surgRisk = [], recRisk = [] }) =
                 if (rows.length === 0) return null;
                 return (
                   <div style={{ marginTop: 8 }}>
-                    <div style={{ fontSize: 12, fontWeight: 700, color: "#4a6278", marginBottom: 6 }}>Domain Bother Scores (0 = none, 4 = extreme):</div>
+                    <div style={{ fontSize: 14, fontWeight: 700, color: "#4a6278", marginBottom: 6 }}>Domain Bother Scores (0 = none, 4 = extreme):</div>
                     {rows.map(r => (
-                      <div key={r.label} style={{ display: "flex", justifyContent: "space-between", fontSize: 12, marginBottom: 4, padding: "4px 0", borderBottom: "1px solid #eee" }}>
+                      <div key={r.label} style={{ display: "flex", justifyContent: "space-between", fontSize: 14, marginBottom: 4, padding: "4px 0", borderBottom: "1px solid #eee" }}>
                         <span style={{ color: "#1a2e3b" }}>{r.icon} {r.label}</span>
                         <span style={{ fontWeight: 700, color: r.score >= 3 ? "#c0392b" : r.score >= 2 ? "#f4a261" : "#2d7d6f" }}>{r.score}/4 — {domainBand(r.score).label}</span>
                       </div>
@@ -1718,7 +1693,7 @@ const PrintSummary = ({ scores, primarySymptom, surgRisk = [], recRisk = [] }) =
           : <div style={{ color: "#7a8fa6", fontSize: 13 }}>IMPACT Bowel Function Survey not yet completed. Complete it in the 'Scores' section.</div>
         }
       </div>
-      <div style={{ fontSize: 11, color: "#7a8fa6", textAlign: "center", marginTop: 32, borderTop: "1px solid #dde7ef", paddingTop: 16 }}>
+      <div style={{ fontSize: 13, color: "#7a8fa6", textAlign: "center", marginTop: 32, borderTop: "1px solid #dde7ef", paddingTop: 16 }}>
         This document was generated by REPAIR, a patient education app from Stanford Colorectal Surgery. It is for educational purposes only and does not constitute medical advice or a medical record.
       </div>
     </div>
@@ -1742,16 +1717,16 @@ export default function App() {
     <div style={{ background: C.bg, minHeight: "100vh", maxWidth: 480, margin: "0 auto", position: "relative", fontFamily: "'Georgia', serif" }}>
       {/* TOP BAR */}
       <div style={{ position: "sticky", top: 0, zIndex: 100, background: C.card, borderBottom: `1px solid ${C.border}`, padding: "12px 16px" }}>
-        <div className="flex items-center justify-between">
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
           <button onClick={() => setMenuOpen(true)} style={{ background: "none", border: "none", fontSize: 22, color: C.navy }}>☰</button>
           <div style={{ color: C.teal, fontWeight: 800, fontSize: 18 }}>🌿 REPAIR</div>
-          <button onClick={() => setShowPDF(!showPDF)} style={{ background: "none", border: "none", fontSize: 20, color: C.muted }}>📄</button>
+          <div style={{ width: 32 }} />
         </div>
         {section !== "home" && (
-          <div className="flex items-center gap-2 mt-1">
+          <div style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 4 }}>
             <button onClick={() => setSection("home")} style={{ background: "none", border: "none", color: C.muted, fontSize: 12 }}>Home</button>
             <span style={{ color: C.muted, fontSize: 12 }}>›</span>
-            <span style={{ color: C.teal, fontSize: 12, fontWeight: 600 }}>{currentNav?.label}</span>
+            <span style={{ color: C.teal, fontSize: 14, fontWeight: 600 }}>{currentNav?.label}</span>
           </div>
         )}
       </div>
@@ -1761,21 +1736,17 @@ export default function App() {
         <div style={{ position: "fixed", inset: 0, zIndex: 200 }}>
           <div onClick={() => setMenuOpen(false)} style={{ position: "absolute", inset: 0, background: "rgba(0,0,0,0.4)" }} />
           <div style={{ position: "absolute", left: 0, top: 0, bottom: 0, width: 280, background: C.card, padding: "48px 0 24px", overflowY: "auto" }}>
-            <div className="px-6 mb-4">
+            <div style={{ padding: "0 24px 16px" }}>
               <div style={{ color: C.teal, fontWeight: 800, fontSize: 20 }}>🌿 REPAIR</div>
-              <div style={{ color: C.muted, fontSize: 12, marginTop: 2 }}>Stanford Colorectal Surgery</div>
+              <div style={{ color: C.muted, fontSize: 14, marginTop: 2 }}>Stanford Colorectal Surgery</div>
             </div>
             {NAV.map(n => (
-              <button key={n.id} onClick={() => { setSection(n.id); setMenuOpen(false); }}
-                className="w-full text-left px-6 py-4 flex items-center gap-3"
-                style={{ background: section === n.id ? C.tealLight : "transparent", borderLeft: section === n.id ? `3px solid ${C.teal}` : "3px solid transparent", color: section === n.id ? C.teal : C.navy, fontWeight: section === n.id ? 700 : 400, fontSize: 15 }}>
+              <button key={n.id} onClick={() => { setSection(n.id); setMenuOpen(false); }} style={{ background: section === n.id ? C.tealLight : "transparent", borderLeft: section === n.id ? `3px solid ${C.teal}` : "3px solid transparent", color: section === n.id ? C.teal : C.navy, fontWeight: section === n.id ? 700 : 400, fontSize: 15 }}>
                 <span>{n.icon}</span><span>{n.label}</span>
               </button>
             ))}
-            <div className="px-6 mt-4">
-              <button onClick={() => { setShowPDF(true); setMenuOpen(false); }}
-                className="w-full rounded-xl py-3 text-center font-semibold"
-                style={{ background: C.tealLight, color: C.teal, border: "none", fontSize: 14 }}>
+            <div>
+              <button onClick={() => { setShowPDF(true); setMenuOpen(false); }} style={{ background: C.tealLight, color: C.teal, border: "none", fontSize: 14 }}>
                 📄 Generate My Summary
               </button>
             </div>
@@ -1787,19 +1758,19 @@ export default function App() {
       {showPDF && (
         <div style={{ position: "fixed", inset: 0, zIndex: 300, background: C.bg, overflowY: "auto" }}>
           <div style={{ padding: 16 }}>
-            <div className="flex justify-between items-center mb-4">
+            <div>
               <div style={{ color: C.navy, fontWeight: 700, fontSize: 16 }}>Pre-Appointment Summary</div>
               <button onClick={() => setShowPDF(false)} style={{ background: "none", border: "none", color: C.muted, fontSize: 20 }}>✕</button>
             </div>
             <Callout body="Print or screenshot this page to bring to your appointment. Share it with your healthcare team — it helps them understand your full picture quickly." icon="📋" />
-            <Btn onClick={() => window.print()} className="w-full mb-4">🖨️ Print / Save as PDF</Btn>
+            <Btn onClick={() => window.print()}>🖨️ Print / Save as PDF</Btn>
             <PrintSummary scores={scores} primarySymptom={primarySymptom} />
           </div>
         </div>
       )}
 
       {/* MAIN CONTENT */}
-      <div style={{ padding: 16, paddingBottom: 120 }}>
+      <div style={{ padding: 18, paddingBottom: 120 }}>
         {section === "home" && <HomeSection onNav={setSection} />}
         {section === "prolapse" && <ProlapseSection />}
         {section === "symptoms" && <SymptomsSection />}
@@ -1818,16 +1789,12 @@ export default function App() {
           { id: "surgical", icon: "🏥", label: "Surgery" },
           { id: "redflags", icon: "🚨", label: "Red Flags" },
         ].map(n => (
-          <button key={n.id} onClick={() => setSection(n.id)}
-            className="flex-1 flex flex-col items-center py-2 gap-0.5"
-            style={{ background: "none", border: "none", color: section === n.id ? C.teal : C.muted }}>
+          <button key={n.id} onClick={() => setSection(n.id)} style={{ background: "none", border: "none", color: section === n.id ? C.teal : C.muted }}>
             <span style={{ fontSize: 22 }}>{n.icon}</span>
             <span style={{ fontSize: 10, fontWeight: section === n.id ? 700 : 400 }}>{n.label}</span>
           </button>
         ))}
-        <button onClick={() => setChatOpen(true)}
-          className="flex-1 flex flex-col items-center py-2 gap-0.5"
-          style={{ background: "none", border: "none", color: C.coral }}>
+        <button onClick={() => setChatOpen(true)} style={{ background: "none", border: "none", color: C.coral }}>
           <span style={{ fontSize: 22 }}>💬</span>
           <span style={{ fontSize: 9, fontWeight: 700, color: C.teal, letterSpacing: 0.2 }}>Ask Our Team</span>
         </button>
