@@ -109,35 +109,48 @@ const NAV = [
   { id: "redflags", label: "Red Flags", icon: "🚨" },
 ];
 
-// ── TEXT TO SPEECH (fixed: preload voices on mount) ───────────────────────────
+// ── TEXT TO SPEECH (lazy voice load — works on iOS Safari) ───────────────────
 const useSpeech = () => {
   const [speaking, setSpeaking] = useState(false);
 
-  useEffect(() => {
-    if (!("speechSynthesis" in window)) return;
-    // Preload voices — Chrome loads them asynchronously
-    window.speechSynthesis.getVoices();
-    window.speechSynthesis.onvoiceschanged = () => window.speechSynthesis.getVoices();
-    return () => { window.speechSynthesis.cancel(); };
-  }, []);
-
   const speak = (text) => {
-    if (!window.speechSynthesis) return;
+    if (!("speechSynthesis" in window)) return;
+    // Cancel any current speech
     window.speechSynthesis.cancel();
     if (speaking) { setSpeaking(false); return; }
-    const clean = text.replace(/[🌿📖🔍🩻🥦📊🏥🚨💬🌱💙⚠️🔄🚫😣🌡️🩸⚖️✓→•🔬💧🚽⬇️⚡😣🫁]/gu, "").replace(/\s+/g, " ").trim();
+
+    const clean = text
+      .replace(/[🌿📖🔍🩻🥦📊🏥🚨💬🌱💙⚠️🔄🚫😣🌡️🩸⚖️✓→•🔬💧🚽⬇️⚡🫁📋🔒📅]/gu, "")
+      .replace(/\s+/g, " ").trim();
+
     const utterance = new SpeechSynthesisUtterance(clean);
     utterance.rate = 0.9;
     utterance.pitch = 1;
     utterance.lang = "en-US";
-    // Prefer natural-sounding voices
-    const voices = window.speechSynthesis.getVoices();
-    const preferred = voices.find(v => ["Samantha", "Karen", "Daniel"].some(n => v.name.includes(n))) || voices.find(v => v.lang === "en-US" && v.localService);
-    if (preferred) utterance.voice = preferred;
     utterance.onend = () => setSpeaking(false);
     utterance.onerror = () => setSpeaking(false);
-    setSpeaking(true);
-    window.speechSynthesis.speak(utterance);
+
+    // Load voices at call-time (required on iOS — voices aren't available until interaction)
+    const trySpeak = () => {
+      const voices = window.speechSynthesis.getVoices();
+      const preferred = voices.find(v =>
+        ["Samantha", "Karen", "Daniel", "Alex"].some(n => v.name.includes(n))
+      ) || voices.find(v => v.lang === "en-US" && v.localService) || voices[0];
+      if (preferred) utterance.voice = preferred;
+      setSpeaking(true);
+      window.speechSynthesis.speak(utterance);
+    };
+
+    const voices = window.speechSynthesis.getVoices();
+    if (voices.length > 0) {
+      trySpeak();
+    } else {
+      // Voices not yet loaded — wait for them then speak
+      window.speechSynthesis.onvoiceschanged = () => {
+        window.speechSynthesis.onvoiceschanged = null;
+        trySpeak();
+      };
+    }
   };
 
   const stop = () => { window.speechSynthesis?.cancel(); setSpeaking(false); };
@@ -569,11 +582,43 @@ const calcIMPACTDomains = (ans) => {
 };
 
 // IMPACT composite 0–16 score + plain-language band
+// Uses answered domains; "no" answers contribute 0 to widen the scored pool
 const calcIMPACT016 = (ans) => {
-  const d = calcIMPACTDomains(ans);
-  const scores = [d.constipScore, d.fiScore, d.urgScore, d.painScore, d.prolapseScore].filter(s => s !== null);
-  if (scores.length === 0) return null;
-  const avg = scores.reduce((a, b) => a + b, 0) / scores.length;
+  const domainScores = [];
+  // Constipation/evacuation — each "no" = 0, each "yes+bother" = bother score
+  const constipKeys = [
+    ans.q3 === "no" ? 0 : (ans.q3 === "yes" && ans.q3_bother ? botherScore(ans.q3_bother) : null),
+    ans.q4 === "no" ? 0 : (ans.q4 === "yes" && ans.q4_bother ? botherScore(ans.q4_bother) : null),
+    ans.q5 === "no" ? 0 : (ans.q5 === "yes" && ans.q5_bother ? botherScore(ans.q5_bother) : null),
+    ans.q6 === "no" ? 0 : (ans.q6 === "yes" && ans.q6_bother ? botherScore(ans.q6_bother) : null),
+  ].filter(s => s !== null);
+  if (constipKeys.length > 0) domainScores.push(constipKeys.reduce((a, b) => a + b, 0) / constipKeys.length);
+
+  // Fecal incontinence
+  if (ans.q8 === "no") domainScores.push(0);
+  else if (ans.q8 === "yes") {
+    const fi = [
+      ans.q8a === "no" ? 0 : (ans.q8a === "yes" && ans.q8a_bother ? botherScore(ans.q8a_bother) : null),
+      ans.q8b === "no" ? 0 : (ans.q8b === "yes" && ans.q8b_bother ? botherScore(ans.q8b_bother) : null),
+      ans.q8c === "no" ? 0 : (ans.q8c === "yes" && ans.q8c_bother ? botherScore(ans.q8c_bother) : null),
+    ].filter(s => s !== null);
+    if (fi.length > 0) domainScores.push(Math.max(...fi));
+  }
+
+  // Urgency
+  if (ans.q9 === "no") domainScores.push(0);
+  else if (ans.q9 === "yes" && ans.q9_bother) domainScores.push(botherScore(ans.q9_bother));
+
+  // Pain
+  if (ans.q10 === "no") domainScores.push(0);
+  else if (ans.q10 === "yes" && ans.q10_bother) domainScores.push(botherScore(ans.q10_bother));
+
+  // Prolapse sensation
+  if (ans.q11 === "no") domainScores.push(0);
+  else if (ans.q11 === "yes" && ans.q11_bother) domainScores.push(botherScore(ans.q11_bother));
+
+  if (domainScores.length === 0) return null;
+  const avg = domainScores.reduce((a, b) => a + b, 0) / domainScores.length;
   return Math.round((avg / 4) * 16);
 };
 
@@ -1123,11 +1168,12 @@ CONTENT RULES:
 
 const RED_FLAG_KEYWORDS = ["bleeding", "blood", "can't push back", "stuck outside", "severe pain", "fever", "emergency", "purple", "dark", "not going back"];
 
-const Chatbot = ({ appState, onClose }) => {
-  const [messages, setMessages] = useState([]);
+const Chatbot = ({ appState, onClose, chatMessages, setChatMessages }) => {
+  const messages = chatMessages;
+  const setMessages = setChatMessages;
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
-  const [showStarters, setShowStarters] = useState(true);
+  const [showStarters, setShowStarters] = useState(messages.length === 0);
   const [copied, setCopied] = useState(false);
   const bottomRef = useRef(null);
   const inputRef = useRef(null);
@@ -1173,8 +1219,26 @@ const Chatbot = ({ appState, onClose }) => {
   };
 
   const handleCopyChat = () => {
-    const text = messages.map(m => `${m.role === "user" ? "You" : "REPAIR"}: ${m.content}`).join("\n\n");
-    navigator.clipboard.writeText(text).then(() => { setCopied(true); setTimeout(() => setCopied(false), 2000); });
+    const clean = (str) => str
+      .replace(/[\u{1F300}-\u{1FFFF}]/gu, "")  // strip emoji
+      .replace(/[⚠️💙🔒📋📅→•✓]/g, "")
+      .replace(/\s+/g, " ").trim();
+    const text = messages
+      .map(m => `${m.role === "user" ? "Me" : "REPAIR"}: ${clean(m.content)}`)
+      .join("\n\n");
+    navigator.clipboard.writeText(text).then(
+      () => { setCopied(true); setTimeout(() => setCopied(false), 2000); },
+      () => {
+        // Fallback for browsers that block clipboard
+        const ta = document.createElement("textarea");
+        ta.value = text;
+        ta.style.position = "fixed"; ta.style.opacity = "0";
+        document.body.appendChild(ta); ta.select();
+        document.execCommand("copy");
+        document.body.removeChild(ta);
+        setCopied(true); setTimeout(() => setCopied(false), 2000);
+      }
+    );
   };
 
   return (
@@ -1268,10 +1332,14 @@ const Chatbot = ({ appState, onClose }) => {
 };
 
 // ─── PRINT SUMMARY ────────────────────────────────────────────────────────────
-const PrintSummary = ({ scores, primarySymptom }) => {
+const PrintSummary = ({ scores, primarySymptom, chatMessages = [] }) => {
   const now = new Date().toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" });
   const score16 = scores.impactDone && scores.impact ? calcIMPACT016(scores.impact) : null;
   const band = impactBand(score16);
+  const cleanText = (str) => str
+    .replace(/[\u{1F300}-\u{1FFFF}]/gu, "")
+    .replace(/[⚠️💙🔒📋📅→•✓⭐🌿🌱]/g, "")
+    .trim();
   return (
     <div style={{ fontFamily: "Georgia, serif", maxWidth: 700, margin: "0 auto", padding: 32, color: "#1a2e3b" }}>
       <div style={{ textAlign: "center", marginBottom: 32, borderBottom: "2px solid #2d7d6f", paddingBottom: 16 }}>
@@ -1324,6 +1392,21 @@ const PrintSummary = ({ scores, primarySymptom }) => {
         ))}
       </div>
 
+      {chatMessages.length > 0 && (
+        <div style={{ marginBottom: 24 }}>
+          <div style={{ fontSize: 14, fontWeight: 700, color: "#2d7d6f", textTransform: "uppercase", letterSpacing: 1, marginBottom: 8 }}>4. My Conversation with Ask Our Team</div>
+          <div style={{ fontSize: 12, color: "#7a8fa6", marginBottom: 12, fontStyle: "italic" }}>Questions I asked and answers I received — for reference in my appointment.</div>
+          {chatMessages.map((m, i) => (
+            <div key={i} style={{ marginBottom: 12, paddingLeft: m.role === "user" ? 0 : 16, borderLeft: m.role === "assistant" ? "3px solid #2d7d6f" : "none" }}>
+              <div style={{ fontSize: 11, fontWeight: 700, color: m.role === "user" ? "#1a2e3b" : "#2d7d6f", textTransform: "uppercase", letterSpacing: 0.5, marginBottom: 3 }}>
+                {m.role === "user" ? "Me" : "REPAIR Assistant"}
+              </div>
+              <div style={{ fontSize: 14, color: "#1a2e3b", lineHeight: 1.6 }}>{cleanText(m.content)}</div>
+            </div>
+          ))}
+        </div>
+      )}
+
       <div style={{ fontSize: 12, color: "#7a8fa6", textAlign: "center", marginTop: 32, borderTop: "1px solid #dde7ef", paddingTop: 16 }}>
         This document was generated by REPAIR, a patient education app from Stanford Colorectal Surgery. It is for educational purposes only and does not constitute medical advice or a medical record.
       </div>
@@ -1340,6 +1423,7 @@ export default function App() {
   const [primarySymptom, setPrimarySymptom] = useState(null);
   const { speak, stop, speaking } = useSpeech();
   const [showPDF, setShowPDF] = useState(false);
+  const [chatMessages, setChatMessages] = useState([]); // lifted so PDF can include them
 
   const currentNav = NAV.find(n => n.id === section);
   const appState = { section, primarySymptom, scores };
@@ -1398,7 +1482,7 @@ export default function App() {
             </div>
             <Callout body="Print or screenshot this page to bring to your appointment." icon="📋" />
             <button onClick={() => window.print()} style={{ background: C.teal, color: "#fff", border: "none", borderRadius: 14, padding: "16px 24px", fontSize: 17, fontWeight: 700, fontFamily: "Georgia, serif", cursor: "pointer", minHeight: 54, marginBottom: 16, width: "100%" }}>🖨️ Print / Save as PDF</button>
-            <PrintSummary scores={scores} primarySymptom={primarySymptom} />
+            <PrintSummary scores={scores} primarySymptom={primarySymptom} chatMessages={chatMessages} />
           </div>
         </div>
       )}
@@ -1434,7 +1518,7 @@ export default function App() {
       </div>
 
       {/* CHATBOT */}
-      {chatOpen && <Chatbot appState={appState} onClose={() => setChatOpen(false)} />}
+      {chatOpen && <Chatbot appState={appState} onClose={() => setChatOpen(false)} chatMessages={chatMessages} setChatMessages={setChatMessages} />}
     </div>
   );
 }
