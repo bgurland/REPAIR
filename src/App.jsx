@@ -581,44 +581,38 @@ const calcIMPACTDomains = (ans) => {
   return { constipScore, fiScore, urgScore, painScore, prolapseScore };
 };
 
-// IMPACT composite 0–16 score + plain-language band
-// Uses answered domains; "no" answers contribute 0 to widen the scored pool
+// IMPACT composite 0–16: sum all bother scores answered, normalize to 0–16
+// "no" = 0, "yes+bother" = bother score, unanswered domains excluded from avg
 const calcIMPACT016 = (ans) => {
-  const domainScores = [];
-  // Constipation/evacuation — each "no" = 0, each "yes+bother" = bother score
-  const constipKeys = [
-    ans.q3 === "no" ? 0 : (ans.q3 === "yes" && ans.q3_bother ? botherScore(ans.q3_bother) : null),
-    ans.q4 === "no" ? 0 : (ans.q4 === "yes" && ans.q4_bother ? botherScore(ans.q4_bother) : null),
-    ans.q5 === "no" ? 0 : (ans.q5 === "yes" && ans.q5_bother ? botherScore(ans.q5_bother) : null),
-    ans.q6 === "no" ? 0 : (ans.q6 === "yes" && ans.q6_bother ? botherScore(ans.q6_bother) : null),
-  ].filter(s => s !== null);
-  if (constipKeys.length > 0) domainScores.push(constipKeys.reduce((a, b) => a + b, 0) / constipKeys.length);
+  if (!ans) return null;
+  const items = [];
 
-  // Fecal incontinence
-  if (ans.q8 === "no") domainScores.push(0);
-  else if (ans.q8 === "yes") {
-    const fi = [
-      ans.q8a === "no" ? 0 : (ans.q8a === "yes" && ans.q8a_bother ? botherScore(ans.q8a_bother) : null),
-      ans.q8b === "no" ? 0 : (ans.q8b === "yes" && ans.q8b_bother ? botherScore(ans.q8b_bother) : null),
-      ans.q8c === "no" ? 0 : (ans.q8c === "yes" && ans.q8c_bother ? botherScore(ans.q8c_bother) : null),
-    ].filter(s => s !== null);
-    if (fi.length > 0) domainScores.push(Math.max(...fi));
+  // Constipation/evacuation items (q3–q6): no=0, yes+bother=score
+  [["q3","q3_bother"],["q4","q4_bother"],["q5","q5_bother"],["q6","q6_bother"]].forEach(([q, b]) => {
+    if (ans[q] === "no") items.push(0);
+    else if (ans[q] === "yes" && ans[b]) items.push(botherScore(ans[b]));
+  });
+
+  // Leakage (q8): no=0, yes = max of sub-items
+  if (ans.q8 === "no") {
+    items.push(0);
+  } else if (ans.q8 === "yes") {
+    const fi = [];
+    [["q8a","q8a_bother"],["q8b","q8b_bother"],["q8c","q8c_bother"]].forEach(([q,b]) => {
+      if (ans[q] === "no") fi.push(0);
+      else if (ans[q] === "yes" && ans[b]) fi.push(botherScore(ans[b]));
+    });
+    if (fi.length > 0) items.push(Math.max(...fi));
   }
 
-  // Urgency
-  if (ans.q9 === "no") domainScores.push(0);
-  else if (ans.q9 === "yes" && ans.q9_bother) domainScores.push(botherScore(ans.q9_bother));
+  // Urgency (q9), pain (q10), prolapse (q11)
+  [["q9","q9_bother"],["q10","q10_bother"],["q11","q11_bother"]].forEach(([q,b]) => {
+    if (ans[q] === "no") items.push(0);
+    else if (ans[q] === "yes" && ans[b]) items.push(botherScore(ans[b]));
+  });
 
-  // Pain
-  if (ans.q10 === "no") domainScores.push(0);
-  else if (ans.q10 === "yes" && ans.q10_bother) domainScores.push(botherScore(ans.q10_bother));
-
-  // Prolapse sensation
-  if (ans.q11 === "no") domainScores.push(0);
-  else if (ans.q11 === "yes" && ans.q11_bother) domainScores.push(botherScore(ans.q11_bother));
-
-  if (domainScores.length === 0) return null;
-  const avg = domainScores.reduce((a, b) => a + b, 0) / domainScores.length;
+  if (items.length === 0) return null;
+  const avg = items.reduce((a, b) => a + b, 0) / items.length;
   return Math.round((avg / 4) * 16);
 };
 
@@ -919,7 +913,8 @@ const CalculatorsSection = ({ scores, setScores, primarySymptom, setPrimarySympt
     setImpactAnswers(ans);
     setImpactDone(true);
     setScores(prev => ({ ...prev, impact: ans, impactDone: true }));
-    setStep(3);
+    // Stay on step 2 so patient sees their results immediately
+    // They can advance to step 3 using the "Next" button
   };
 
   const sympCallout = primarySymptom === "incontinence" ? "Leakage symptoms respond well to surgical repair — an important point for your pre-op conversation."
@@ -977,7 +972,13 @@ const CalculatorsSection = ({ scores, setScores, primarySymptom, setPrimarySympt
               <Callout body="This is the IMPACT Bowel Function Short Form — validated and endorsed by the Pelvic Floor Disorders Consortium." icon="🔬" />
               {surveyDone && impactAnswers ? <IMPACTResults ans={impactAnswers} onRetake={() => { setImpactDone(false); setImpactAnswers(null); }} />
                 : <IMPACTSurvey onComplete={handleImpactComplete} />}
-              {surveyDone && (<button onClick={() => setStep(3)} style={{ width: "100%", borderRadius: 14, padding: "16px 0", background: C.teal, color: "#fff", border: "none", fontSize: 17, fontWeight: 700, cursor: "pointer", marginTop: 8, fontFamily: "Georgia, serif" }}>Next: Surgical Risk →</button>)}
+              {surveyDone && (
+                <div style={{ marginTop: 8 }}>
+                  <button onClick={() => setStep(3)} style={{ width: "100%", borderRadius: 14, padding: "14px 0", background: C.tealLight, color: C.teal, border: `1px solid ${C.teal}`, fontSize: 16, fontWeight: 600, cursor: "pointer", fontFamily: "Georgia, serif", marginBottom: 8 }}>
+                    Optional: Surgical Risk Checklist →
+                  </button>
+                </div>
+              )}
             </div>
           )}
         </div>
@@ -991,9 +992,9 @@ const CalculatorsSection = ({ scores, setScores, primarySymptom, setPrimarySympt
         </div>
         <div style={{ flex: 1, paddingLeft: 16, paddingBottom: 8 }}>
           <button onClick={() => surveyDone && setStep(3)} style={{ background: "none", border: "none", padding: 0, cursor: surveyDone ? "pointer" : "default", textAlign: "left", marginBottom: step === 3 ? 16 : 8, fontFamily: "Georgia, serif" }}>
-            <div style={{ color: step >= 3 ? C.navy : C.muted, fontWeight: 700, fontSize: 18, lineHeight: 1.2 }}>Surgical Risk Checklist <span style={{ fontSize: 13, fontWeight: 400, color: C.muted }}> — optional</span></div>
+            <div style={{ color: step >= 3 ? C.navy : C.muted, fontWeight: 700, fontSize: 18, lineHeight: 1.2 }}>Surgical Risk Checklist <span style={{ fontSize: 13, fontWeight: 400, color: C.muted }}>(optional)</span></div>
             {step > 3 && <div style={{ color: C.teal, fontSize: 15, marginTop: 4 }}>✓ {surgRisk.length === 0 ? "No factors identified" : `${surgRisk.length} factor${surgRisk.length > 1 ? "s" : ""} identified`}</div>}
-            {step < 3 && <div style={{ color: C.muted, fontSize: 14, marginTop: 3 }}>Complete Steps 1 & 2 first</div>}
+            {!surveyDone && <div style={{ color: C.muted, fontSize: 14, marginTop: 3 }}>Complete the Bowel Survey first</div>}
           </button>
           {step === 3 && (
             <div>
@@ -1018,9 +1019,9 @@ const CalculatorsSection = ({ scores, setScores, primarySymptom, setPrimarySympt
           <StepDot n="4" done={false} active={step === 4} />
         </div>
         <div style={{ flex: 1, paddingLeft: 16, paddingBottom: 24 }}>
-          <button onClick={() => step >= 3 && setStep(4)} style={{ background: "none", border: "none", padding: 0, cursor: step >= 3 ? "pointer" : "default", textAlign: "left", marginBottom: step === 4 ? 16 : 8, fontFamily: "Georgia, serif" }}>
-            <div style={{ color: step >= 4 ? C.navy : C.muted, fontWeight: 700, fontSize: 18, lineHeight: 1.2 }}>Recurrence Risk Factors <span style={{ fontSize: 13, fontWeight: 400, color: C.muted }}> — optional</span></div>
-            {step < 4 && <div style={{ color: C.muted, fontSize: 14, marginTop: 3 }}>Complete Steps 1–3 first</div>}
+          <button onClick={() => surveyDone && setStep(4)} style={{ background: "none", border: "none", padding: 0, cursor: surveyDone ? "pointer" : "default", textAlign: "left", marginBottom: step === 4 ? 16 : 8, fontFamily: "Georgia, serif" }}>
+            <div style={{ color: step >= 4 ? C.navy : C.muted, fontWeight: 700, fontSize: 18, lineHeight: 1.2 }}>Recurrence Risk Factors <span style={{ fontSize: 13, fontWeight: 400, color: C.muted }}>(optional)</span></div>
+            {!surveyDone && <div style={{ color: C.muted, fontSize: 14, marginTop: 3 }}>Complete the Bowel Survey first</div>}
           </button>
           {step === 4 && (
             <div>
