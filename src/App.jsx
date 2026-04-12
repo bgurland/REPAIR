@@ -1876,6 +1876,7 @@ const Chatbot = ({ appState, onClose }) => {
   const [loading, setLoading] = useState(false);
   const [showStarters, setShowStarters] = useState(true);
   const bottomRef = useRef(null);
+  const inputRef = useRef(null);
 
   const starters = [
     "What is the difference between internal and external prolapse?",
@@ -1884,7 +1885,9 @@ const Chatbot = ({ appState, onClose }) => {
     "How does diet affect my pelvic floor?",
   ];
 
-  useEffect(() => { bottomRef.current?.scrollIntoView({ behavior: "smooth" }); }, [messages, loading]);
+  useEffect(() => {
+    bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages, loading]);
 
   const buildContext = () => {
     const lines = [];
@@ -1894,7 +1897,7 @@ const Chatbot = ({ appState, onClose }) => {
   };
 
   const send = async (text) => {
-    if (!text.trim()) return;
+    if (!text.trim() || loading) return;
     setShowStarters(false);
     const isRedFlag = RED_FLAG_KEYWORDS.some(k => text.toLowerCase().includes(k));
     const newMessages = [...messages, { role: "user", content: text }];
@@ -1921,246 +1924,258 @@ const Chatbot = ({ appState, onClose }) => {
   };
 
   return (
-    <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.5)", zIndex: 1000, display: "flex", flexDirection: "column", justifyContent: "flex-end" }}>
-      <div style={{ background: C.card, borderTopLeftRadius: 24, borderTopRightRadius: 24, maxHeight: "90vh", display: "flex", flexDirection: "column" }}>
-        <div style={{ borderBottom: `1px solid ${C.border}` }}>
-          <div>
-            <div style={{ color: C.navy, fontWeight: 700, fontSize: 16 }}>Ask Our Team</div>
-            <div style={{ color: C.muted, fontSize: 12 }}>Here to educate — not to diagnose</div>
+    <div style={{
+      position: "fixed", inset: 0,
+      background: "rgba(0,0,0,0.55)",
+      zIndex: 1000,
+      display: "flex", flexDirection: "column", justifyContent: "flex-end",
+    }}>
+      <div style={{
+        background: C.card,
+        borderTopLeftRadius: 28, borderTopRightRadius: 28,
+        maxHeight: "92vh",
+        display: "flex", flexDirection: "column",
+        boxShadow: "0 -8px 40px rgba(0,0,0,0.18)",
+      }}>
+
+        {/* ── HEADER ── */}
+        <div style={{
+          padding: "20px 20px 16px",
+          borderBottom: `1px solid ${C.border}`,
+          display: "flex", alignItems: "center", justifyContent: "space-between",
+          flexShrink: 0,
+        }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
+            {/* Avatar */}
+            <div style={{
+              width: 52, height: 52, borderRadius: "50%",
+              background: `linear-gradient(135deg, ${C.teal}, ${C.tealMid})`,
+              display: "flex", alignItems: "center", justifyContent: "center",
+              fontSize: 26, flexShrink: 0,
+              boxShadow: "0 2px 10px rgba(45,125,111,0.3)",
+            }}>🌿</div>
+            <div>
+              <div style={{ color: C.navy, fontWeight: 800, fontSize: 20, lineHeight: 1.1 }}>Ask Our Team</div>
+              <div style={{ color: C.teal, fontSize: 15, fontWeight: 600, marginTop: 2 }}>Here to educate — not to diagnose</div>
+            </div>
           </div>
-          <button onClick={onClose} style={{ fontSize: 22, color: C.muted, background: "none", border: "none" }}>✕</button>
+          {/* Close button — large target */}
+          <button
+            onClick={onClose}
+            style={{
+              width: 48, height: 48, borderRadius: "50%",
+              background: "#f0f4f8", border: "none",
+              display: "flex", alignItems: "center", justifyContent: "center",
+              fontSize: 22, color: C.slate, cursor: "pointer",
+              flexShrink: 0,
+            }}>✕</button>
         </div>
-        <div style={{ background: C.warnLt, borderBottom: `1px solid ${C.border}` }}>
-          <div style={{ color: C.slate, fontSize: 12 }}>I'm here to help you learn and prepare — not to diagnose or replace your healthcare team. For urgent symptoms, contact your provider directly.</div>
+
+        {/* ── DISCLAIMER BANNER ── */}
+        <div style={{
+          background: C.tealLight,
+          borderBottom: `1px solid ${C.border}`,
+          padding: "12px 20px",
+          flexShrink: 0,
+        }}>
+          <div style={{ color: C.teal, fontSize: 15, lineHeight: 1.5, fontWeight: 500 }}>
+            💙 I'm here to help you learn and prepare — not to diagnose or replace your healthcare team. For urgent symptoms, contact your provider directly.
+          </div>
         </div>
-        <div style={{ minHeight: 200 }}>
+
+        {/* ── MESSAGE AREA ── */}
+        <div style={{
+          flex: 1, overflowY: "auto",
+          padding: "20px 16px 8px",
+          display: "flex", flexDirection: "column",
+          gap: 0,
+          minHeight: 180,
+        }}>
+
+          {/* Starter prompts */}
           {showStarters && messages.length === 0 && (
             <div>
-              <div style={{ color: C.muted, fontSize: 16, marginBottom: 12 }}>Ask me anything, or choose a topic:</div>
+              <div style={{ color: C.slate, fontSize: 17, fontWeight: 600, marginBottom: 16, textAlign: "center" }}>
+                Ask me anything, or tap a topic below:
+              </div>
               {starters.map((s, i) => (
-                <button key={i} onClick={() => send(s)} style={{ background: C.tealLight, border: `1px solid ${C.teal}33`, color: C.teal, fontSize: 13 }}>{s}</button>
+                <button
+                  key={i}
+                  onClick={() => send(s)}
+                  style={{
+                    width: "100%", textAlign: "left",
+                    background: C.card,
+                    border: `2px solid ${C.teal}`,
+                    borderRadius: 16,
+                    padding: "16px 20px",
+                    marginBottom: 12,
+                    color: C.navy,
+                    fontSize: 17,
+                    lineHeight: 1.5,
+                    cursor: "pointer",
+                    fontFamily: "Georgia, serif",
+                    display: "flex", alignItems: "center", gap: 14,
+                    minHeight: 60,
+                    boxShadow: "0 1px 4px rgba(45,125,111,0.08)",
+                    transition: "background 0.15s",
+                  }}>
+                  <span style={{ color: C.teal, fontSize: 22, flexShrink: 0 }}>→</span>
+                  <span>{s}</span>
+                </button>
               ))}
             </div>
           )}
+
+          {/* Messages */}
           {messages.map((m, i) => (
-            <div key={i} style={{ marginBottom: 12, display: "flex", justifyContent: m.role === "user" ? "flex-end" : "flex-start" }}>
+            <div key={i} style={{
+              display: "flex",
+              justifyContent: m.role === "user" ? "flex-end" : "flex-start",
+              marginBottom: 16,
+              alignItems: "flex-end",
+              gap: 10,
+            }}>
+              {/* Bot avatar on left */}
+              {m.role === "assistant" && (
+                <div style={{
+                  width: 38, height: 38, borderRadius: "50%",
+                  background: `linear-gradient(135deg, ${C.teal}, ${C.tealMid})`,
+                  display: "flex", alignItems: "center", justifyContent: "center",
+                  fontSize: 18, flexShrink: 0, marginBottom: 2,
+                }}>🌿</div>
+              )}
+
               <div style={{
-                maxWidth: "85%",
-                background: m.role === "user" ? C.teal : C.tealLight,
+                maxWidth: "78%",
+                background: m.role === "user" ? C.teal : "#f0f7f5",
                 color: m.role === "user" ? "#fff" : C.navy,
-                fontSize: 17, lineHeight: 1.7,
-                borderBottomRightRadius: m.role === "user" ? 4 : 16,
-                borderBottomLeftRadius: m.role === "user" ? 16 : 4,
-              }}>{m.content}</div>
+                fontSize: 18,
+                lineHeight: 1.7,
+                padding: "16px 20px",
+                borderRadius: m.role === "user"
+                  ? "20px 20px 6px 20px"
+                  : "20px 20px 20px 6px",
+                boxShadow: "0 2px 8px rgba(0,0,0,0.06)",
+                whiteSpace: "pre-wrap",
+              }}>
+                {m.content}
+              </div>
+
+              {/* User avatar on right */}
+              {m.role === "user" && (
+                <div style={{
+                  width: 38, height: 38, borderRadius: "50%",
+                  background: C.navyMid,
+                  display: "flex", alignItems: "center", justifyContent: "center",
+                  fontSize: 18, flexShrink: 0, color: "#fff", fontWeight: 700,
+                }}>You</div>
+              )}
             </div>
           ))}
+
+          {/* Typing indicator */}
           {loading && (
-            <div>
-              <div style={{ background: C.tealLight, color: C.muted, fontSize: 13 }}>Thinking…</div>
+            <div style={{ display: "flex", alignItems: "flex-end", gap: 10, marginBottom: 16 }}>
+              <div style={{
+                width: 38, height: 38, borderRadius: "50%",
+                background: `linear-gradient(135deg, ${C.teal}, ${C.tealMid})`,
+                display: "flex", alignItems: "center", justifyContent: "center",
+                fontSize: 18, flexShrink: 0,
+              }}>🌿</div>
+              <div style={{
+                background: "#f0f7f5",
+                borderRadius: "20px 20px 20px 6px",
+                padding: "18px 24px",
+                display: "flex", alignItems: "center", gap: 8,
+              }}>
+                {[0, 1, 2].map(n => (
+                  <div key={n} style={{
+                    width: 12, height: 12, borderRadius: "50%",
+                    background: C.tealMid,
+                    animation: `bounce 1.2s ease-in-out ${n * 0.2}s infinite`,
+                  }} />
+                ))}
+              </div>
             </div>
           )}
           <div ref={bottomRef} />
         </div>
-        <div style={{ borderTop: `1px solid ${C.border}` }}>
-          <div style={{ display: "flex", gap: 8 }}>
-            <input value={input} onChange={e => setInput(e.target.value)} onKeyDown={e => e.key === "Enter" && send(input)}
-              placeholder="Ask a question…" style={{ background: C.bg, border: `1.5px solid ${C.border}`, fontSize: 16, color: C.navy, minHeight: 54 }} />
-            <button onClick={() => send(input)} disabled={!input.trim() || loading} style={{ background: C.teal, color: "#fff", border: "none", minHeight: 54, minWidth: 52, opacity: (!input.trim() || loading) ? 0.5 : 1, fontSize: 20 }}>↑</button>
+
+        {/* ── INPUT ROW ── */}
+        <div style={{
+          borderTop: `2px solid ${C.border}`,
+          padding: "16px 16px 20px",
+          flexShrink: 0,
+          background: C.card,
+        }}>
+          <div style={{ display: "flex", gap: 10, alignItems: "flex-end" }}>
+            <div style={{ flex: 1, position: "relative" }}>
+              <textarea
+                ref={inputRef}
+                value={input}
+                onChange={e => {
+                  setInput(e.target.value);
+                  e.target.style.height = "auto";
+                  e.target.style.height = Math.min(e.target.scrollHeight, 120) + "px";
+                }}
+                onKeyDown={e => {
+                  if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); send(input); }
+                }}
+                placeholder="Type your question here…"
+                rows={1}
+                style={{
+                  width: "100%",
+                  background: "#f4f8fb",
+                  border: `2px solid ${C.border}`,
+                  borderRadius: 18,
+                  padding: "16px 18px",
+                  fontSize: 18,
+                  color: C.navy,
+                  fontFamily: "Georgia, serif",
+                  lineHeight: 1.5,
+                  resize: "none",
+                  outline: "none",
+                  minHeight: 56,
+                  maxHeight: 120,
+                  boxSizing: "border-box",
+                  transition: "border-color 0.2s",
+                }}
+                onFocus={e => e.target.style.borderColor = C.teal}
+                onBlur={e => e.target.style.borderColor = C.border}
+              />
+            </div>
+            {/* Send button — large, clear */}
+            <button
+              onClick={() => send(input)}
+              disabled={!input.trim() || loading}
+              style={{
+                width: 58, height: 58,
+                borderRadius: "50%",
+                background: input.trim() && !loading ? C.teal : C.border,
+                border: "none",
+                display: "flex", alignItems: "center", justifyContent: "center",
+                fontSize: 24, color: "#fff",
+                cursor: input.trim() && !loading ? "pointer" : "not-allowed",
+                flexShrink: 0,
+                transition: "background 0.2s",
+                boxShadow: input.trim() && !loading ? "0 3px 12px rgba(45,125,111,0.35)" : "none",
+              }}>
+              ↑
+            </button>
+          </div>
+          <div style={{ color: C.muted, fontSize: 13, textAlign: "center", marginTop: 10 }}>
+            For education only · Not a substitute for medical advice
           </div>
         </div>
       </div>
-    </div>
-  );
-};
 
-// ─── PRINT / PDF SUMMARY ──────────────────────────────────────────────────────
-const PrintSummary = ({ scores, primarySymptom, surgRisk = [], recRisk = [] }) => {
-  const now = new Date().toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" });
-  return (
-    <div id="print-summary" style={{ fontFamily: "Georgia, serif", maxWidth: 700, margin: "0 auto", padding: 32, color: "#1a2e3b" }}>
-      <div style={{ textAlign: "center", marginBottom: 32, borderBottom: "2px solid #2d7d6f", paddingBottom: 16 }}>
-        <div style={{ fontSize: 28, fontWeight: 800, color: "#2d7d6f" }}>REPAIR</div>
-        <div style={{ fontSize: 16, color: "#4a6278" }}>Pre-Appointment Summary</div>
-        <div style={{ fontSize: 16, color: "#7a8fa6", marginTop: 4 }}>Prepared: {now} · For discussion with your healthcare team — not a medical record</div>
-      </div>
-      {primarySymptom && (
-        <div style={{ marginBottom: 24 }}>
-          <div style={{ fontSize: 16, fontWeight: 700, color: "#2d7d6f", textTransform: "uppercase", letterSpacing: 1, marginBottom: 8 }}>1. My Primary Bothersome Symptom</div>
-          <div style={{ fontSize: 16, color: "#1a2e3b" }}>The symptom that bothers me most: <strong>{primarySymptom}</strong></div>
-        </div>
-      )}
-      <div style={{ marginBottom: 24 }}>
-        <div style={{ fontSize: 16, fontWeight: 700, color: "#2d7d6f", textTransform: "uppercase", letterSpacing: 1, marginBottom: 8 }}>2. My Bowel Survey (IMPACT)</div>
-        {scores.impactDone
-          ? <div>
-              <div style={{ fontSize: 17, color: "#1a2e3b", lineHeight: 1.6, marginBottom: 10 }}>{impactSummaryText(scores.impact)}</div>
-              {(() => {
-                const d = calcIMPACTDomains(scores.impact);
-                const rows = [
-                  { label: "Constipation / Evacuation", icon: "🚽", score: d.constipScore },
-                  { label: "Fecal Leakage / Incontinence", icon: "💧", score: d.fiScore },
-                  { label: "Urgency", icon: "⚡", score: d.urgScore },
-                  { label: "Rectal / Anal Pain", icon: "😣", score: d.painScore },
-                  { label: "Prolapse Sensation", icon: "⬇️", score: d.prolapseScore },
-                ].filter(r => r.score !== null);
-                if (rows.length === 0) return null;
-                return (
-                  <div style={{ marginTop: 8 }}>
-                    <div style={{ fontSize: 16, fontWeight: 700, color: "#4a6278", marginBottom: 6 }}>Domain Bother Scores (0 = none, 4 = extreme):</div>
-                    {rows.map(r => (
-                      <div key={r.label} style={{ display: "flex", justifyContent: "space-between", fontSize: 16, marginBottom: 4, padding: "4px 0", borderBottom: "1px solid #eee" }}>
-                        <span style={{ color: "#1a2e3b" }}>{r.icon} {r.label}</span>
-                        <span style={{ fontWeight: 700, color: r.score >= 3 ? "#c0392b" : r.score >= 2 ? "#f4a261" : "#2d7d6f" }}>{r.score}/4 — {domainBand(r.score).label}</span>
-                      </div>
-                    ))}
-                  </div>
-                );
-              })()}
-            </div>
-          : <div style={{ color: "#7a8fa6", fontSize: 13 }}>IMPACT Bowel Function Survey not yet completed. Complete it in the 'Scores' section.</div>
+      {/* Bounce animation */}
+      <style>{`
+        @keyframes bounce {
+          0%, 60%, 100% { transform: translateY(0); opacity: 0.4; }
+          30% { transform: translateY(-8px); opacity: 1; }
         }
-      </div>
-      <div style={{ fontSize: 15, color: "#7a8fa6", textAlign: "center", marginTop: 32, borderTop: "1px solid #dde7ef", paddingTop: 16 }}>
-        This document was generated by REPAIR, a patient education app from Stanford Colorectal Surgery. It is for educational purposes only and does not constitute medical advice or a medical record.
-      </div>
+      `}</style>
     </div>
   );
 };
-
-// ─── MAIN APP ─────────────────────────────────────────────────────────────────
-export default function App() {
-  const [section, setSection] = useState("home");
-  const [chatOpen, setChatOpen] = useState(false);
-  const [menuOpen, setMenuOpen] = useState(false);
-  const [scores, setScores] = useState({});
-  const [primarySymptom, setPrimarySymptom] = useState(null);
-  const { speak, stop, speaking } = useSpeech();
-  const [showPDF, setShowPDF] = useState(false);
-
-  const currentNav = NAV.find(n => n.id === section);
-
-  const appState = { section, primarySymptom, scores };
-
-  return (
-    <div style={{ background: C.bg, minHeight: "100vh", maxWidth: 480, margin: "0 auto", position: "relative", fontFamily: "'Georgia', serif" }}>
-      {/* TOP BAR */}
-      <div style={{ position: "sticky", top: 0, zIndex: 100, background: C.card, borderBottom: `1px solid ${C.border}`, padding: "12px 16px" }}>
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-          <button onClick={() => setMenuOpen(true)} style={{ background: "none", border: "none", fontSize: 22, color: C.navy }}>☰</button>
-          <div style={{ color: C.teal, fontWeight: 800, fontSize: 18 }}>🌿 REPAIR</div>
-          <div style={{ width: 32 }} />
-        </div>
-        {section !== "home" && (
-          <div style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 4 }}>
-            <button onClick={() => setSection("home")} style={{ background: "none", border: "none", color: C.muted, fontSize: 12 }}>Home</button>
-            <span style={{ color: C.muted, fontSize: 12 }}>›</span>
-            <span style={{ color: C.teal, fontSize: 16, fontWeight: 600 }}>{currentNav?.label}</span>
-          </div>
-        )}
-      </div>
-
-      {/* MENU DRAWER */}
-      {menuOpen && (
-        <div style={{ position: "fixed", inset: 0, zIndex: 200 }}>
-          <div onClick={() => setMenuOpen(false)} style={{ position: "absolute", inset: 0, background: "rgba(0,0,0,0.4)" }} />
-          <div style={{ position: "absolute", left: 0, top: 0, bottom: 0, width: 280, background: C.card, padding: "48px 0 24px", overflowY: "auto" }}>
-            <div style={{ padding: "0 24px 16px" }}>
-              <div style={{ color: C.teal, fontWeight: 800, fontSize: 20 }}>🌿 REPAIR</div>
-              <div style={{ color: C.muted, fontSize: 16, marginTop: 2 }}>Stanford Colorectal Surgery</div>
-            </div>
-            {NAV.map(n => (
-              <button key={n.id} onClick={() => { setSection(n.id); setMenuOpen(false); }} style={{ background: section === n.id ? C.tealLight : "transparent", borderLeft: section === n.id ? `3px solid ${C.teal}` : "3px solid transparent", color: section === n.id ? C.teal : C.navy, fontWeight: section === n.id ? 700 : 400, fontSize: 15 }}>
-                <span>{n.icon}</span><span>{n.label}</span>
-              </button>
-            ))}
-            <div>
-              <button onClick={() => { setShowPDF(true); setMenuOpen(false); }} style={{ background: C.tealLight, color: C.teal, border: "none", fontSize: 14 }}>
-                📄 Generate My Summary
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* PDF SUMMARY */}
-      {showPDF && (
-        <div style={{ position: "fixed", inset: 0, zIndex: 300, background: C.bg, overflowY: "auto" }}>
-          <div style={{ padding: 16 }}>
-            <div>
-              <div style={{ color: C.navy, fontWeight: 700, fontSize: 16 }}>Pre-Appointment Summary</div>
-              <button onClick={() => setShowPDF(false)} style={{ background: "none", border: "none", color: C.muted, fontSize: 20 }}>✕</button>
-            </div>
-            <Callout body="Print or screenshot this page to bring to your appointment. Share it with your healthcare team — it helps them understand your full picture quickly." icon="📋" />
-            <Btn onClick={() => window.print()}>🖨️ Print / Save as PDF</Btn>
-            <PrintSummary scores={scores} primarySymptom={primarySymptom} />
-          </div>
-        </div>
-      )}
-
-      {/* MAIN CONTENT */}
-      <div style={{ padding: 18, paddingBottom: 120 }}>
-        {section === "home" && <HomeSection onNav={setSection} />}
-        {section === "prolapse" && <ProlapseSection speak={speak} stop={stop} speaking={speaking} />}
-        {section === "symptoms" && <SymptomsSection speak={speak} stop={stop} speaking={speaking} scores={scores} setScores={setScores} primarySymptom={primarySymptom} setPrimarySymptom={setPrimarySymptom} />}
-        {section === "imaging" && <ImagingSection speak={speak} stop={stop} speaking={speaking} />}
-        {section === "lifestyle" && <LifestyleSection speak={speak} stop={stop} speaking={speaking} />}
-        {section === "surgical" && <SurgicalSection speak={speak} stop={stop} speaking={speaking} />}
-        {section === "redflags" && <RedFlagsSection speak={speak} stop={stop} speaking={speaking} />}
-      </div>
-
-      {/* FLOATING ASK OUR TEAM BUTTON */}
-      {!chatOpen && (
-        <button
-          onClick={() => setChatOpen(true)}
-          style={{
-            position: "fixed",
-            bottom: 90,
-            right: 20,
-            zIndex: 200,
-            background: C.teal,
-            color: "#fff",
-            border: "none",
-            borderRadius: 30,
-            padding: "14px 22px",
-            fontSize: 16,
-            fontWeight: 700,
-            fontFamily: "Georgia, serif",
-            boxShadow: "0 4px 20px rgba(45,125,111,0.4)",
-            display: "flex",
-            alignItems: "center",
-            gap: 10,
-            cursor: "pointer",
-            maxWidth: 220,
-          }}>
-          <span style={{ fontSize: 22 }}>💬</span>
-          <span>Ask Our Team</span>
-        </button>
-      )}
-
-      {/* BOTTOM NAV */}
-      <div style={{ position: "fixed", bottom: 0, left: "50%", transform: "translateX(-50%)", width: "100%", maxWidth: 480, background: C.card, borderTop: `1px solid ${C.border}`, display: "flex", paddingBottom: "env(safe-area-inset-bottom, 0)" }}>
-        {[
-          { id: "home", label: "Home" },
-          { id: "symptoms", label: "Symptoms" },
-          { id: "surgical", label: "Surgery" },
-          { id: "redflags", label: "Red Flags" },
-        ].map(n => (
-          <button key={n.id} onClick={() => setSection(n.id)}
-            style={{
-              flex: 1, display: "flex", alignItems: "center", justifyContent: "center",
-              padding: "12px 4px", background: "none", border: "none",
-              color: section === n.id ? C.teal : C.muted,
-              fontWeight: section === n.id ? 700 : 400,
-              fontSize: 14, fontFamily: "Georgia, serif",
-              borderTop: section === n.id ? `3px solid ${C.teal}` : "3px solid transparent",
-            }}>
-            {n.label}
-          </button>
-        ))}
-      </div>
-
-      {/* CHATBOT */}
-      {chatOpen && <Chatbot appState={appState} onClose={() => setChatOpen(false)} />}
-    </div>
-  );
-}
