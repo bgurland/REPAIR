@@ -31,11 +31,12 @@ const VimeoEmbed = ({ videoId, title }) => (
 // ─── COLORS ──────────────────────────────────────────────────────────────────
 const C = {
   teal: "#2d7d6f", tealLight: "#e8f5f2", tealMid: "#4a9d8f",
+  tealDeep: "#1f5a50",
   sage: "#6b8f71", sageLt: "#eef4ef",
   coral: "#e07a5f", coralLt: "#fdf1ee",
   navy: "#1a2e3b", navyMid: "#2c4a5e",
   slate: "#4a6278", muted: "#7a8fa6",
-  bg: "#f7f9fb", card: "#ffffff", border: "#dde7ef",
+  bg: "#f6f4ef", card: "#ffffff", border: "#e4ded4", borderSoft: "#ede8df",
   warn: "#f4a261", warnLt: "#fff7ee",
   red: "#c0392b", redLt: "#fdf0ef",
 };
@@ -82,7 +83,7 @@ const Btn = ({ children, onClick, variant = "primary", disabled = false, style: 
   );
 };
 
-// ─── PRIVACY NOTE (4 touchpoints) ────────────────────────────────────────────
+// ─── PRIVACY NOTE ─────────────────────────────────────────────────────────────
 const PrivacyNote = ({ context = "default" }) => {
   const msgs = {
     home: "What you do here is yours. Nothing is saved, nothing is shared, and no one sees your answers unless you choose to show them.",
@@ -109,119 +110,171 @@ const NAV = [
   { id: "redflags", label: "Red Flags", icon: "🚨" },
 ];
 
-// ── TEXT TO SPEECH (lazy voice load — works on iOS Safari) ───────────────────
+// ── TEXT TO SPEECH ───────────────────────────────────────────────────────────
 const useSpeech = () => {
   const [speaking, setSpeaking] = useState(false);
-
   const speak = (text) => {
     if (!("speechSynthesis" in window)) return;
     window.speechSynthesis.cancel();
     if (speaking) { setSpeaking(false); return; }
-
-    const clean = text
-      .replace(/[🌿📖🔍🩻🥦📊🏥🚨💬🌱💙⚠️🔄🚫😣🌡️🩸⚖️✓→•🔬💧🚽⬇️⚡🫁📋🔒📅]/gu, "")
-      .replace(/\s+/g, " ").trim();
-
+    const clean = text.replace(/[🌿📖🔍🩻🥦📊🏥🚨💬🌱💙⚠️🔄🚫😣🌡️🩸⚖️✓→•🔬💧🚽⬇️⚡🫁📋🔒📅]/gu, "").replace(/\s+/g, " ").trim();
     const utterance = new SpeechSynthesisUtterance(clean);
-    utterance.rate = 0.9;
-    utterance.pitch = 1;
-    utterance.lang = "en-US";
+    utterance.rate = 0.9; utterance.pitch = 1; utterance.lang = "en-US";
     utterance.onend = () => setSpeaking(false);
     utterance.onerror = () => setSpeaking(false);
-
     const trySpeak = () => {
       const voices = window.speechSynthesis.getVoices();
-      const preferred = voices.find(v =>
-        ["Samantha", "Karen", "Daniel", "Alex"].some(n => v.name.includes(n))
-      ) || voices.find(v => v.lang === "en-US" && v.localService) || voices[0];
+      const preferred = voices.find(v => ["Samantha", "Karen", "Daniel", "Alex"].some(n => v.name.includes(n))) || voices.find(v => v.lang === "en-US" && v.localService) || voices[0];
       if (preferred) utterance.voice = preferred;
       setSpeaking(true);
       window.speechSynthesis.speak(utterance);
     };
-
     const voices = window.speechSynthesis.getVoices();
-    if (voices.length > 0) {
-      trySpeak();
-    } else {
-      window.speechSynthesis.onvoiceschanged = () => {
-        window.speechSynthesis.onvoiceschanged = null;
-        trySpeak();
-      };
-    }
+    if (voices.length > 0) { trySpeak(); } else { window.speechSynthesis.onvoiceschanged = () => { window.speechSynthesis.onvoiceschanged = null; trySpeak(); }; }
   };
-
   const stop = () => { window.speechSynthesis?.cancel(); setSpeaking(false); };
   return { speak, stop, speaking };
 };
 
 const SpeakBtn = ({ speaking, onSpeak }) => (
-  <button onClick={onSpeak}
-    style={{ background: speaking ? C.teal : C.tealLight, color: speaking ? "#fff" : C.teal, border: `1.5px solid ${C.teal}`, borderRadius: 20, padding: "6px 14px", fontSize: 13, fontFamily: "Georgia, serif", fontWeight: 600, cursor: "pointer", display: "flex", alignItems: "center", gap: 6, marginBottom: 16 }}>
-    <span>{speaking ? "⏹" : "🔊"}</span>
-    <span>{speaking ? "Stop" : "Read aloud"}</span>
+  <button onClick={onSpeak} style={{ background: speaking ? C.teal : C.tealLight, color: speaking ? "#fff" : C.teal, border: `1.5px solid ${C.teal}`, borderRadius: 20, padding: "6px 14px", fontSize: 13, fontFamily: "Georgia, serif", fontWeight: 600, cursor: "pointer", display: "flex", alignItems: "center", gap: 6, marginBottom: 16 }}>
+    <span>{speaking ? "⏹" : "🔊"}</span><span>{speaking ? "Stop" : "Read aloud"}</span>
   </button>
 );
 
-// ─── HOME ────────────────────────────────────────────────────────────────────
-const HomeSection = ({ onNav }) => (
-  <div>
-    <div style={{ background: `linear-gradient(135deg, ${C.teal}, ${C.navyMid})`, borderRadius: 20, padding: "28px 20px", marginBottom: 20, textAlign: "center" }}>
-      <div style={{ fontSize: 42, marginBottom: 8 }}>🌿</div>
-      <h1 style={{ color: "#fff", fontSize: 26, fontWeight: 800, marginBottom: 6 }}>REPAIR</h1>
-      <div style={{ color: "rgba(255,255,255,0.65)", fontSize: 15, letterSpacing: 1.2, textTransform: "uppercase", marginBottom: 10, fontWeight: 600 }}>
-        Rectal prolapse · Education · Patient Awareness · Information · Resource
-      </div>
-      <p style={{ color: "rgba(255,255,255,0.85)", fontSize: 16, lineHeight: 1.5 }}>
-        Your personal guide to pelvic floor health, bowel wellness, and rectal prolapse — from Stanford's colorectal surgery team.
-      </p>
-    </div>
-
-    <PrivacyNote context="home" />
-
-    <Callout icon="💬" title="You're not alone" body="Millions of people live with pelvic floor symptoms — and most never talk about them. This app is a safe, shame-free place to learn, prepare, and feel more in control." />
-
-    <div style={{ color: C.navy, fontSize: 17, fontWeight: 700, marginBottom: 12 }}>Explore</div>
-    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 16 }}>
-      {NAV.filter(n => n.id !== "home").map(n => (
-        <button key={n.id} onClick={() => onNav(n.id)}
-          style={{ background: C.card, border: `1px solid ${C.border}`, minHeight: 90, boxShadow: "0 2px 6px rgba(0,0,0,0.04)", borderRadius: 16, padding: 16, textAlign: "left", cursor: "pointer", fontFamily: "Georgia, serif" }}>
-          <div style={{ fontSize: 24, marginBottom: 4 }}>{n.icon}</div>
-          <div style={{ color: C.navy, fontSize: 17, fontWeight: 600, lineHeight: 1.3 }}>{n.label}</div>
-        </button>
-      ))}
-    </div>
-
-    <Card style={{ background: C.sageLt, border: `1px solid ${C.sage}22`, borderRadius: 16, padding: 16 }}>
-      <div style={{ color: C.sage, fontSize: 16, fontWeight: 700, marginBottom: 4, textTransform: "uppercase", letterSpacing: 1 }}>Stanford Colorectal Surgery</div>
-      <div style={{ color: C.navy, fontSize: 17, lineHeight: 1.6, marginBottom: 8 }}>
-        Content created by Dr. Brooke Gurland and reviewed by a multidisciplinary team. This app educates — it does not diagnose or replace your healthcare team.
-      </div>
-      <div style={{ color: C.sage, fontSize: 16, lineHeight: 1.6, borderTop: `1px solid ${C.sage}33`, paddingTop: 8 }}>
-        <strong>REPAIR</strong> — <span style={{ fontStyle: "italic" }}>Rectal prolapse Education and Patient Awareness Information Resource</span>
-      </div>
-    </Card>
+// ─── V2 CREDENTIALS STRIP ────────────────────────────────────────────────────
+const CredentialsStrip = () => (
+  <div style={{ background: C.tealDeep, color: "#fff", padding: "10px 16px", fontSize: 12.5, lineHeight: 1.4, textAlign: "center", letterSpacing: 0.2, flexShrink: 0 }}>
+    Built by <span style={{ color: "#c8ebe3", fontWeight: 700, letterSpacing: 0.5 }}>colorectal surgeons &amp; pelvic floor specialists</span>
+    <br />
+    Educational only · Does not diagnose · Private by design
   </div>
 );
 
-// ─── PROLAPSE SECTION (accordion) ────────────────────────────────────────────
+// ─── V2 DIFFERENT CARD ───────────────────────────────────────────────────────
+const DifferentCard = () => {
+  const [expanded, setExpanded] = useState(false);
+  if (expanded) {
+    return (
+      <div style={{ background: C.card, border: `1.5px solid ${C.teal}`, borderRadius: 14, padding: "18px 18px 16px", marginBottom: 18 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 12 }}>
+          <div style={{ width: 36, height: 36, borderRadius: "50%", background: C.tealLight, display: "flex", alignItems: "center", justifyContent: "center", border: `1.5px solid ${C.teal}`, fontSize: 18, flexShrink: 0 }}>✨</div>
+          <div style={{ color: C.tealDeep, fontWeight: 700, fontSize: 15 }}>How I'm different</div>
+        </div>
+        <div style={{ color: C.navy, fontSize: 15, lineHeight: 1.6, paddingTop: 10, borderTop: `1px solid ${C.borderSoft}` }}>
+          I was <strong style={{ color: C.tealDeep }}>shaped by colorectal surgeons and pelvic floor specialists</strong> — not trained on the open internet.
+          <br /><br />
+          My answers stay within <strong style={{ color: C.tealDeep }}>what your specialist team wants you to know</strong>. When a question is outside what I'm trained on, I'll say so and point you back to your care team.
+          <br /><br />
+          I don't diagnose. I don't replace your doctor. I'm here to help you understand, prepare, and ask better questions.
+        </div>
+        <button onClick={() => setExpanded(false)} style={{ background: "none", border: "none", color: C.muted, fontSize: 13, cursor: "pointer", fontFamily: "Georgia, serif", textDecoration: "underline", textUnderlineOffset: 3, marginTop: 10, padding: 0 }}>← Close</button>
+      </div>
+    );
+  }
+  return (
+    <button onClick={() => setExpanded(true)} style={{ background: C.tealLight, border: `1.5px solid rgba(45,125,111,0.25)`, borderRadius: 14, padding: "14px 16px", marginBottom: 18, cursor: "pointer", display: "flex", alignItems: "center", gap: 12, fontFamily: "Georgia, serif", textAlign: "left", width: "100%", transition: "all 0.15s ease" }}>
+      <div style={{ width: 36, height: 36, borderRadius: "50%", background: C.card, display: "flex", alignItems: "center", justifyContent: "center", border: `1.5px solid ${C.teal}`, fontSize: 18, flexShrink: 0 }}>✨</div>
+      <div style={{ flex: 1, color: C.tealDeep, fontSize: 14.5, fontWeight: 600, lineHeight: 1.4 }}>Not just any chatbot — tap to see how I'm different</div>
+      <div style={{ color: C.teal, fontSize: 18, flexShrink: 0 }}>›</div>
+    </button>
+  );
+};
+
+// ─── V2 TOPICS OVERLAY ───────────────────────────────────────────────────────
+const TopicsOverlay = ({ onClose, onNav }) => (
+  <div style={{ position: "absolute", inset: 0, background: C.bg, zIndex: 50, display: "flex", flexDirection: "column" }}>
+    <div style={{ background: C.card, padding: "14px 16px", borderBottom: `1px solid ${C.border}`, display: "flex", alignItems: "center", gap: 12, flexShrink: 0 }}>
+      <button onClick={onClose} style={{ background: "none", border: "none", color: C.teal, fontSize: 16, cursor: "pointer", fontFamily: "Georgia, serif", fontWeight: 600 }}>← Back to chat</button>
+      <div style={{ color: C.navy, fontWeight: 700, fontSize: 17 }}>Browse by topic</div>
+    </div>
+    <div style={{ padding: "18px 20px 8px", color: C.slate, fontSize: 14, lineHeight: 1.55 }}>
+      You can also ask me about any of these — just tap to open.
+    </div>
+    <div style={{ padding: "8px 16px 20px", overflowY: "auto", flex: 1 }}>
+      {[
+        { id: "prolapse", icon: "📖", label: "Understanding prolapse & bowel dysfunction" },
+        { id: "symptoms", icon: "🔍", label: "Symptoms & IMPACT score" },
+        { id: "imaging", icon: "🩻", label: "Pelvic floor testing" },
+        { id: "lifestyle", icon: "🥦", label: "Lifestyle & bowel habit training" },
+        { id: "surgical", icon: "🏥", label: "Considering surgery" },
+        { id: "redflags", icon: "🚨", label: "Red flags — when to seek care" },
+      ].map(t => (
+        <button key={t.id} onClick={() => { onNav(t.id); onClose(); }}
+          style={{ background: C.card, border: `1px solid ${C.border}`, borderRadius: 14, padding: "14px 16px", marginBottom: 10, display: "flex", alignItems: "center", gap: 14, cursor: "pointer", fontFamily: "Georgia, serif", textAlign: "left", width: "100%" }}>
+          <div style={{ fontSize: 22, width: 40, height: 40, borderRadius: "50%", background: C.sageLt, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>{t.icon}</div>
+          <div style={{ flex: 1, color: C.navy, fontSize: 15, fontWeight: 600, lineHeight: 1.3 }}>{t.label}</div>
+        </button>
+      ))}
+    </div>
+  </div>
+);
+
+// ─── V2 HOME SECTION ─────────────────────────────────────────────────────────
+const STARTERS = [
+  { icon: "🔍", text: "Help me understand my symptoms or diagnosis", prompt: "I'd like to understand my symptoms or diagnosis better. Can you help me figure out what's happening?" },
+  { icon: "📅", text: "I'm preparing for an appointment", prompt: "I'm preparing for an upcoming appointment. Can you help me get ready — including what questions to ask?" },
+  { icon: "🥦", text: "What lifestyle changes can help?", prompt: "I want to know what lifestyle changes can help with my pelvic floor health." },
+  { icon: "🏥", text: "I'm thinking about surgery", prompt: "I'm thinking about surgery and want to understand my options and what to expect." },
+];
+
+const HomeSection = ({ onStartChat, onNav }) => {
+  const [showTopics, setShowTopics] = useState(false);
+
+  return (
+    <div style={{ flex: 1, background: C.bg, overflowY: "auto", padding: "20px 16px 12px", display: "flex", flexDirection: "column", position: "relative" }}>
+      {showTopics && <TopicsOverlay onClose={() => setShowTopics(false)} onNav={onNav} />}
+
+      {/* Intro card */}
+      <div style={{ background: C.card, borderRadius: 20, padding: 20, marginBottom: 18, border: `1px solid ${C.border}`, boxShadow: "0 2px 10px rgba(26,46,59,0.05)" }}>
+        <div style={{ width: 52, height: 52, borderRadius: "50%", background: `linear-gradient(135deg, ${C.teal}, ${C.tealMid})`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 26, boxShadow: "0 3px 10px rgba(45,125,111,0.3)", marginBottom: 12 }}>🌿</div>
+        <div style={{ color: C.navy, fontSize: 20, fontWeight: 700, lineHeight: 1.3, marginBottom: 8 }}>Hello — I'm REPAIR.</div>
+        <div style={{ color: C.slate, fontSize: 16, lineHeight: 1.6 }}>
+          A pelvic floor companion built by <strong style={{ color: C.teal }}>colorectal surgeons and pelvic floor specialists</strong> to help you understand your condition, your symptoms, and what to expect from care.
+          <br /><br />
+          I can also help you <strong style={{ color: C.teal }}>build a summary to bring to your appointment</strong> — just ask.
+          <br /><br />
+          Ask me anything, or tap a starter below.
+        </div>
+      </div>
+
+      {/* How I'm different card */}
+      <DifferentCard />
+
+      {/* Starters */}
+      <div style={{ color: C.muted, fontSize: 12, fontWeight: 700, textTransform: "uppercase", letterSpacing: 1.2, margin: "6px 4px 10px" }}>Where to begin</div>
+
+      {STARTERS.map((s, i) => (
+        <button key={i} onClick={() => onStartChat(s.prompt)}
+          style={{ background: C.card, border: `1.5px solid ${C.border}`, borderRadius: 16, padding: "14px 16px", marginBottom: 10, display: "flex", alignItems: "center", gap: 14, cursor: "pointer", fontFamily: "Georgia, serif", textAlign: "left", width: "100%", transition: "all 0.15s ease" }}>
+          <div style={{ fontSize: 20, width: 38, height: 38, borderRadius: "50%", background: C.tealLight, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>{s.icon}</div>
+          <div style={{ flex: 1, color: C.navy, fontSize: 15, fontWeight: 600, lineHeight: 1.35 }}>{s.text}</div>
+          <div style={{ color: C.teal, fontSize: 18, flexShrink: 0 }}>›</div>
+        </button>
+      ))}
+
+      <div style={{ textAlign: "center", marginTop: "auto", paddingTop: 16 }}>
+        <button onClick={() => setShowTopics(true)} style={{ background: "none", border: "none", color: C.muted, fontSize: 13, fontFamily: "Georgia, serif", cursor: "pointer", textDecoration: "underline", textUnderlineOffset: 3 }}>
+          Or browse topics on your own →
+        </button>
+      </div>
+    </div>
+  );
+};
+
+// ─── PROLAPSE SECTION ────────────────────────────────────────────────────────
 const PROLAPSE_CARDS = [
   {
     id: "what", icon: "📖", title: "What Is Rectal Prolapse?",
     content: () => (
       <div>
-        <p style={{ color: C.navy, fontSize: 16, lineHeight: 1.7, marginBottom: 16 }}>
-          Rectal prolapse occurs when part or all of the rectum slips out of its normal position and protrudes through the anal opening — or folds inward on itself. Think of the rectum like a sock: prolapse is like the sock starting to turn inside out.
-        </p>
+        <p style={{ color: C.navy, fontSize: 16, lineHeight: 1.7, marginBottom: 16 }}>Rectal prolapse occurs when part or all of the rectum slips out of its normal position and protrudes through the anal opening — or folds inward on itself. Think of the rectum like a sock: prolapse is like the sock starting to turn inside out.</p>
         <p style={{ color: C.navy, fontSize: 17, fontWeight: 700, marginBottom: 8 }}>▶ Watch this animation first</p>
         <VimeoEmbed videoId="743819969" title="Rectal Prolapse & Rectocele" />
         <Card style={{ borderRadius: 14, padding: 16, marginBottom: 12 }}>
           <div style={{ color: C.teal, fontWeight: 700, fontSize: 17, marginBottom: 8 }}>Internal vs External</div>
-          <div style={{ color: C.navy, fontSize: 16, lineHeight: 1.7, marginBottom: 12 }}>
-            <strong>Internal prolapse (intussusception):</strong> The rectum folds inward on itself but stays inside the body. Diagnosed through imaging or examination. Symptoms include incomplete evacuation, straining, and a feeling of blockage. <em>Internal prolapse is real and can significantly affect quality of life.</em>
-          </div>
-          <div style={{ color: C.navy, fontSize: 16, lineHeight: 1.7 }}>
-            <strong>External prolapse:</strong> The rectum protrudes through the anal opening and is visible. This ranges from the inner lining (mucosal prolapse) to the full thickness of the rectal wall.
-          </div>
+          <div style={{ color: C.navy, fontSize: 16, lineHeight: 1.7, marginBottom: 12 }}><strong>Internal prolapse (intussusception):</strong> The rectum folds inward on itself but stays inside the body. Diagnosed through imaging or examination. Symptoms include incomplete evacuation, straining, and a feeling of blockage. <em>Internal prolapse is real and can significantly affect quality of life.</em></div>
+          <div style={{ color: C.navy, fontSize: 16, lineHeight: 1.7 }}><strong>External prolapse:</strong> The rectum protrudes through the anal opening and is visible. This ranges from the inner lining (mucosal prolapse) to the full thickness of the rectal wall.</div>
         </Card>
       </div>
     ),
@@ -243,10 +296,7 @@ const PROLAPSE_CARDS = [
           <Card key={r.grade} style={{ borderRadius: 14, padding: 14, marginBottom: 10 }}>
             <div style={{ display: "flex", gap: 12, alignItems: "flex-start" }}>
               <div style={{ width: 36, height: 36, borderRadius: "50%", background: C.tealLight, color: C.teal, fontWeight: 800, fontSize: 15, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>G{r.grade}</div>
-              <div>
-                <div style={{ color: C.navy, fontSize: 16, fontWeight: 600, marginBottom: 4 }}>{r.desc}</div>
-                <div style={{ color: C.muted, fontSize: 13 }}>{r.sig}</div>
-              </div>
+              <div><div style={{ color: C.navy, fontSize: 16, fontWeight: 600, marginBottom: 4 }}>{r.desc}</div><div style={{ color: C.muted, fontSize: 13 }}>{r.sig}</div></div>
             </div>
           </Card>
         ))}
@@ -283,10 +333,7 @@ const PROLAPSE_CARDS = [
           <Card key={s.step} style={{ borderRadius: 14, padding: 14, marginBottom: 10 }}>
             <div style={{ display: "flex", gap: 12 }}>
               <div style={{ width: 32, height: 32, borderRadius: "50%", background: C.teal, color: "#fff", fontWeight: 800, fontSize: 14, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>{s.step}</div>
-              <div>
-                <div style={{ color: C.navy, fontWeight: 700, fontSize: 16, marginBottom: 4 }}>{s.title}</div>
-                <div style={{ color: C.slate, fontSize: 17, lineHeight: 1.6 }}>{s.body}</div>
-              </div>
+              <div><div style={{ color: C.navy, fontWeight: 700, fontSize: 16, marginBottom: 4 }}>{s.title}</div><div style={{ color: C.slate, fontSize: 17, lineHeight: 1.6 }}>{s.body}</div></div>
             </div>
           </Card>
         ))}
@@ -328,17 +375,13 @@ const ProlapseSection = ({ speak, stop, speaking }) => {
       <Callout body="Rectal prolapse is more common than most people know — and far more treatable than most people fear. Understanding what's happening in your body is the first step." />
       {PROLAPSE_CARDS.map(card => (
         <div key={card.id} style={{ marginBottom: 8 }}>
-          <button
-            onClick={() => setOpen(open === card.id ? null : card.id)}
-            style={{ width: "100%", textAlign: "left", background: open === card.id ? C.tealLight : C.card, border: `1.5px solid ${open === card.id ? C.teal : C.border}`, borderRadius: open === card.id ? "16px 16px 0 0" : 16, padding: "16px 18px", display: "flex", alignItems: "center", gap: 12, cursor: "pointer", fontFamily: "Georgia, serif" }}>
+          <button onClick={() => setOpen(open === card.id ? null : card.id)} style={{ width: "100%", textAlign: "left", background: open === card.id ? C.tealLight : C.card, border: `1.5px solid ${open === card.id ? C.teal : C.border}`, borderRadius: open === card.id ? "16px 16px 0 0" : 16, padding: "16px 18px", display: "flex", alignItems: "center", gap: 12, cursor: "pointer", fontFamily: "Georgia, serif" }}>
             <span style={{ fontSize: 22 }}>{card.icon}</span>
             <span style={{ color: C.navy, fontWeight: 700, fontSize: 16, flex: 1 }}>{card.title}</span>
             <span style={{ color: C.muted, fontSize: 18, transform: open === card.id ? "rotate(180deg)" : "none", transition: "transform 0.2s" }}>▾</span>
           </button>
           {open === card.id && (
-            <div style={{ background: C.card, border: `1.5px solid ${C.teal}`, borderTop: "none", borderRadius: "0 0 16px 16px", padding: 16 }}>
-              {card.content()}
-            </div>
+            <div style={{ background: C.card, border: `1.5px solid ${C.teal}`, borderTop: "none", borderRadius: "0 0 16px 16px", padding: 16 }}>{card.content()}</div>
           )}
         </div>
       ))}
@@ -367,8 +410,7 @@ const SymptomsSection = ({ speak, stop, speaking, scores, setScores, primarySymp
         <div>
           {SYMPTOMS.map(s => (
             <div key={s.id}>
-              <button onClick={() => setOpen(open === s.id ? null : s.id)}
-                style={{ width: "100%", textAlign: "left", background: open === s.id ? C.tealLight : C.card, border: `1.5px solid ${open === s.id ? C.teal : C.border}`, borderRadius: open === s.id ? "16px 16px 0 0" : 16, padding: "14px 16px", display: "flex", alignItems: "center", gap: 12, cursor: "pointer", fontFamily: "Georgia, serif", marginBottom: open === s.id ? 0 : 8 }}>
+              <button onClick={() => setOpen(open === s.id ? null : s.id)} style={{ width: "100%", textAlign: "left", background: open === s.id ? C.tealLight : C.card, border: `1.5px solid ${open === s.id ? C.teal : C.border}`, borderRadius: open === s.id ? "16px 16px 0 0" : 16, padding: "14px 16px", display: "flex", alignItems: "center", gap: 12, cursor: "pointer", fontFamily: "Georgia, serif", marginBottom: open === s.id ? 0 : 8 }}>
                 <span style={{ fontSize: 24 }}>{s.icon}</span>
                 <span style={{ color: C.navy, fontWeight: 600, fontSize: 17, flex: 1 }}>{s.label}</span>
                 <span style={{ color: C.muted, fontSize: 18 }}>{open === s.id ? "▲" : "▼"}</span>
@@ -430,8 +472,7 @@ const ImagingSection = ({ speak, stop, speaking }) => {
       <Callout body="Imaging tests for pelvic floor and bowel problems can feel unfamiliar or even embarrassing. Knowing what to expect makes the experience much easier." icon="💙" />
       {IMAGING.map(s => (
         <div key={s.id}>
-          <button onClick={() => setOpen(open === s.id ? null : s.id)}
-            style={{ width: "100%", textAlign: "left", background: open === s.id ? C.tealLight : C.card, border: `1.5px solid ${open === s.id ? C.teal : C.border}`, borderRadius: open === s.id ? "16px 16px 0 0" : 16, padding: "14px 16px", display: "flex", alignItems: "center", gap: 12, cursor: "pointer", fontFamily: "Georgia, serif", marginBottom: open === s.id ? 0 : 8 }}>
+          <button onClick={() => setOpen(open === s.id ? null : s.id)} style={{ width: "100%", textAlign: "left", background: open === s.id ? C.tealLight : C.card, border: `1.5px solid ${open === s.id ? C.teal : C.border}`, borderRadius: open === s.id ? "16px 16px 0 0" : 16, padding: "14px 16px", display: "flex", alignItems: "center", gap: 12, cursor: "pointer", fontFamily: "Georgia, serif", marginBottom: open === s.id ? 0 : 8 }}>
             <span style={{ fontSize: 22 }}>{s.icon}</span>
             <span style={{ color: C.navy, fontWeight: 600, fontSize: 16, flex: 1, lineHeight: 1.3 }}>{s.label}</span>
             <span style={{ color: C.muted }}>{open === s.id ? "▲" : "▼"}</span>
@@ -489,31 +530,20 @@ const LifestyleSection = ({ speak, stop, speaking }) => {
     <div>
       <SectionHeader title="Lifestyle Medicine" subtitle="Lifestyle changes are not a consolation prize — they are the foundation of pelvic floor health." />
       <Callout body="The six pillars of lifestyle medicine each connect directly to pelvic floor and bowel health. Small, consistent changes make a real difference." icon="🌱" />
-      <div style={{ color: C.navy, fontSize: 16, lineHeight: 1.7, marginBottom: 16 }}>
-        <strong>Bowel habit training tips:</strong> Use the gastrocolic reflex — try sitting on the toilet 20–30 minutes after breakfast. Don't ignore the urge. Limit toilet time to 5–10 minutes. Raise your knees with a step stool to relax the anorectal angle.
-      </div>
+      <div style={{ color: C.navy, fontSize: 16, lineHeight: 1.7, marginBottom: 16 }}><strong>Bowel habit training tips:</strong> Use the gastrocolic reflex — try sitting on the toilet 20–30 minutes after breakfast. Don't ignore the urge. Limit toilet time to 5–10 minutes. Raise your knees with a step stool to relax the anorectal angle.</div>
       <VimeoEmbed videoId="1175949349" title="Constipation & Dyssynergic Defecation" />
       <div style={{ color: C.navy, fontSize: 17, fontWeight: 700, marginBottom: 12, marginTop: 8 }}>The 6 Lifestyle Medicine Pillars</div>
       {LIFESTYLE_PILLARS.map(p => (
         <div key={p.id}>
-          <button onClick={() => setOpen(open === p.id ? null : p.id)}
-            style={{ width: "100%", textAlign: "left", background: open === p.id ? "#f0f7f5" : C.card, border: `1.5px solid ${open === p.id ? p.color : C.border}`, borderRadius: open === p.id ? "16px 16px 0 0" : 16, padding: "14px 16px", display: "flex", alignItems: "center", gap: 12, cursor: "pointer", fontFamily: "Georgia, serif", marginBottom: open === p.id ? 0 : 8 }}>
+          <button onClick={() => setOpen(open === p.id ? null : p.id)} style={{ width: "100%", textAlign: "left", background: open === p.id ? "#f0f7f5" : C.card, border: `1.5px solid ${open === p.id ? p.color : C.border}`, borderRadius: open === p.id ? "16px 16px 0 0" : 16, padding: "14px 16px", display: "flex", alignItems: "center", gap: 12, cursor: "pointer", fontFamily: "Georgia, serif", marginBottom: open === p.id ? 0 : 8 }}>
             <span style={{ fontSize: 24 }}>{p.icon}</span>
-            <div style={{ flex: 1 }}>
-              <div style={{ color: C.navy, fontWeight: 600, fontSize: 14 }}>{p.label}</div>
-              <div style={{ color: C.muted, fontSize: 16, marginTop: 2 }}>{p.desc.substring(0, 60)}...</div>
-            </div>
+            <div style={{ flex: 1 }}><div style={{ color: C.navy, fontWeight: 600, fontSize: 14 }}>{p.label}</div><div style={{ color: C.muted, fontSize: 16, marginTop: 2 }}>{p.desc.substring(0, 60)}...</div></div>
             <span style={{ color: C.muted }}>{open === p.id ? "▲" : "▼"}</span>
           </button>
           {open === p.id && (
             <div style={{ background: C.card, border: `1.5px solid ${p.color}`, borderTop: "none", borderRadius: "0 0 16px 16px", padding: 16, borderLeft: `4px solid ${p.color}`, marginBottom: 8 }}>
               <div style={{ color: C.navy, fontSize: 16, lineHeight: 1.7, marginBottom: 12 }}>{p.desc}</div>
-              {p.tips.map((t, i) => (
-                <div key={i} style={{ display: "flex", gap: 8, marginBottom: 8 }}>
-                  <div style={{ color: p.color, fontSize: 16, marginTop: 2, flexShrink: 0 }}>✓</div>
-                  <div style={{ color: C.slate, fontSize: 17, lineHeight: 1.6 }}>{t}</div>
-                </div>
-              ))}
+              {p.tips.map((t, i) => (<div key={i} style={{ display: "flex", gap: 8, marginBottom: 8 }}><div style={{ color: p.color, fontSize: 16, marginTop: 2, flexShrink: 0 }}>✓</div><div style={{ color: C.slate, fontSize: 17, lineHeight: 1.6 }}>{t}</div></div>))}
             </div>
           )}
         </div>
@@ -585,9 +615,8 @@ const calcIMPACT016 = (ans) => {
     if (ans[q] === "no") items.push(0);
     else if (ans[q] === "yes" && ans[b]) items.push(botherScore(ans[b]));
   });
-  if (ans.q8 === "no") {
-    items.push(0);
-  } else if (ans.q8 === "yes") {
+  if (ans.q8 === "no") { items.push(0); }
+  else if (ans.q8 === "yes") {
     const fi = [];
     [["q8a","q8a_bother"],["q8b","q8b_bother"],["q8c","q8c_bother"]].forEach(([q,b]) => {
       if (ans[q] === "no") fi.push(0);
@@ -635,8 +664,7 @@ const impactSummaryText = (ans) => {
 };
 
 const OptBtn = ({ label, selected, onClick, color = C.teal }) => (
-  <button onClick={onClick}
-    style={{ width: "100%", textAlign: "left", display: "flex", alignItems: "center", gap: 14, background: selected ? color : C.tealLight, border: `2px solid ${selected ? color : C.border}`, borderRadius: 12, padding: "14px 16px", marginBottom: 10, minHeight: 54, cursor: "pointer", fontFamily: "Georgia, serif" }}>
+  <button onClick={onClick} style={{ width: "100%", textAlign: "left", display: "flex", alignItems: "center", gap: 14, background: selected ? color : C.tealLight, border: `2px solid ${selected ? color : C.border}`, borderRadius: 12, padding: "14px 16px", marginBottom: 10, minHeight: 54, cursor: "pointer", fontFamily: "Georgia, serif" }}>
     <div style={{ width: 22, height: 22, borderRadius: "50%", flexShrink: 0, border: `2.5px solid ${selected ? "#fff" : color}`, background: selected ? "#fff" : "transparent", display: "flex", alignItems: "center", justifyContent: "center" }}>
       {selected && <div style={{ width: 10, height: 10, borderRadius: "50%", background: color }} />}
     </div>
@@ -649,8 +677,7 @@ const YesNoGate = ({ question, value, onChange }) => (
     {question ? <div style={{ color: C.navy, fontWeight: 600, fontSize: 16, marginBottom: 8 }}>{question}</div> : null}
     <div style={{ display: "flex", gap: 12 }}>
       {["yes", "no"].map(v => (
-        <button key={v} onClick={() => onChange(v)}
-          style={{ flex: 1, padding: "14px 0", borderRadius: 12, cursor: "pointer", background: value === v ? C.teal : C.tealLight, color: value === v ? "#fff" : C.navy, border: `2px solid ${value === v ? C.teal : C.border}`, fontWeight: 700, fontSize: 18, minHeight: 54, fontFamily: "Georgia, serif" }}>
+        <button key={v} onClick={() => onChange(v)} style={{ flex: 1, padding: "14px 0", borderRadius: 12, cursor: "pointer", background: value === v ? C.teal : C.tealLight, color: value === v ? "#fff" : C.navy, border: `2px solid ${value === v ? C.teal : C.border}`, fontWeight: 700, fontSize: 18, minHeight: 54, fontFamily: "Georgia, serif" }}>
           {v === "yes" ? "YES" : "NO"}
         </button>
       ))}
@@ -668,7 +695,6 @@ const IMPACTSurvey = ({ onComplete }) => {
   const [ans, setAns] = useState({});
   const totalSteps = 12;
   const answeredCount = Object.keys(ans).filter(k => ["bristol","q2","q3","q4","q5","q6","q7","q8","q9","q10","q11","q12"].includes(k)).length;
-
   const set = (key, val) => setAns(prev => ({ ...prev, [key]: val }));
 
   const canProceed = () => {
@@ -715,18 +741,12 @@ const IMPACTSurvey = ({ onComplete }) => {
       <button onClick={next} disabled={!canProceed()} style={{ width: "100%", borderRadius: 14, padding: "16px 0", background: canProceed() ? C.teal : C.border, color: "#fff", border: "none", fontSize: 17, fontWeight: 700, cursor: canProceed() ? "pointer" : "not-allowed", marginTop: 8, opacity: canProceed() ? 1 : 0.5, fontFamily: "Georgia, serif" }}>
         {step < totalSteps ? "Next question →" : "Show My Report ✓"}
       </button>
-
       {showEarlyReport && step < totalSteps && (
         <div style={{ textAlign: "center", marginTop: 10 }}>
-          <button onClick={() => onComplete(ans)} style={{ background: "none", border: "none", color: C.teal, fontSize: 15, fontWeight: 600, cursor: "pointer", textDecoration: "underline", fontFamily: "Georgia, serif" }}>
-            Show my report now (Q{step}–12 optional) →
-          </button>
+          <button onClick={() => onComplete(ans)} style={{ background: "none", border: "none", color: C.teal, fontSize: 15, fontWeight: 600, cursor: "pointer", textDecoration: "underline", fontFamily: "Georgia, serif" }}>Show my report now (Q{step}–12 optional) →</button>
         </div>
       )}
-
-      {step > 1 && (
-        <button onClick={() => setStep(s => s - 1)} style={{ width: "100%", borderRadius: 14, padding: "10px 0", marginTop: 8, background: "none", color: C.muted, border: `1px solid ${C.border}`, fontSize: 14, cursor: "pointer", fontFamily: "Georgia, serif" }}>← Back</button>
-      )}
+      {step > 1 && (<button onClick={() => setStep(s => s - 1)} style={{ width: "100%", borderRadius: 14, padding: "10px 0", marginTop: 8, background: "none", color: C.muted, border: `1px solid ${C.border}`, fontSize: 14, cursor: "pointer", fontFamily: "Georgia, serif" }}>← Back</button>)}
     </div>
   );
 };
@@ -759,18 +779,25 @@ const IMPACTResults = ({ ans, onRetake }) => {
   const hasDomainScores = [constipScore, fiScore, urgScore, painScore, prolapseScore].some(s => s !== null);
   const score16 = calcIMPACT016(ans);
   const band = impactBand(score16);
-  const [copied, setCopied] = useState(false);
+  const [shared, setShared] = useState(false);
 
-  const summaryForCopy = `IMPACT Bowel Survey Results\nComposite Score: ${score16}/16 — ${band?.label || "N/A"}\n${band?.msg || ""}\n\nSymptom Domains:\n${[["Constipation/Evacuation","🚽",constipScore],["Fecal Leakage","💧",fiScore],["Urgency","⚡",urgScore],["Rectal Pain","😣",painScore],["Prolapse Sensation","⬇️",prolapseScore]].filter(([,,s])=>s!==null).map(([l,i,s])=>`${i} ${l}: ${domainBand(s)?.label}`).join("\n")}\n\nNote: For discussion with your healthcare team — not a diagnosis.`;
+  // ── V2: Web Share API replaces broken copy button ──
+  const summaryForShare = `IMPACT Bowel Survey Results\nComposite Score: ${score16}/16 — ${band?.label || "N/A"}\n${band?.msg || ""}\n\nSymptom Domains:\n${[["Constipation/Evacuation","🚽",constipScore],["Fecal Leakage","💧",fiScore],["Urgency","⚡",urgScore],["Rectal Pain","😣",painScore],["Prolapse Sensation","⬇️",prolapseScore]].filter(([,,s])=>s!==null).map(([l,i,s])=>`${i} ${l}: ${domainBand(s)?.label}`).join("\n")}\n\nFor discussion with your healthcare team — not a diagnosis.\nGenerated by REPAIR (repair-pelvic-floor.netlify.app)`;
 
-  const handleCopy = () => {
-    navigator.clipboard.writeText(summaryForCopy).then(() => { setCopied(true); setTimeout(() => setCopied(false), 2000); });
+  const handleShare = async () => {
+    if (navigator.share) {
+      try {
+        await navigator.share({ title: "My IMPACT Bowel Survey Results", text: summaryForShare });
+        setShared(true); setTimeout(() => setShared(false), 2000);
+      } catch {}
+    } else {
+      navigator.clipboard.writeText(summaryForShare).then(() => { setShared(true); setTimeout(() => setShared(false), 2000); });
+    }
   };
 
   return (
     <div>
       <PrivacyNote context="results" />
-
       {score16 !== null && band && (
         <Card style={{ background: C.tealLight, border: `2px solid ${band.color}`, borderRadius: 16, padding: 16, marginBottom: 16, textAlign: "center" }}>
           <div style={{ color: C.muted, fontSize: 14, marginBottom: 4 }}>IMPACT Composite Score</div>
@@ -780,13 +807,11 @@ const IMPACTResults = ({ ans, onRetake }) => {
           <div style={{ color: C.navy, fontSize: 15, lineHeight: 1.6, marginTop: 12, textAlign: "left" }}>{band.msg}</div>
         </Card>
       )}
-
       <Card style={{ border: `2px solid ${bristol?.color || C.border}`, borderRadius: 16, padding: 16, marginBottom: 16 }}>
         <div style={{ color: C.muted, fontSize: 14, textTransform: "uppercase", letterSpacing: 0.5, marginBottom: 4 }}>Stool Type (Bristol Scale)</div>
         <div style={{ color: bristol?.color || C.navy, fontWeight: 700, fontSize: 17, marginBottom: 4 }}>Type {ans.bristol} — {BRISTOL_TYPES.find(t => t.type === ans.bristol)?.desc}</div>
         {bristol && <div style={{ color: C.slate, fontSize: 17, lineHeight: 1.5 }}>{bristol.note}</div>}
       </Card>
-
       {hasDomainScores && (
         <Card style={{ borderRadius: 16, padding: 16, marginBottom: 16 }}>
           <div style={{ color: C.navy, fontWeight: 700, fontSize: 16, marginBottom: 4 }}>Symptom Bother by Domain</div>
@@ -799,7 +824,6 @@ const IMPACTResults = ({ ans, onRetake }) => {
           <div style={{ color: C.muted, fontSize: 14, marginTop: 8, lineHeight: 1.5 }}>These domain scores are based on your bother ratings. They are not diagnostic — share them with your healthcare team.</div>
         </Card>
       )}
-
       {hasLeakage && (
         <Card style={{ border: `2px solid ${C.coral}`, borderRadius: 16, padding: 16, marginBottom: 16 }}>
           <div style={{ color: C.coral, fontWeight: 700, fontSize: 16, marginBottom: 6 }}>💧 Leakage Detail</div>
@@ -808,7 +832,6 @@ const IMPACTResults = ({ ans, onRetake }) => {
           {ans.q8c === "yes" && <div style={{ color: C.navy, fontSize: 17 }}>• Gas — {ans.q8c_freq} / bother: {ans.q8c_bother}</div>}
         </Card>
       )}
-
       {ans.q12 && ans.q12 !== "never" && (
         <Card style={{ border: `2px solid ${C.red}`, borderRadius: 16, padding: 16, marginBottom: 16 }}>
           <div style={{ color: C.red, fontWeight: 700, fontSize: 16, marginBottom: 4 }}>🩸 Rectal Bleeding</div>
@@ -816,29 +839,21 @@ const IMPACTResults = ({ ans, onRetake }) => {
           <div style={{ color: C.red, fontSize: 17, fontWeight: 600 }}>Please make sure to mention this to your healthcare team at your appointment.</div>
         </Card>
       )}
-
       <Card style={{ background: C.tealLight, border: `2px solid ${C.teal}`, borderRadius: 16, padding: 16, marginBottom: 16 }}>
         <div style={{ color: C.teal, fontWeight: 700, fontSize: 16, marginBottom: 6 }}>💬 Summary for your healthcare team</div>
         <div style={{ color: C.navy, fontSize: 17, lineHeight: 1.6 }}>{summaryText}</div>
       </Card>
-
       <Card style={{ background: C.warnLt, border: `1px solid ${C.warn}44`, borderRadius: 16, padding: 16, marginBottom: 16 }}>
         <div style={{ color: C.warn, fontWeight: 700, fontSize: 14, marginBottom: 4 }}>📅 Before your appointment</div>
-        <div style={{ color: C.navy, fontSize: 15, lineHeight: 1.6 }}>Print or screenshot this report to bring with you, or tap Copy Summary to save it. Sharing it with your team saves time and opens a better conversation.</div>
+        <div style={{ color: C.navy, fontSize: 15, lineHeight: 1.6 }}>Print or screenshot this report to bring with you. Sharing it with your team saves time and opens a better conversation.</div>
       </Card>
-
       <div style={{ display: "flex", gap: 10, marginBottom: 12 }}>
-        <button onClick={handleCopy} style={{ flex: 1, borderRadius: 14, padding: "14px 0", background: C.tealLight, color: C.teal, border: "none", fontSize: 15, fontWeight: 700, cursor: "pointer", fontFamily: "Georgia, serif" }}>
-          {copied ? "✓ Copied!" : "📋 Copy Summary"}
+        <button onClick={handleShare} style={{ flex: 1, borderRadius: 14, padding: "14px 0", background: C.tealLight, color: C.teal, border: "none", fontSize: 15, fontWeight: 700, cursor: "pointer", fontFamily: "Georgia, serif" }}>
+          {shared ? "✓ Sent!" : "📤 Save or send this summary"}
         </button>
       </div>
-
-      <div style={{ color: C.muted, fontSize: 14, textAlign: "center", marginBottom: 12 }}>
-        IMPACT Bowel Function Short Form — Endorsed by ASCRS, AUGS, ICS, SUFU (Bordeianou et al., Dis Colon Rectum 2020)
-      </div>
-
+      <div style={{ color: C.muted, fontSize: 14, textAlign: "center", marginBottom: 12 }}>IMPACT Bowel Function Short Form — Endorsed by ASCRS, AUGS, ICS, SUFU (Bordeianou et al., Dis Colon Rectum 2020)</div>
       <button onClick={onRetake} style={{ width: "100%", borderRadius: 14, padding: "14px 0", background: C.tealLight, color: C.teal, border: `1px solid ${C.teal}`, fontSize: 15, fontWeight: 600, cursor: "pointer", fontFamily: "Georgia, serif", marginBottom: 16 }}>↩ Retake survey</button>
-
       {hasLeakage && <VimeoEmbed videoId="743819969" title="Fecal Incontinence — Understanding the Condition" />}
       {hasConstip && <VimeoEmbed videoId="1175949349" title="Constipation & Dyssynergic Defecation" />}
     </div>
@@ -953,9 +968,7 @@ const CalculatorsSection = ({ scores, setScores, primarySymptom, setPrimarySympt
                 : <IMPACTSurvey onComplete={handleImpactComplete} />}
               {surveyDone && (
                 <div style={{ marginTop: 8 }}>
-                  <button onClick={() => setStep(3)} style={{ width: "100%", borderRadius: 14, padding: "14px 0", background: C.tealLight, color: C.teal, border: `1px solid ${C.teal}`, fontSize: 16, fontWeight: 600, cursor: "pointer", fontFamily: "Georgia, serif", marginBottom: 8 }}>
-                    Optional: Surgical Risk Checklist →
-                  </button>
+                  <button onClick={() => setStep(3)} style={{ width: "100%", borderRadius: 14, padding: "14px 0", background: C.tealLight, color: C.teal, border: `1px solid ${C.teal}`, fontSize: 16, fontWeight: 600, cursor: "pointer", fontFamily: "Georgia, serif", marginBottom: 8 }}>Optional: Surgical Risk Checklist →</button>
                 </div>
               )}
             </div>
@@ -1051,32 +1064,7 @@ const SurgicalSection = ({ speak, stop, speaking }) => {
     { id: "mesh", q: "Will I need mesh?", content: (<div><Callout body="Not all rectopexy procedures use mesh. Your care team will explain what they recommend and why. The information below supports an informed conversation." icon="ℹ️" />{[{ type: "Synthetic Mesh", icon: "🔩", desc: "Permanent synthetic material (polypropylene). Durable and widely used.", erosion: "~1.8% erosion rate", rec: "~3.7% recurrence" }, { type: "Biologic Mesh", icon: "🧬", desc: "Biologic material works by helping your body grow new, stronger tissue over time.", erosion: "~0.7% erosion rate", rec: "~4.0% recurrence" }, { type: "Suture Only — No Mesh", icon: "🪡", desc: "Rectum secured with sutures alone. A valid option for many patients.", erosion: "No mesh — no erosion risk", rec: "Comparable outcomes" }].map(m => (<Card key={m.type} style={{ borderRadius: 14, padding: 14, marginBottom: 10 }}><div style={{ display: "flex", gap: 10, alignItems: "center", marginBottom: 8 }}><span style={{ fontSize: 22 }}>{m.icon}</span><span style={{ color: C.navy, fontWeight: 700, fontSize: 16 }}>{m.type}</span></div><div style={{ color: C.navy, fontSize: 16, lineHeight: 1.6, marginBottom: 10 }}>{m.desc}</div><div style={{ display: "flex", gap: 24 }}><div><div style={{ color: C.muted, fontSize: 13, textTransform: "uppercase" }}>Erosion</div><div style={{ color: C.navy, fontSize: 15, fontWeight: 600 }}>{m.erosion}</div></div><div><div style={{ color: C.muted, fontSize: 13, textTransform: "uppercase" }}>Recurrence</div><div style={{ color: C.navy, fontSize: 15, fontWeight: 600 }}>{m.rec}</div></div></div></Card>))}<div style={{ color: C.navy, fontWeight: 700, fontSize: 16, marginBottom: 10 }}>My preference to discuss with my care team:</div>{[{ id: "discuss", label: "I'd like to discuss mesh options" }, { id: "avoid", label: "I'd prefer to discuss suture rectopexy (no mesh)" }, { id: "open", label: "I'm open to whatever my care team recommends" }].map(o => (<OptionCard key={o.id} label={o.label} selected={meshPref === o.id} onClick={() => setMeshPref(o.id)} />))}</div>) },
     { id: "risk", q: "Am I a good candidate for surgery?", content: (<div><div style={{ color: C.slate, fontSize: 16, lineHeight: 1.6, marginBottom: 16 }}>Select any factors that apply to you. This helps you start an informed conversation with your care team about surgical risk.</div>{SURG_RISKS.map(r => (<CheckCard key={r} label={r} checked={surgRisk.includes(r)} onClick={() => setSurgRisk(prev => prev.includes(r) ? prev.filter(x => x !== r) : [...prev, r])} />))}<Card style={{ background: C.tealLight, borderRadius: 14, padding: 14, marginTop: 4 }}><div style={{ color: C.teal, fontWeight: 700, fontSize: 16, marginBottom: 4 }}>{surgRisk.length === 0 ? "✅ No risk factors identified" : `${surgRisk.length} factor${surgRisk.length > 1 ? "s" : ""} to discuss`}</div><div style={{ color: C.navy, fontSize: 16, lineHeight: 1.6 }}>{surgRisk.length === 0 ? "Reassuring — your team will do their own full pre-op assessment." : "Bring these to your consultation. Your team can explain how they affect your individual risk."}</div></Card></div>) },
     { id: "recurrence", q: "Could prolapse come back after surgery?", content: (<div><Callout body="Yes — rectal prolapse can recur after surgery. Knowing your risk factors helps you and your care team make the best plan. Some factors can be improved before surgery." icon="🔄" />{REC_RISKS.map(r => (<div key={r.id}><CheckCard label={r.label} checked={recRisk.includes(r.id)} onClick={() => setRecRisk(prev => prev.includes(r.id) ? prev.filter(x => x !== r.id) : [...prev, r.id])} color={C.coral} />{recRisk.includes(r.id) && (<div style={{ background: C.coralLt, borderRadius: 12, padding: "12px 16px", marginTop: -6, marginBottom: 10 }}><div style={{ color: C.slate, fontSize: 15, lineHeight: 1.6 }}>{r.why}</div></div>)}</div>))}{recRisk.length > 0 && (<Card style={{ background: C.tealLight, borderRadius: 14, padding: 14 }}><div style={{ color: C.teal, fontWeight: 700, fontSize: 16, marginBottom: 6 }}>{recRisk.length} factor{recRisk.length > 1 ? "s" : ""} identified</div><div style={{ color: C.navy, fontSize: 16, lineHeight: 1.6 }}>Bring this to your appointment. The more your team knows, the better they can plan with you.</div></Card>)}</div>) },
-    {
-      id: "questions", q: "What should I ask my care team?", content: (
-        <div>
-          <div style={{ color: C.slate, fontSize: 16, lineHeight: 1.6, marginBottom: 16 }}>Empowered patients get better care. Use this list to prepare for your consultation:</div>
-          {[
-            "What type of rectopexy are you recommending and why?",
-            "Will mesh be used? What are the implications for my situation?",
-            "What is the expected recurrence rate for me specifically?",
-            "My most bothersome symptom is [leakage / constipation / prolapse] — how likely is surgery to improve this?",
-            "What happens to my bowel function after surgery?",
-            "What if my symptoms don't improve — what options remain?",
-            "What should I do before surgery to optimize my outcome?",
-            "Should I see a pelvic floor physical therapist before or after surgery?",
-            "What is your personal experience and complication rate with this procedure?",
-          ].map((q, i) => (
-            <Card key={i} style={{ borderRadius: 14, padding: 14, marginBottom: 10 }}>
-              <div style={{ display: "flex", gap: 14 }}>
-                <div style={{ color: C.teal, fontWeight: 800, fontSize: 17, flexShrink: 0, minWidth: 32 }}>Q{i + 1}</div>
-                <div style={{ color: C.navy, fontSize: 16, lineHeight: 1.6 }}>{q}</div>
-              </div>
-            </Card>
-          ))}
-          <Callout body="Surgery is one part of the picture. Lifestyle work — fiber, movement, pelvic floor PT, stress management — remains important before and after any procedure." icon="🌿" />
-        </div>
-      )
-    },
+    { id: "questions", q: "What should I ask my care team?", content: (<div><div style={{ color: C.slate, fontSize: 16, lineHeight: 1.6, marginBottom: 16 }}>Empowered patients get better care. Use this list to prepare for your consultation:</div>{["What type of rectopexy are you recommending and why?", "Will mesh be used? What are the implications for my situation?", "What is the expected recurrence rate for me specifically?", "My most bothersome symptom is [leakage / constipation / prolapse] — how likely is surgery to improve this?", "What happens to my bowel function after surgery?", "What if my symptoms don't improve — what options remain?", "What should I do before surgery to optimize my outcome?", "Should I see a pelvic floor physical therapist before or after surgery?", "What is your personal experience and complication rate with this procedure?"].map((q, i) => (<Card key={i} style={{ borderRadius: 14, padding: 14, marginBottom: 10 }}><div style={{ display: "flex", gap: 14 }}><div style={{ color: C.teal, fontWeight: 800, fontSize: 17, flexShrink: 0, minWidth: 32 }}>Q{i + 1}</div><div style={{ color: C.navy, fontSize: 16, lineHeight: 1.6 }}>{q}</div></div></Card>))}<Callout body="Surgery is one part of the picture. Lifestyle work — fiber, movement, pelvic floor PT, stress management — remains important before and after any procedure." icon="🌿" /></div>) },
   ];
 
   return (
@@ -1152,6 +1140,11 @@ This patient has indicated they want more detail and research. Adjust your respo
 const SYSTEM_PROMPT = `You are a warm, knowledgeable patient education assistant embedded in the REPAIR app — a free, clinician-authored tool for patients with rectal prolapse, bowel dysfunction, and pelvic floor disorders. The app was created by a colorectal surgeon and lifestyle medicine physician at Stanford.
 
 Your role is to educate patients in plain language, help them understand their conditions, and prepare meaningful questions for their appointments. You are not a doctor, not a diagnosis tool, and not a substitute for clinical care.
+
+═══════════════════════════════════
+PROVENANCE & IDENTITY SOURCE
+═══════════════════════════════════
+You were built by colorectal surgeons and pelvic floor specialists at Stanford. Your answers come from what your specialist team wants patients to know — not from general internet knowledge. When a question is outside your scope, say so clearly and direct the patient back to their care team. You do not need to say "I'm not ChatGPT" or compare yourself to other AI tools. Simply be what you are: a specialist-built companion for pelvic floor patients.
 
 ═══════════════════════════════════
 READING LEVEL & WRITING RULES
@@ -1268,20 +1261,21 @@ Every substantive clinical response closes with direction to the patient's healt
 
 // V2 red flag detection — context-aware, does not over-trigger on informational mentions
 const INFORMATIONAL_CONTEXT = ["mentioned", "told me", "risk of", "discussed", "said there was", "warned about", "asked about", "reading about", "heard that", "does it cause"];
-
 const RED_FLAG_KEYWORDS = ["bleeding actively", "blood coming out", "can't push back", "stuck outside", "won't go back", "severe pain", "excruciating", "fever", "emergency", "purple tissue", "dark tissue", "can't pass stool"];
 
-const Chatbot = ({ appState, onClose, chatMessages, setChatMessages }) => {
+// ── V2 CHATBOT — now supports inline={true} for home screen use ───────────────
+const Chatbot = ({ appState, onClose, chatMessages, setChatMessages, inline = false, starterPrompt = null }) => {
   const messages = chatMessages;
   const setMessages = setChatMessages;
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
-  const [showStarters, setShowStarters] = useState(messages.length === 0);
-  const [copied, setCopied] = useState(false);
-  const [listeningStyle, setListeningStyle] = useState(null); // null | "depth" | "practical"
+  const [showStarters, setShowStarters] = useState(messages.length === 0 && !starterPrompt);
+  const [shared, setShared] = useState(false);
+  const [listeningStyle, setListeningStyle] = useState(null);
   const [hasAskedStyle, setHasAskedStyle] = useState(false);
   const bottomRef = useRef(null);
   const inputRef = useRef(null);
+  const starterFired = useRef(false);
 
   const starters = [
     "What is the difference between internal and external prolapse?",
@@ -1292,6 +1286,14 @@ const Chatbot = ({ appState, onClose, chatMessages, setChatMessages }) => {
 
   useEffect(() => { bottomRef.current?.scrollIntoView({ behavior: "smooth" }); }, [messages, loading]);
 
+  // Fire starter prompt once on mount if provided
+  useEffect(() => {
+    if (starterPrompt && !starterFired.current && messages.length === 0) {
+      starterFired.current = true;
+      send(starterPrompt);
+    }
+  }, [starterPrompt]);
+
   const buildContext = () => {
     const lines = [];
     if (appState.section) lines.push(`Patient is in the "${appState.section}" section.`);
@@ -1301,7 +1303,6 @@ const Chatbot = ({ appState, onClose, chatMessages, setChatMessages }) => {
     return lines.length ? `\n\nPATIENT CONTEXT (use to personalize — do not repeat back verbatim):\n${lines.join("\n")}` : "";
   };
 
-  // Context-aware emergency detection — V2
   const isActiveEmergency = (text) => {
     const lower = text.toLowerCase();
     const hasRedFlag = RED_FLAG_KEYWORDS.some(k => lower.includes(k));
@@ -1310,10 +1311,7 @@ const Chatbot = ({ appState, onClose, chatMessages, setChatMessages }) => {
     return !hasInfoContext;
   };
 
-  // Check-in logic — fires once per session after substantive response
-  const shouldAskStyle = (replyText) => {
-    return !hasAskedStyle && replyText.length > 300;
-  };
+  const shouldAskStyle = (replyText) => !hasAskedStyle && replyText.length > 300;
 
   const detectStyleChoice = (text) => {
     const lower = text.toLowerCase();
@@ -1327,42 +1325,28 @@ const Chatbot = ({ appState, onClose, chatMessages, setChatMessages }) => {
   const send = async (text) => {
     if (!text.trim() || loading) return;
     setShowStarters(false);
-
-    // Detect if patient is choosing a listening style
     const styleChoice = detectStyleChoice(text);
     if (styleChoice && hasAskedStyle) setListeningStyle(styleChoice);
-
     const newMessages = [...messages, { role: "user", content: text }];
     setMessages(newMessages);
     setInput("");
     setLoading(true);
-
-    // Build system prompt — append Track 1 if depth style chosen
     const systemWithContext = (listeningStyle === "depth" ? SYSTEM_PROMPT + TRACK1_ADDITION : SYSTEM_PROMPT) + buildContext();
-
     try {
       const res = await fetch("/api/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          messages: newMessages,
-          listeningStyle: listeningStyle,
-        }),
+        body: JSON.stringify({ messages: newMessages, listeningStyle }),
       });
       const data = await res.json();
       let reply = data.reply || "I'm sorry, I couldn't process that response.";
-
-      // Context-aware emergency prepend
       if (isActiveEmergency(text)) {
         reply = "⚠️ What you're describing may need prompt attention. Please contact your healthcare team today or go to an emergency department if you're unsure. Don't wait.\n\n" + reply;
       }
-
-      // Append style check-in if appropriate
       if (shouldAskStyle(reply)) {
         reply += "\n\n---\nIs this helpful? I can go two ways from here — more detail and research if you want to really understand the science, or keep it focused on what's practical and what others find helpful. What feels right?";
         setHasAskedStyle(true);
       }
-
       setMessages([...newMessages, { role: "assistant", content: reply }]);
     } catch {
       setMessages([...newMessages, { role: "assistant", content: "I'm having trouble connecting right now. Please try again in a moment." }]);
@@ -1370,114 +1354,123 @@ const Chatbot = ({ appState, onClose, chatMessages, setChatMessages }) => {
     setLoading(false);
   };
 
-  const handleCopyChat = () => {
-    const clean = (str) => str
-      .replace(/[\u{1F300}-\u{1FFFF}]/gu, "")
-      .replace(/[⚠️💙🔒📋📅→•✓]/g, "")
-      .replace(/\s+/g, " ").trim();
-    const text = messages
-      .map(m => `${m.role === "user" ? "Me" : "REPAIR"}: ${clean(m.content)}`)
-      .join("\n\n");
-    navigator.clipboard.writeText(text).then(
-      () => { setCopied(true); setTimeout(() => setCopied(false), 2000); },
-      () => {
-        const ta = document.createElement("textarea");
-        ta.value = text;
-        ta.style.position = "fixed"; ta.style.opacity = "0";
-        document.body.appendChild(ta); ta.select();
-        document.execCommand("copy");
-        document.body.removeChild(ta);
-        setCopied(true); setTimeout(() => setCopied(false), 2000);
-      }
-    );
+  // ── V2: Web Share API replaces broken copy button ──
+  const handleShare = async () => {
+    const clean = (str) => str.replace(/[\u{1F300}-\u{1FFFF}]/gu, "").replace(/[⚠️💙🔒📋📅→•✓]/g, "").replace(/\s+/g, " ").trim();
+    const text = messages.map(m => `${m.role === "user" ? "Me" : "REPAIR"}: ${clean(m.content)}`).join("\n\n");
+    const shareData = { title: "My REPAIR conversation", text };
+    if (navigator.share && navigator.canShare && navigator.canShare(shareData)) {
+      try { await navigator.share(shareData); setShared(true); setTimeout(() => setShared(false), 2000); return; } catch {}
+    }
+    navigator.clipboard.writeText(text).then(() => { setShared(true); setTimeout(() => setShared(false), 2000); });
   };
 
+  // Inline mode: render chat content directly (no fixed modal wrapper)
+  const chatContent = (
+    <>
+      {/* Messages */}
+      <div style={{ flex: 1, overflowY: "auto", padding: inline ? "0 0 8px" : "20px 16px 8px", display: "flex", flexDirection: "column", minHeight: 180 }}>
+        {showStarters && messages.length === 0 && (
+          <div>
+            <div style={{ color: C.slate, fontSize: 17, fontWeight: 600, marginBottom: 16, textAlign: "center" }}>Ask me anything, or tap a topic below:</div>
+            {starters.map((s, i) => (
+              <button key={i} onClick={() => send(s)} style={{ width: "100%", textAlign: "left", background: C.card, border: `2px solid ${C.teal}`, borderRadius: 16, padding: "16px 20px", marginBottom: 12, color: C.navy, fontSize: 17, lineHeight: 1.5, cursor: "pointer", fontFamily: "Georgia, serif", display: "flex", alignItems: "center", gap: 14, minHeight: 60 }}>
+                <span style={{ color: C.teal, fontSize: 22, flexShrink: 0 }}>→</span>
+                <span>{s}</span>
+              </button>
+            ))}
+          </div>
+        )}
+        {messages.map((m, i) => (
+          <div key={i} style={{ display: "flex", justifyContent: m.role === "user" ? "flex-end" : "flex-start", marginBottom: 16, alignItems: "flex-end", gap: 10 }}>
+            {m.role === "assistant" && (<div style={{ width: 34, height: 34, borderRadius: "50%", background: `linear-gradient(135deg, ${C.teal}, ${C.tealMid})`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, flexShrink: 0, marginBottom: 2 }}>🌿</div>)}
+            <div style={{ maxWidth: "82%", background: m.role === "user" ? C.teal : C.card, color: m.role === "user" ? "#fff" : C.navy, fontSize: 16, lineHeight: 1.7, padding: "14px 18px", borderRadius: m.role === "user" ? "20px 20px 6px 20px" : "20px 20px 20px 6px", border: m.role === "assistant" ? `1px solid ${C.borderSoft}` : "none", boxShadow: "0 2px 8px rgba(0,0,0,0.06)", whiteSpace: "pre-wrap" }}>{m.content}</div>
+            {m.role === "user" && (<div style={{ width: 34, height: 34, borderRadius: "50%", background: C.navyMid, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, flexShrink: 0, color: "#fff", fontWeight: 700 }}>You</div>)}
+          </div>
+        ))}
+        {loading && (
+          <div style={{ display: "flex", alignItems: "flex-end", gap: 10, marginBottom: 16 }}>
+            <div style={{ width: 34, height: 34, borderRadius: "50%", background: `linear-gradient(135deg, ${C.teal}, ${C.tealMid})`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, flexShrink: 0 }}>🌿</div>
+            <div style={{ background: C.card, borderRadius: "20px 20px 20px 6px", padding: "14px 18px", border: `1px solid ${C.borderSoft}`, display: "flex", alignItems: "center", gap: 8 }}>
+              {[0, 1, 2].map(n => (<div key={n} style={{ width: 10, height: 10, borderRadius: "50%", background: C.tealMid, animation: `bounce 1.2s ease-in-out ${n * 0.2}s infinite` }} />))}
+            </div>
+          </div>
+        )}
+        <div ref={bottomRef} />
+      </div>
+
+      {/* Input */}
+      <div style={{ borderTop: `1px solid ${C.border}`, padding: "12px 14px 14px", flexShrink: 0, background: C.card }}>
+        {messages.length > 0 && (
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
+            <div style={{ color: C.muted, fontSize: 12 }}>📅 Save your summary to bring to your appointment.</div>
+            <button onClick={handleShare} style={{ background: "none", border: "none", color: C.teal, fontSize: 12, fontWeight: 600, cursor: "pointer", fontFamily: "Georgia, serif" }}>
+              {shared ? "✓ Saved!" : "📤 Save or send"}
+            </button>
+          </div>
+        )}
+        <div style={{ display: "flex", gap: 10, alignItems: "flex-end" }}>
+          <input ref={inputRef} value={input}
+            onChange={e => setInput(e.target.value)}
+            onKeyDown={e => { if (e.key === "Enter") { e.preventDefault(); send(input); } }}
+            placeholder="Ask me anything…"
+            style={{ flex: 1, background: "#f4f8fb", border: `2px solid ${C.border}`, borderRadius: 18, padding: "14px 16px", fontSize: 16, color: C.navy, fontFamily: "Georgia, serif", lineHeight: 1.5, outline: "none" }}
+            onFocus={e => e.target.style.borderColor = C.teal}
+            onBlur={e => e.target.style.borderColor = C.border} />
+          <button onClick={() => send(input)} disabled={!input.trim() || loading}
+            style={{ width: 50, height: 50, borderRadius: "50%", background: input.trim() && !loading ? C.teal : C.border, border: "none", fontSize: 20, color: "#fff", cursor: input.trim() && !loading ? "pointer" : "not-allowed", flexShrink: 0 }}>↑</button>
+        </div>
+        <div style={{ display: "flex", justifyContent: "space-between", marginTop: 8, padding: "0 4px" }}>
+          <div style={{ color: C.teal, fontSize: 11.5, fontWeight: 600 }}>🔒 Private · Not saved</div>
+          <div style={{ color: C.muted, fontSize: 11.5 }}>For education · Not medical advice</div>
+        </div>
+      </div>
+      <style>{`@keyframes bounce { 0%, 60%, 100% { transform: translateY(0); opacity: 0.4; } 30% { transform: translateY(-8px); opacity: 1; } }`}</style>
+    </>
+  );
+
+  // Inline mode: no modal wrapper
+  if (inline) {
+    return (
+      <div style={{ flex: 1, display: "flex", flexDirection: "column", overflow: "hidden" }}>
+        {/* Back to home link */}
+        {messages.length > 0 && (
+          <div style={{ padding: "8px 16px 0", flexShrink: 0 }}>
+            <button onClick={onClose} style={{ background: "none", border: "none", color: C.muted, fontSize: 13, cursor: "pointer", fontFamily: "Georgia, serif", textDecoration: "underline", textUnderlineOffset: 3 }}>← Start over</button>
+          </div>
+        )}
+        {chatContent}
+      </div>
+    );
+  }
+
+  // Modal mode: for section-page chatbot (existing behavior)
   return (
     <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.55)", zIndex: 1000, display: "flex", flexDirection: "column", justifyContent: "flex-end" }}>
       <div style={{ background: C.card, borderTopLeftRadius: 28, borderTopRightRadius: 28, maxHeight: "92vh", display: "flex", flexDirection: "column", boxShadow: "0 -8px 40px rgba(0,0,0,0.18)" }}>
-
-        {/* Header */}
+        {/* Modal header */}
         <div style={{ padding: "20px 20px 16px", borderBottom: `1px solid ${C.border}`, display: "flex", alignItems: "center", justifyContent: "space-between", flexShrink: 0 }}>
           <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
-            <div style={{ width: 52, height: 52, borderRadius: "50%", background: `linear-gradient(135deg, ${C.teal}, ${C.tealMid})`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 26, flexShrink: 0, boxShadow: "0 2px 10px rgba(45,125,111,0.3)" }}>🌿</div>
+            <div style={{ width: 52, height: 52, borderRadius: "50%", background: `linear-gradient(135deg, ${C.teal}, ${C.tealMid})`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 26, flexShrink: 0 }}>🌿</div>
             <div>
-              <div style={{ color: C.navy, fontWeight: 800, fontSize: 20, lineHeight: 1.1 }}>Ask Our Team</div>
+              <div style={{ color: C.navy, fontWeight: 800, fontSize: 20, lineHeight: 1.1 }}>Ask REPAIR</div>
               <div style={{ color: C.teal, fontSize: 15, fontWeight: 600, marginTop: 2 }}>Here to educate — not to diagnose</div>
             </div>
           </div>
           <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
             {messages.length > 0 && (
-              <button onClick={handleCopyChat} style={{ background: C.tealLight, border: "none", borderRadius: 10, padding: "8px 12px", color: C.teal, fontSize: 13, fontWeight: 600, cursor: "pointer", fontFamily: "Georgia, serif" }}>
-                {copied ? "✓ Copied" : "📋 Copy"}
+              <button onClick={handleShare} style={{ background: C.tealLight, border: "none", borderRadius: 10, padding: "8px 12px", color: C.teal, fontSize: 13, fontWeight: 600, cursor: "pointer", fontFamily: "Georgia, serif" }}>
+                {shared ? "✓ Saved!" : "📤 Save"}
               </button>
             )}
-            <button onClick={onClose} style={{ width: 48, height: 48, borderRadius: "50%", background: "#f0f4f8", border: "none", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22, color: C.slate, cursor: "pointer", flexShrink: 0 }}>✕</button>
+            <button onClick={onClose} style={{ width: 48, height: 48, borderRadius: "50%", background: "#f0f4f8", border: "none", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22, color: C.slate, cursor: "pointer" }}>✕</button>
           </div>
         </div>
-
-        {/* Privacy banner */}
         <div style={{ background: C.tealLight, borderBottom: `1px solid ${C.border}`, padding: "10px 20px", flexShrink: 0 }}>
-          <div style={{ color: C.teal, fontSize: 14, lineHeight: 1.5, fontWeight: 500 }}>
-            🔒 Your conversation is private and isn't saved after you close this window. · Not a substitute for medical advice.
-          </div>
+          <div style={{ color: C.teal, fontSize: 14, lineHeight: 1.5, fontWeight: 500 }}>🔒 Private · Not saved after you close · Not a substitute for medical advice.</div>
         </div>
-
-        {/* Messages */}
-        <div style={{ flex: 1, overflowY: "auto", padding: "20px 16px 8px", display: "flex", flexDirection: "column", minHeight: 180 }}>
-          {showStarters && messages.length === 0 && (
-            <div>
-              <div style={{ color: C.slate, fontSize: 17, fontWeight: 600, marginBottom: 16, textAlign: "center" }}>Ask me anything, or tap a topic below:</div>
-              {starters.map((s, i) => (
-                <button key={i} onClick={() => send(s)}
-                  style={{ width: "100%", textAlign: "left", background: C.card, border: `2px solid ${C.teal}`, borderRadius: 16, padding: "16px 20px", marginBottom: 12, color: C.navy, fontSize: 17, lineHeight: 1.5, cursor: "pointer", fontFamily: "Georgia, serif", display: "flex", alignItems: "center", gap: 14, minHeight: 60 }}>
-                  <span style={{ color: C.teal, fontSize: 22, flexShrink: 0 }}>→</span>
-                  <span>{s}</span>
-                </button>
-              ))}
-            </div>
-          )}
-          {messages.map((m, i) => (
-            <div key={i} style={{ display: "flex", justifyContent: m.role === "user" ? "flex-end" : "flex-start", marginBottom: 16, alignItems: "flex-end", gap: 10 }}>
-              {m.role === "assistant" && (<div style={{ width: 38, height: 38, borderRadius: "50%", background: `linear-gradient(135deg, ${C.teal}, ${C.tealMid})`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, flexShrink: 0, marginBottom: 2 }}>🌿</div>)}
-              <div style={{ maxWidth: "78%", background: m.role === "user" ? C.teal : "#f0f7f5", color: m.role === "user" ? "#fff" : C.navy, fontSize: 18, lineHeight: 1.7, padding: "16px 20px", borderRadius: m.role === "user" ? "20px 20px 6px 20px" : "20px 20px 20px 6px", boxShadow: "0 2px 8px rgba(0,0,0,0.06)", whiteSpace: "pre-wrap" }}>{m.content}</div>
-              {m.role === "user" && (<div style={{ width: 38, height: 38, borderRadius: "50%", background: C.navyMid, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, flexShrink: 0, color: "#fff", fontWeight: 700 }}>You</div>)}
-            </div>
-          ))}
-          {loading && (
-            <div style={{ display: "flex", alignItems: "flex-end", gap: 10, marginBottom: 16 }}>
-              <div style={{ width: 38, height: 38, borderRadius: "50%", background: `linear-gradient(135deg, ${C.teal}, ${C.tealMid})`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, flexShrink: 0 }}>🌿</div>
-              <div style={{ background: "#f0f7f5", borderRadius: "20px 20px 20px 6px", padding: "18px 24px", display: "flex", alignItems: "center", gap: 8 }}>
-                {[0, 1, 2].map(n => (<div key={n} style={{ width: 12, height: 12, borderRadius: "50%", background: C.tealMid, animation: `bounce 1.2s ease-in-out ${n * 0.2}s infinite` }} />))}
-              </div>
-            </div>
-          )}
-          <div ref={bottomRef} />
-        </div>
-
-        {/* Input */}
-        <div style={{ borderTop: `2px solid ${C.border}`, padding: "16px 16px 20px", flexShrink: 0, background: C.card }}>
-          {messages.length > 0 && (
-            <div style={{ color: C.muted, fontSize: 12, textAlign: "center", marginBottom: 8 }}>
-              📅 When done, print your Pre-Appointment Summary to share this conversation with your team.
-            </div>
-          )}
-          <div style={{ display: "flex", gap: 10, alignItems: "flex-end" }}>
-            <div style={{ flex: 1 }}>
-              <textarea ref={inputRef} value={input}
-                onChange={e => { setInput(e.target.value); e.target.style.height = "auto"; e.target.style.height = Math.min(e.target.scrollHeight, 120) + "px"; }}
-                onKeyDown={e => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); send(input); } }}
-                placeholder="Type your question here…" rows={1}
-                style={{ width: "100%", background: "#f4f8fb", border: `2px solid ${C.border}`, borderRadius: 18, padding: "16px 18px", fontSize: 18, color: C.navy, fontFamily: "Georgia, serif", lineHeight: 1.5, resize: "none", outline: "none", minHeight: 56, maxHeight: 120, boxSizing: "border-box" }}
-                onFocus={e => e.target.style.borderColor = C.teal}
-                onBlur={e => e.target.style.borderColor = C.border} />
-            </div>
-            <button onClick={() => send(input)} disabled={!input.trim() || loading}
-              style={{ width: 58, height: 58, borderRadius: "50%", background: input.trim() && !loading ? C.teal : C.border, border: "none", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 24, color: "#fff", cursor: input.trim() && !loading ? "pointer" : "not-allowed", flexShrink: 0, boxShadow: input.trim() && !loading ? "0 3px 12px rgba(45,125,111,0.35)" : "none" }}>↑</button>
-          </div>
-          <div style={{ color: C.muted, fontSize: 13, textAlign: "center", marginTop: 10 }}>For education only · Not a substitute for medical advice</div>
-        </div>
+        {chatContent}
       </div>
-      <style>{`@keyframes bounce { 0%, 60%, 100% { transform: translateY(0); opacity: 0.4; } 30% { transform: translateY(-8px); opacity: 1; } }`}</style>
     </div>
   );
 };
@@ -1487,16 +1480,19 @@ const PrintSummary = ({ scores, primarySymptom, chatMessages = [] }) => {
   const now = new Date().toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" });
   const score16 = scores.impactDone && scores.impact ? calcIMPACT016(scores.impact) : null;
   const band = impactBand(score16);
-  const cleanText = (str) => str
-    .replace(/[\u{1F300}-\u{1FFFF}]/gu, "")
-    .replace(/[⚠️💙🔒📋📅→•✓⭐🌿🌱]/g, "")
-    .trim();
+  const cleanText = (str) => str.replace(/[\u{1F300}-\u{1FFFF}]/gu, "").replace(/[⚠️💙🔒📋📅→•✓⭐🌿🌱]/g, "").trim();
+
   return (
     <div style={{ fontFamily: "Georgia, serif", maxWidth: 700, margin: "0 auto", padding: 32, color: "#1a2e3b" }}>
       <div style={{ textAlign: "center", marginBottom: 32, borderBottom: "2px solid #2d7d6f", paddingBottom: 16 }}>
         <div style={{ fontSize: 28, fontWeight: 800, color: "#2d7d6f" }}>REPAIR</div>
         <div style={{ fontSize: 16, color: "#4a6278" }}>Pre-Appointment Summary</div>
         <div style={{ fontSize: 14, color: "#7a8fa6", marginTop: 4 }}>Prepared: {now} · For discussion with your healthcare team — not a medical record</div>
+      </div>
+
+      {/* V2: Save reminder */}
+      <div style={{ background: "#fff3cd", border: "1px solid #f4a261", borderRadius: 10, padding: "12px 14px", marginBottom: 24, fontSize: 14, color: "#1a2e3b", fontWeight: 600, textAlign: "center" }}>
+        ⚠️ Save or print this now — it won't be here when you return.
       </div>
 
       <div style={{ background: "#f0f7f5", borderRadius: 10, padding: "10px 14px", marginBottom: 24, fontSize: 13, color: "#4a6278" }}>
@@ -1530,12 +1526,7 @@ const PrintSummary = ({ scores, primarySymptom, chatMessages = [] }) => {
 
       <div style={{ marginBottom: 24 }}>
         <div style={{ fontSize: 14, fontWeight: 700, color: "#2d7d6f", textTransform: "uppercase", letterSpacing: 1, marginBottom: 8 }}>3. Questions for My Appointment</div>
-        {[
-          "What realistic improvement I can expect in my specific symptoms",
-          "Lifestyle or non-surgical options I should pursue first or alongside treatment",
-          "Whether I should see a pelvic floor physical therapist",
-          "Whether surgery is appropriate for my situation",
-        ].map((q, i) => (
+        {["What realistic improvement I can expect in my specific symptoms", "Lifestyle or non-surgical options I should pursue first or alongside treatment", "Whether I should see a pelvic floor physical therapist", "Whether surgery is appropriate for my situation"].map((q, i) => (
           <div key={i} style={{ display: "flex", gap: 8, marginBottom: 6, fontSize: 14 }}>
             <span style={{ color: "#2d7d6f", fontWeight: 700 }}>□</span>
             <span>{q}</span>
@@ -1545,13 +1536,11 @@ const PrintSummary = ({ scores, primarySymptom, chatMessages = [] }) => {
 
       {chatMessages.length > 0 && (
         <div style={{ marginBottom: 24 }}>
-          <div style={{ fontSize: 14, fontWeight: 700, color: "#2d7d6f", textTransform: "uppercase", letterSpacing: 1, marginBottom: 8 }}>4. My Conversation with Ask Our Team</div>
+          <div style={{ fontSize: 14, fontWeight: 700, color: "#2d7d6f", textTransform: "uppercase", letterSpacing: 1, marginBottom: 8 }}>4. My Conversation with REPAIR</div>
           <div style={{ fontSize: 12, color: "#7a8fa6", marginBottom: 12, fontStyle: "italic" }}>Questions I asked and answers I received — for reference in my appointment.</div>
           {chatMessages.map((m, i) => (
             <div key={i} style={{ marginBottom: 12, paddingLeft: m.role === "user" ? 0 : 16, borderLeft: m.role === "assistant" ? "3px solid #2d7d6f" : "none" }}>
-              <div style={{ fontSize: 11, fontWeight: 700, color: m.role === "user" ? "#1a2e3b" : "#2d7d6f", textTransform: "uppercase", letterSpacing: 0.5, marginBottom: 3 }}>
-                {m.role === "user" ? "Me" : "REPAIR Assistant"}
-              </div>
+              <div style={{ fontSize: 11, fontWeight: 700, color: m.role === "user" ? "#1a2e3b" : "#2d7d6f", textTransform: "uppercase", letterSpacing: 0.5, marginBottom: 3 }}>{m.role === "user" ? "Me" : "REPAIR"}</div>
               <div style={{ fontSize: 14, color: "#1a2e3b", lineHeight: 1.6 }}>{cleanText(m.content)}</div>
             </div>
           ))}
@@ -1559,7 +1548,7 @@ const PrintSummary = ({ scores, primarySymptom, chatMessages = [] }) => {
       )}
 
       <div style={{ fontSize: 12, color: "#7a8fa6", textAlign: "center", marginTop: 32, borderTop: "1px solid #dde7ef", paddingTop: 16 }}>
-        This document was generated by REPAIR, a patient education app from Stanford Colorectal Surgery. It is for educational purposes only and does not constitute medical advice or a medical record.
+        Generated by REPAIR — a free patient education app built by colorectal surgeons and pelvic floor specialists. For educational purposes only. Not a medical record.
       </div>
     </div>
   );
@@ -1568,7 +1557,7 @@ const PrintSummary = ({ scores, primarySymptom, chatMessages = [] }) => {
 // ─── MAIN APP ─────────────────────────────────────────────────────────────────
 export default function App() {
   const [section, setSection] = useState("home");
-  const [chatOpen, setChatOpen] = useState(false);
+  const [chatOpen, setChatOpen] = useState(false);       // modal chatbot for section pages
   const [menuOpen, setMenuOpen] = useState(false);
   const [scores, setScores] = useState({});
   const [primarySymptom, setPrimarySymptom] = useState(null);
@@ -1576,18 +1565,35 @@ export default function App() {
   const [showPDF, setShowPDF] = useState(false);
   const [chatMessages, setChatMessages] = useState([]);
 
+  // V2 home chat state
+  const [homeChatStarted, setHomeChatStarted] = useState(false);
+  const [starterPrompt, setStarterPrompt] = useState(null);
+
   const currentNav = NAV.find(n => n.id === section);
   const appState = { section, primarySymptom, scores };
 
+  const handleStartChat = (prompt) => {
+    setStarterPrompt(prompt);
+    setHomeChatStarted(true);
+  };
+
+  const handleHomeChatClose = () => {
+    setHomeChatStarted(false);
+    setStarterPrompt(null);
+  };
+
   return (
-    <div style={{ background: C.bg, minHeight: "100vh", maxWidth: 480, margin: "0 auto", position: "relative", fontFamily: "Georgia, serif" }}>
+    <div style={{ background: C.bg, minHeight: "100vh", maxWidth: 480, margin: "0 auto", position: "relative", fontFamily: "Georgia, serif", display: "flex", flexDirection: "column", height: "100vh" }}>
 
       {/* TOP BAR */}
-      <div style={{ position: "sticky", top: 0, zIndex: 100, background: C.card, borderBottom: `1px solid ${C.border}`, padding: "12px 16px" }}>
+      <div style={{ background: C.card, borderBottom: `1px solid ${C.border}`, padding: "12px 16px", flexShrink: 0 }}>
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
           <button onClick={() => setMenuOpen(true)} style={{ background: "none", border: "none", fontSize: 22, color: C.navy, cursor: "pointer", padding: 4 }}>☰</button>
-          <div style={{ color: C.teal, fontWeight: 800, fontSize: 18 }}>🌿 REPAIR</div>
-          <div style={{ width: 36 }} />
+          <div style={{ textAlign: "center" }}>
+            <div style={{ color: C.teal, fontWeight: 800, fontSize: 17, letterSpacing: 0.3 }}>🌿 REPAIR</div>
+            <div style={{ color: C.muted, fontSize: 10.5, letterSpacing: 0.7, textTransform: "uppercase", fontWeight: 600, marginTop: 1 }}>Pelvic floor companion</div>
+          </div>
+          <div style={{ width: 30 }} />
         </div>
         {section !== "home" && (
           <div style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 4 }}>
@@ -1598,24 +1604,32 @@ export default function App() {
         )}
       </div>
 
-      {/* MENU DRAWER */}
+      {/* V2: Credentials strip — always visible */}
+      <CredentialsStrip />
+
+      {/* V2 SIMPLIFIED HAMBURGER MENU */}
       {menuOpen && (
         <div style={{ position: "fixed", inset: 0, zIndex: 200 }}>
           <div onClick={() => setMenuOpen(false)} style={{ position: "absolute", inset: 0, background: "rgba(0,0,0,0.4)" }} />
           <div style={{ position: "absolute", left: 0, top: 0, bottom: 0, width: 280, background: C.card, padding: "48px 0 24px", overflowY: "auto" }}>
             <div style={{ padding: "0 24px 16px" }}>
               <div style={{ color: C.teal, fontWeight: 800, fontSize: 20 }}>🌿 REPAIR</div>
-              <div style={{ color: C.muted, fontSize: 14, marginTop: 2 }}>Stanford Colorectal Surgery</div>
+              <div style={{ color: C.muted, fontSize: 14, marginTop: 2 }}>Pelvic floor companion</div>
             </div>
-            {NAV.map(n => (
-              <button key={n.id} onClick={() => { setSection(n.id); setMenuOpen(false); }}
-                style={{ width: "100%", textAlign: "left", background: section === n.id ? C.tealLight : "transparent", borderLeft: section === n.id ? `3px solid ${C.teal}` : "3px solid transparent", color: section === n.id ? C.teal : C.navy, fontWeight: section === n.id ? 700 : 400, fontSize: 16, padding: "14px 24px", border: "none", cursor: "pointer", fontFamily: "Georgia, serif", display: "flex", alignItems: "center", gap: 12 }}>
-                <span>{n.icon}</span><span>{n.label}</span>
-              </button>
-            ))}
+            <div style={{ borderTop: `1px solid ${C.border}`, marginBottom: 8 }} />
+            {/* V2: 3 items only */}
+            <button onClick={() => { setMenuOpen(false); }} style={{ width: "100%", textAlign: "left", background: "transparent", color: C.navy, fontSize: 16, padding: "14px 24px", border: "none", cursor: "pointer", fontFamily: "Georgia, serif", display: "flex", alignItems: "center", gap: 12 }}>
+              <span>ℹ️</span><span>About REPAIR</span>
+            </button>
+            <button onClick={() => { window.open("https://forms.gle/VaTBhPCe4iEL3ifd9", "_blank"); setMenuOpen(false); }} style={{ width: "100%", textAlign: "left", background: "transparent", color: C.navy, fontSize: 16, padding: "14px 24px", border: "none", cursor: "pointer", fontFamily: "Georgia, serif", display: "flex", alignItems: "center", gap: 12 }}>
+              <span>💬</span><span>Feedback</span>
+            </button>
+            <button onClick={() => { setMenuOpen(false); }} style={{ width: "100%", textAlign: "left", background: "transparent", color: C.navy, fontSize: 16, padding: "14px 24px", border: "none", cursor: "pointer", fontFamily: "Georgia, serif", display: "flex", alignItems: "center", gap: 12 }}>
+              <span>🔒</span><span>Privacy</span>
+            </button>
+            <div style={{ borderTop: `1px solid ${C.border}`, margin: "8px 0" }} />
             <div style={{ padding: "12px 24px" }}>
-              <button onClick={() => { setShowPDF(true); setMenuOpen(false); }}
-                style={{ width: "100%", background: C.tealLight, color: C.teal, border: "none", borderRadius: 12, padding: "14px 0", fontSize: 15, fontWeight: 600, cursor: "pointer", fontFamily: "Georgia, serif" }}>
+              <button onClick={() => { setShowPDF(true); setMenuOpen(false); }} style={{ width: "100%", background: C.tealLight, color: C.teal, border: "none", borderRadius: 12, padding: "14px 0", fontSize: 15, fontWeight: 600, cursor: "pointer", fontFamily: "Georgia, serif" }}>
                 📄 Generate My Summary
               </button>
             </div>
@@ -1631,45 +1645,76 @@ export default function App() {
               <div style={{ color: C.navy, fontWeight: 700, fontSize: 16 }}>Pre-Appointment Summary</div>
               <button onClick={() => setShowPDF(false)} style={{ background: "none", border: "none", color: C.muted, fontSize: 22, cursor: "pointer" }}>✕</button>
             </div>
-            <Callout body="Print or screenshot this page to bring to your appointment." icon="📋" />
+            <Callout body="Save or print this now — it won't be here when you return." icon="⚠️" color={C.warn} bg={C.warnLt} />
             <button onClick={() => window.print()} style={{ background: C.teal, color: "#fff", border: "none", borderRadius: 14, padding: "16px 24px", fontSize: 17, fontWeight: 700, fontFamily: "Georgia, serif", cursor: "pointer", minHeight: 54, marginBottom: 16, width: "100%" }}>🖨️ Print / Save as PDF</button>
             <PrintSummary scores={scores} primarySymptom={primarySymptom} chatMessages={chatMessages} />
           </div>
         </div>
       )}
 
-      {/* MAIN CONTENT */}
-      <div style={{ padding: 18, paddingBottom: 120 }}>
-        {section === "home" && <HomeSection onNav={setSection} />}
-        {section === "prolapse" && <ProlapseSection speak={speak} stop={stop} speaking={speaking} />}
-        {section === "symptoms" && <SymptomsSection speak={speak} stop={stop} speaking={speaking} scores={scores} setScores={setScores} primarySymptom={primarySymptom} setPrimarySymptom={setPrimarySymptom} />}
-        {section === "imaging" && <ImagingSection speak={speak} stop={stop} speaking={speaking} />}
-        {section === "lifestyle" && <LifestyleSection speak={speak} stop={stop} speaking={speaking} />}
-        {section === "surgical" && <SurgicalSection speak={speak} stop={stop} speaking={speaking} />}
-        {section === "redflags" && <RedFlagsSection speak={speak} stop={stop} speaking={speaking} />}
+      {/* MAIN CONTENT AREA */}
+      <div style={{ flex: 1, overflow: "hidden", display: "flex", flexDirection: "column" }}>
+
+        {/* HOME: chat-first layout */}
+        {section === "home" && (
+          <>
+            {!homeChatStarted ? (
+              <HomeSection onStartChat={handleStartChat} onNav={setSection} />
+            ) : (
+              <Chatbot
+                inline={true}
+                appState={appState}
+                onClose={handleHomeChatClose}
+                chatMessages={chatMessages}
+                setChatMessages={setChatMessages}
+                starterPrompt={starterPrompt}
+              />
+            )}
+          </>
+        )}
+
+        {/* SECTION PAGES: scrollable content + floating chat button */}
+        {section !== "home" && (
+          <div style={{ flex: 1, overflowY: "auto", padding: 18, paddingBottom: 120 }}>
+            {section === "prolapse" && <ProlapseSection speak={speak} stop={stop} speaking={speaking} />}
+            {section === "symptoms" && <SymptomsSection speak={speak} stop={stop} speaking={speaking} scores={scores} setScores={setScores} primarySymptom={primarySymptom} setPrimarySymptom={setPrimarySymptom} />}
+            {section === "imaging" && <ImagingSection speak={speak} stop={stop} speaking={speaking} />}
+            {section === "lifestyle" && <LifestyleSection speak={speak} stop={stop} speaking={speaking} />}
+            {section === "surgical" && <SurgicalSection speak={speak} stop={stop} speaking={speaking} />}
+            {section === "redflags" && <RedFlagsSection speak={speak} stop={stop} speaking={speaking} />}
+          </div>
+        )}
       </div>
 
-      {/* FLOATING ASK OUR TEAM BUTTON */}
-      {!chatOpen && (
-        <button onClick={() => setChatOpen(true)}
-          style={{ position: "fixed", bottom: 90, right: 20, zIndex: 200, background: C.teal, color: "#fff", border: "none", borderRadius: 30, padding: "14px 22px", fontSize: 16, fontWeight: 700, fontFamily: "Georgia, serif", boxShadow: "0 4px 20px rgba(45,125,111,0.4)", display: "flex", alignItems: "center", gap: 10, cursor: "pointer" }}>
+      {/* BOTTOM NAV — only on section pages */}
+      {section !== "home" && (
+        <div style={{ background: C.card, borderTop: `1px solid ${C.border}`, display: "flex", flexShrink: 0, paddingBottom: "env(safe-area-inset-bottom, 0)" }}>
+          {[{ id: "home", label: "Home" }, { id: "symptoms", label: "Symptoms" }, { id: "surgical", label: "Surgery" }, { id: "redflags", label: "Red Flags" }].map(n => (
+            <button key={n.id} onClick={() => setSection(n.id)} style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", padding: "14px 4px", background: "none", border: "none", color: section === n.id ? C.teal : C.muted, fontWeight: section === n.id ? 700 : 400, fontSize: 14, fontFamily: "Georgia, serif", borderTop: section === n.id ? `3px solid ${C.teal}` : "3px solid transparent", cursor: "pointer" }}>
+              {n.label}
+            </button>
+          ))}
+        </div>
+      )}
+
+      {/* FLOATING CHAT BUTTON — section pages only */}
+      {section !== "home" && !chatOpen && (
+        <button onClick={() => setChatOpen(true)} style={{ position: "fixed", bottom: 90, right: 20, zIndex: 200, background: C.teal, color: "#fff", border: "none", borderRadius: 30, padding: "14px 22px", fontSize: 16, fontWeight: 700, fontFamily: "Georgia, serif", boxShadow: "0 4px 20px rgba(45,125,111,0.4)", display: "flex", alignItems: "center", gap: 10, cursor: "pointer" }}>
           <span style={{ fontSize: 22 }}>💬</span>
-          <span>Ask Our Team</span>
+          <span>Ask REPAIR</span>
         </button>
       )}
 
-      {/* BOTTOM NAV */}
-      <div style={{ position: "fixed", bottom: 0, left: "50%", transform: "translateX(-50%)", width: "100%", maxWidth: 480, background: C.card, borderTop: `1px solid ${C.border}`, display: "flex", paddingBottom: "env(safe-area-inset-bottom, 0)" }}>
-        {[{ id: "home", label: "Home" }, { id: "symptoms", label: "Symptoms" }, { id: "surgical", label: "Surgery" }, { id: "redflags", label: "Red Flags" }].map(n => (
-          <button key={n.id} onClick={() => setSection(n.id)}
-            style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", padding: "14px 4px", background: "none", border: "none", color: section === n.id ? C.teal : C.muted, fontWeight: section === n.id ? 700 : 400, fontSize: 14, fontFamily: "Georgia, serif", borderTop: section === n.id ? `3px solid ${C.teal}` : "3px solid transparent", cursor: "pointer" }}>
-            {n.label}
-          </button>
-        ))}
-      </div>
-
-      {/* CHATBOT */}
-      {chatOpen && <Chatbot appState={appState} onClose={() => setChatOpen(false)} chatMessages={chatMessages} setChatMessages={setChatMessages} />}
+      {/* MODAL CHATBOT — section pages */}
+      {chatOpen && (
+        <Chatbot
+          inline={false}
+          appState={appState}
+          onClose={() => setChatOpen(false)}
+          chatMessages={chatMessages}
+          setChatMessages={setChatMessages}
+        />
+      )}
     </div>
   );
 }
