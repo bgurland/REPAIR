@@ -1637,7 +1637,17 @@ export default function App() {
               <button onClick={() => setShowPDF(false)} style={{ background: "none", border: "none", color: C.muted, fontSize: 22, cursor: "pointer" }}>✕</button>
             </div>
             <Callout body="Save or print this now — it won't be here when you return." icon="⚠️" color={C.warn} bg={C.warnLt} />
-            <button onClick={() => window.print()} style={{ background: C.teal, color: "#fff", border: "none", borderRadius: 14, padding: "16px 24px", fontSize: 17, fontWeight: 700, fontFamily: "Georgia, serif", cursor: "pointer", minHeight: 54, marginBottom: 16, width: "100%" }}>🖨️ Print / Save as PDF</button>
+            <button onClick={async () => {
+              if (navigator.share) {
+                try {
+                  await navigator.share({ title: "REPAIR Pre-Appointment Summary", text: "My pre-appointment summary from REPAIR — please open on a computer to print." });
+                  return;
+                } catch {}
+              }
+              window.print();
+            }} style={{ background: C.teal, color: "#fff", border: "none", borderRadius: 14, padding: "16px 24px", fontSize: 17, fontWeight: 700, fontFamily: "Georgia, serif", cursor: "pointer", minHeight: 54, marginBottom: 16, width: "100%" }}>
+              📤 Save or print this summary
+            </button>
             <PrintSummary scores={scores} primarySymptom={primarySymptom} chatMessages={pdfChatMessages} />
           </div>
         </div>
@@ -1748,4 +1758,3 @@ export default function App() {
     </div>
   );
 }
-
