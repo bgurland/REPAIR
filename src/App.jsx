@@ -1300,32 +1300,24 @@ const Chatbot = ({ appState, onClose, chatMessages, setChatMessages, inline = fa
       .replace(/[⚠️💙🔒📋📅→•✓]/g, "")
       .replace(/\*\*(.*?)\*\*/g, "$1")
       .replace(/---/g, "")
+      .replace(/[^\x00-\x7F]/g, "") // strip any remaining non-ASCII
       .trim();
     const lines = messages.map(m =>
       `${m.role === "user" ? "Me" : "REPAIR"}:\n${clean(m.content)}`
     );
     const text = lines.join("\n\n");
 
-    // iOS-safe copy using textarea + execCommand
-    const copyViaTextarea = () => {
-      const ta = document.createElement("textarea");
-      ta.value = text;
-      ta.style.position = "fixed";
-      ta.style.top = "0";
-      ta.style.left = "0";
-      ta.style.opacity = "0";
-      document.body.appendChild(ta);
-      ta.focus();
-      ta.select();
+    // Try Web Share API with plain ASCII text
+    if (navigator.share) {
       try {
-        document.execCommand("copy");
+        await navigator.share({ title: "My REPAIR conversation", text });
         setShared(true);
         setTimeout(() => setShared(false), 2000);
+        return;
       } catch {}
-      document.body.removeChild(ta);
-    };
+    }
 
-    // Try clipboard first — avoids URL encoding issue in share targets
+    // Clipboard fallback
     try {
       await navigator.clipboard.writeText(text);
       setShared(true);
@@ -1333,8 +1325,18 @@ const Chatbot = ({ appState, onClose, chatMessages, setChatMessages, inline = fa
       return;
     } catch {}
 
-    // Fallback: textarea copy
-    copyViaTextarea();
+    // iOS-safe textarea fallback
+    const ta = document.createElement("textarea");
+    ta.value = text;
+    ta.style.position = "fixed";
+    ta.style.top = "0";
+    ta.style.left = "0";
+    ta.style.opacity = "0";
+    document.body.appendChild(ta);
+    ta.focus();
+    ta.select();
+    try { document.execCommand("copy"); setShared(true); setTimeout(() => setShared(false), 2000); } catch {}
+    document.body.removeChild(ta);
   };
 
   // Inline mode: render chat content directly (no fixed modal wrapper)
@@ -1465,11 +1467,6 @@ const PrintSummary = ({ scores, primarySymptom, chatMessages = [] }) => {
         <div style={{ fontSize: 28, fontWeight: 800, color: "#2d7d6f" }}>REPAIR</div>
         <div style={{ fontSize: 16, color: "#4a6278" }}>Pre-Appointment Summary</div>
         <div style={{ fontSize: 14, color: "#7a8fa6", marginTop: 4 }}>Prepared: {now} · For discussion with your healthcare team — not a medical record</div>
-      </div>
-
-      {/* V2: Save reminder */}
-      <div style={{ background: "#fff3cd", border: "1px solid #f4a261", borderRadius: 10, padding: "12px 14px", marginBottom: 24, fontSize: 14, color: "#1a2e3b", fontWeight: 600, textAlign: "center" }}>
-        ⚠️ Save or print this now — it won't be here when you return.
       </div>
 
       <div style={{ background: "#f0f7f5", borderRadius: 10, padding: "10px 14px", marginBottom: 24, fontSize: 13, color: "#4a6278" }}>
