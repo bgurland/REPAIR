@@ -183,7 +183,7 @@ const DifferentCard = () => {
 
 // ─── V2 TOPICS OVERLAY ───────────────────────────────────────────────────────
 const TopicsOverlay = ({ onClose, onNav }) => (
-  <div style={{ position: "absolute", inset: 0, background: C.bg, zIndex: 50, display: "flex", flexDirection: "column" }}>
+  <div style={{ position: "fixed", top: 0, left: 0, right: 0, bottom: 0, background: C.bg, zIndex: 150, display: "flex", flexDirection: "column" }}>
     <div style={{ background: C.card, padding: "14px 16px", borderBottom: `1px solid ${C.border}`, display: "flex", alignItems: "center", gap: 12, flexShrink: 0 }}>
       <button onClick={onClose} style={{ background: "none", border: "none", color: C.teal, fontSize: 16, cursor: "pointer", fontFamily: "Georgia, serif", fontWeight: 600 }}>← Back to chat</button>
       <div style={{ color: C.navy, fontWeight: 700, fontSize: 17 }}>Browse by topic</div>
