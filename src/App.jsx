@@ -228,13 +228,13 @@ const HomeSection = ({ onStartChat, onNav }) => {
       {/* Intro card */}
       <div style={{ background: C.card, borderRadius: 20, padding: 20, marginBottom: 18, border: `1px solid ${C.border}`, boxShadow: "0 2px 10px rgba(26,46,59,0.05)" }}>
         <div style={{ width: 52, height: 52, borderRadius: "50%", background: `linear-gradient(135deg, ${C.teal}, ${C.tealMid})`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 26, boxShadow: "0 3px 10px rgba(45,125,111,0.3)", marginBottom: 12 }}>🌿</div>
-        <div style={{ color: C.navy, fontSize: 20, fontWeight: 700, lineHeight: 1.3, marginBottom: 8 }}>Hello — I'm REPAIR.</div>
+        <div style={{ color: C.navy, fontSize: 20, fontWeight: 700, lineHeight: 1.3, marginBottom: 8 }}>You found me — good.</div>
         <div style={{ color: C.slate, fontSize: 16, lineHeight: 1.6 }}>
-          A pelvic floor companion built by <strong style={{ color: C.teal }}>colorectal surgeons and pelvic floor specialists</strong> to help you understand your condition, your symptoms, and what to expect from care.
+          I'm REPAIR, a pelvic floor companion built by <strong style={{ color: C.teal }}>colorectal surgeons and pelvic floor specialists</strong> to help you understand what's happening in your body, prepare for appointments, and feel less alone in this.
           <br /><br />
           I can also help you <strong style={{ color: C.teal }}>build a summary to bring to your appointment</strong> — just ask.
           <br /><br />
-          Ask me anything, or tap a starter below.
+          Whatever brought you here, you don't have to figure this out alone.
         </div>
       </div>
 
@@ -253,12 +253,11 @@ const HomeSection = ({ onStartChat, onNav }) => {
         </button>
       ))}
 
-      <div style={{ textAlign: "center", marginTop: "auto", paddingTop: 16 }}>
-        <button onClick={() => setShowTopics(true)} style={{ background: "none", border: "none", color: C.muted, fontSize: 13, fontFamily: "Georgia, serif", cursor: "pointer", textDecoration: "underline", textUnderlineOffset: 3 }}>
-          Or browse topics on your own →
+      <div style={{ textAlign: "center", marginTop: 8, paddingTop: 12, paddingBottom: 8 }}>
+        <button onClick={() => setShowTopics(true)} style={{ background: C.tealLight, border: `1.5px solid ${C.teal}`, borderRadius: 12, color: C.teal, fontSize: 15, fontWeight: 600, fontFamily: "Georgia, serif", cursor: "pointer", padding: "12px 20px", width: "100%" }}>
+          Browse topics on your own →
         </button>
-      </div>
-    </div>
+      </div>    </div>
   );
 };
 
@@ -305,7 +304,7 @@ const PROLAPSE_CARDS = [
     ),
   },
   {
-    id: "why", icon: "🔍", title: "Why Prolapse Happens",
+    id: "why", icon: "❓", title: "Why Prolapse Happens",
     content: () => (
       <div>
         <p style={{ color: C.navy, fontSize: 16, lineHeight: 1.7, marginBottom: 16 }}>Prolapse develops when the structures that hold the rectum in place are weakened or stretched. Common contributing factors:</p>
@@ -320,20 +319,24 @@ const PROLAPSE_CARDS = [
     ),
   },
   {
-    id: "eval", icon: "🩺", title: "How Prolapse Is Evaluated",
+    id: "eval", icon: "🔎", title: "How Prolapse Is Evaluated",
     content: () => (
       <div>
         <p style={{ color: C.navy, fontSize: 16, lineHeight: 1.7, marginBottom: 16 }}>A healthcare provider will typically take a thorough approach to evaluation:</p>
         {[
           { step: "1", title: "Symptom History", body: "A detailed conversation about what you're experiencing, how long it's been happening, and how it affects your daily life." },
           { step: "2", title: "Physical Examination", body: "Often includes examination while straining, to see how the rectum behaves under pressure. This may feel vulnerable — the team performs this regularly." },
+          { step: "photo", title: "📸 Photo Tip", body: "If you have external prolapse, consider taking a photo when tissue is out and bringing it to your appointment. Your surgeon can learn a lot from seeing what you see — even a photo on your phone helps.", isPhoto: true },
           { step: "3", title: "Imaging Studies", body: "Depending on findings, your team may order defecography, dynamic MRI, or other studies. See the Imaging section for what to expect." },
           { step: "4", title: "Specialist Referral", body: "You may be referred to a colorectal surgeon, urogynecologist, pelvic floor PT, or gastroenterologist — or a multidisciplinary team." },
         ].map(s => (
-          <Card key={s.step} style={{ borderRadius: 14, padding: 14, marginBottom: 10 }}>
+          <Card key={s.step} style={{ background: s.isPhoto ? C.coralLt : C.card, border: s.isPhoto ? `1px solid ${C.coral}44` : `1px solid ${C.border}`, borderRadius: 14, padding: 14, marginBottom: 10 }}>
             <div style={{ display: "flex", gap: 12 }}>
-              <div style={{ width: 32, height: 32, borderRadius: "50%", background: C.teal, color: "#fff", fontWeight: 800, fontSize: 14, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>{s.step}</div>
-              <div><div style={{ color: C.navy, fontWeight: 700, fontSize: 16, marginBottom: 4 }}>{s.title}</div><div style={{ color: C.slate, fontSize: 17, lineHeight: 1.6 }}>{s.body}</div></div>
+              {!s.isPhoto && <div style={{ width: 32, height: 32, borderRadius: "50%", background: C.teal, color: "#fff", fontWeight: 800, fontSize: 14, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>{s.step}</div>}
+              <div>
+                <div style={{ color: s.isPhoto ? C.coral : C.navy, fontWeight: 700, fontSize: 16, marginBottom: 4 }}>{s.title}</div>
+                <div style={{ color: C.slate, fontSize: 17, lineHeight: 1.6 }}>{s.body}</div>
+              </div>
             </div>
           </Card>
         ))}
@@ -357,10 +360,6 @@ const PROLAPSE_CARDS = [
             <div style={{ color: C.slate, fontSize: 17, lineHeight: 1.6 }}>{t.desc}</div>
           </Card>
         ))}
-        <Card style={{ background: C.coralLt, borderRadius: 14, padding: 14, marginBottom: 10 }}>
-          <div style={{ color: C.coral, fontWeight: 700, fontSize: 17, marginBottom: 4 }}>📸 Photo Guidance</div>
-          <div style={{ color: C.navy, fontSize: 17, lineHeight: 1.6 }}>If you have external prolapse, consider taking a photo when tissue is out and bringing it to your appointment. Look for concentric rings (full-thickness prolapse) vs. radial folds (mucosal prolapse). This helps your surgeon significantly.</div>
-        </Card>
         <div style={{ color: C.muted, fontSize: 16, textAlign: "center" }}>This app does not recommend specific treatments. Your healthcare team will work with you to find the approach that fits your situation.</div>
       </div>
     ),
@@ -404,7 +403,6 @@ const SymptomsSection = ({ speak, stop, speaking, scores, setScores, primarySymp
   return (
     <div>
       <SectionHeader title="Symptoms & My Score" subtitle="Explore your symptoms, then see how you score with our validated questionnaire." />
-      <SpeakBtn speaking={speaking} onSpeak={() => speak(document.getElementById("section-content")?.innerText || "")} />
       <Callout body="Millions of people live with these symptoms — and most never talk about them. You're not alone in what you're experiencing." icon="💙" />
       {!showScores ? (
         <div>
@@ -785,13 +783,32 @@ const IMPACTResults = ({ ans, onRetake }) => {
   const summaryForShare = `IMPACT Bowel Survey Results\nComposite Score: ${score16}/16 — ${band?.label || "N/A"}\n${band?.msg || ""}\n\nSymptom Domains:\n${[["Constipation/Evacuation","🚽",constipScore],["Fecal Leakage","💧",fiScore],["Urgency","⚡",urgScore],["Rectal Pain","😣",painScore],["Prolapse Sensation","⬇️",prolapseScore]].filter(([,,s])=>s!==null).map(([l,i,s])=>`${i} ${l}: ${domainBand(s)?.label}`).join("\n")}\n\nFor discussion with your healthcare team — not a diagnosis.\nGenerated by REPAIR (repair-pelvic-floor.netlify.app)`;
 
   const handleShare = async () => {
+    const copyViaTextarea = (t) => {
+      const ta = document.createElement("textarea");
+      ta.value = t;
+      ta.style.position = "fixed";
+      ta.style.top = "0";
+      ta.style.left = "0";
+      ta.style.opacity = "0";
+      document.body.appendChild(ta);
+      ta.focus();
+      ta.select();
+      try { document.execCommand("copy"); setShared(true); setTimeout(() => setShared(false), 2000); } catch {}
+      document.body.removeChild(ta);
+    };
+
     if (navigator.share) {
       try {
         await navigator.share({ title: "My IMPACT Bowel Survey Results", text: summaryForShare });
         setShared(true); setTimeout(() => setShared(false), 2000);
+        return;
       } catch {}
-    } else {
-      navigator.clipboard.writeText(summaryForShare).then(() => { setShared(true); setTimeout(() => setShared(false), 2000); });
+    }
+    try {
+      await navigator.clipboard.writeText(summaryForShare);
+      setShared(true); setTimeout(() => setShared(false), 2000);
+    } catch {
+      copyViaTextarea(summaryForShare);
     }
   };
 
@@ -883,17 +900,6 @@ const CalculatorsSection = ({ scores, setScores, primarySymptom, setPrimarySympt
   const [step, setStep] = useState(1);
   const [impactAnswers, setImpactAnswers] = useState(null);
   const [impactDone, setImpactDone] = useState(false);
-  const [surgRisk, setSurgRisk] = useState([]);
-  const [recRisk, setRecRisk] = useState([]);
-
-  const SURG_RISKS = ["Age over 75", "Active heart disease or recent cardiac event", "Poorly controlled diabetes", "BMI over 35", "Active smoking", "Severe lung disease (COPD, requiring oxygen)", "Kidney disease", "Prior pelvic or abdominal radiation", "Blood thinning medications", "Prior abdominal surgery with complications"];
-  const REC_RISKS = [
-    { id: "prior", label: "Prior rectal prolapse repair", why: "Previous repair is one of the strongest predictors of recurrence. Scar tissue affects tissue quality and repair durability." },
-    { id: "age80", label: "Age over 80", why: "Connective tissue weakens with age; supporting structures are less able to hold a repair long-term." },
-    { id: "hypermobility", label: "Connective tissue disorder / joint hypermobility", why: "People with generalized connective tissue laxity (Ehlers-Danlos, etc.) have higher recurrence risk — not due to biology they can control, but tissue quality." },
-    { id: "straining", label: "Chronic straining / constipation", why: "⭐ Modifiable. Optimizing bowel habits before surgery significantly improves outcomes." },
-    { id: "obesity", label: "BMI ≥ 30", why: "⭐ Modifiable. Even modest weight loss can meaningfully reduce intra-abdominal pressure on the repair." },
-  ];
   const SYMPTOM_OPTS = [
     { id: "incontinence", label: "Leakage or inability to control stool or gas" },
     { id: "ods", label: "Difficulty emptying / straining / incomplete evacuation" },
@@ -968,7 +974,11 @@ const CalculatorsSection = ({ scores, setScores, primarySymptom, setPrimarySympt
                 : <IMPACTSurvey onComplete={handleImpactComplete} />}
               {surveyDone && (
                 <div style={{ marginTop: 8 }}>
-                  <button onClick={() => setStep(3)} style={{ width: "100%", borderRadius: 14, padding: "14px 0", background: C.tealLight, color: C.teal, border: `1px solid ${C.teal}`, fontSize: 16, fontWeight: 600, cursor: "pointer", fontFamily: "Georgia, serif", marginBottom: 8 }}>Optional: Surgical Risk Checklist →</button>
+                  <div style={{ background: C.tealLight, borderRadius: 14, padding: 20, textAlign: "center" }}>
+                    <div style={{ fontSize: 28, marginBottom: 8 }}>🎉</div>
+                    <div style={{ color: C.teal, fontWeight: 700, fontSize: 18, marginBottom: 6 }}>Survey complete!</div>
+                    <div style={{ color: C.navy, fontSize: 16, lineHeight: 1.6 }}>Your responses are ready to share with your healthcare team. For surgical risk and recurrence factors, see the <strong>Considering Surgery</strong> section.</div>
+                  </div>
                 </div>
               )}
             </div>
@@ -976,67 +986,6 @@ const CalculatorsSection = ({ scores, setScores, primarySymptom, setPrimarySympt
         </div>
       </div>
 
-      {/* Step 3 */}
-      <div style={{ display: "flex", gap: 0 }}>
-        <div style={{ display: "flex", flexDirection: "column", alignItems: "center", width: 40, flexShrink: 0 }}>
-          <StepDot n="3" done={step > 3} active={step === 3} />
-          <div style={{ width: 2, flex: 1, minHeight: 16, background: step > 3 ? C.teal : C.border, marginTop: 4 }} />
-        </div>
-        <div style={{ flex: 1, paddingLeft: 16, paddingBottom: 8 }}>
-          <button onClick={() => surveyDone && setStep(3)} style={{ background: "none", border: "none", padding: 0, cursor: surveyDone ? "pointer" : "default", textAlign: "left", marginBottom: step === 3 ? 16 : 8, fontFamily: "Georgia, serif" }}>
-            <div style={{ color: step >= 3 ? C.navy : C.muted, fontWeight: 700, fontSize: 18, lineHeight: 1.2 }}>Surgical Risk Checklist <span style={{ fontSize: 13, fontWeight: 400, color: C.muted }}>(optional)</span></div>
-            {step > 3 && <div style={{ color: C.teal, fontSize: 15, marginTop: 4 }}>✓ {surgRisk.length === 0 ? "No factors identified" : `${surgRisk.length} factor${surgRisk.length > 1 ? "s" : ""} identified`}</div>}
-            {!surveyDone && <div style={{ color: C.muted, fontSize: 14, marginTop: 3 }}>Complete the Bowel Survey first</div>}
-          </button>
-          {step === 3 && (
-            <div>
-              <div style={{ color: C.slate, fontSize: 16, lineHeight: 1.6, marginBottom: 16 }}>Select any factors that apply. This helps you start an informed conversation with your care team.</div>
-              {SURG_RISKS.map(r => <CheckCard key={r} label={r} checked={surgRisk.includes(r)} onClick={() => setSurgRisk(prev => prev.includes(r) ? prev.filter(x => x !== r) : [...prev, r])} />)}
-              <Card style={{ background: C.tealLight, borderRadius: 14, padding: 14, marginTop: 4 }}>
-                <div style={{ color: C.teal, fontWeight: 700, fontSize: 16, marginBottom: 4 }}>{surgRisk.length === 0 ? "✅ No risk factors identified" : `${surgRisk.length} factor${surgRisk.length > 1 ? "s" : ""} identified`}</div>
-                <div style={{ color: C.navy, fontSize: 16, lineHeight: 1.6 }}>{surgRisk.length === 0 ? "Reassuring — your team will do their own full assessment." : surgRisk.length <= 2 ? "Worth discussing with your care team so they can plan accordingly." : "Your care team will want to know about these and may recommend additional pre-operative preparation."}</div>
-              </Card>
-              <div style={{ display: "flex", gap: 10, marginTop: 8 }}>
-                <button onClick={() => setStep(4)} style={{ flex: 1, borderRadius: 14, padding: "14px 0", background: C.teal, color: "#fff", border: "none", fontSize: 16, fontWeight: 700, cursor: "pointer", fontFamily: "Georgia, serif" }}>Next: Recurrence Risk →</button>
-                <button onClick={() => setStep(4)} style={{ flex: 0, borderRadius: 14, padding: "14px 16px", background: "none", color: C.muted, border: `1px solid ${C.border}`, fontSize: 14, cursor: "pointer", fontFamily: "Georgia, serif" }}>Skip</button>
-              </div>
-            </div>
-          )}
-        </div>
-      </div>
-
-      {/* Step 4 */}
-      <div style={{ display: "flex", gap: 0 }}>
-        <div style={{ display: "flex", flexDirection: "column", alignItems: "center", width: 40, flexShrink: 0 }}>
-          <StepDot n="4" done={false} active={step === 4} />
-        </div>
-        <div style={{ flex: 1, paddingLeft: 16, paddingBottom: 24 }}>
-          <button onClick={() => surveyDone && setStep(4)} style={{ background: "none", border: "none", padding: 0, cursor: surveyDone ? "pointer" : "default", textAlign: "left", marginBottom: step === 4 ? 16 : 8, fontFamily: "Georgia, serif" }}>
-            <div style={{ color: step >= 4 ? C.navy : C.muted, fontWeight: 700, fontSize: 18, lineHeight: 1.2 }}>Recurrence Risk Factors <span style={{ fontSize: 13, fontWeight: 400, color: C.muted }}>(optional)</span></div>
-            {!surveyDone && <div style={{ color: C.muted, fontSize: 14, marginTop: 3 }}>Complete the Bowel Survey first</div>}
-          </button>
-          {step === 4 && (
-            <div>
-              <Callout body="Rectal prolapse can come back after surgery. Knowing your risk factors helps you and your care team make the best plan — some can be improved before surgery." icon="🔄" />
-              {REC_RISKS.map(r => (
-                <div key={r.id}>
-                  <CheckCard label={r.label} checked={recRisk.includes(r.id)} onClick={() => setRecRisk(prev => prev.includes(r.id) ? prev.filter(x => x !== r.id) : [...prev, r.id])} color={C.coral} />
-                  {recRisk.includes(r.id) && (<div style={{ background: C.coralLt, borderRadius: 12, padding: "12px 16px", marginTop: -6, marginBottom: 10, marginLeft: 4 }}><div style={{ color: C.slate, fontSize: 15, lineHeight: 1.6 }}>{r.why}</div></div>)}
-                </div>
-              ))}
-              <Card style={{ background: C.tealLight, borderRadius: 14, padding: 14 }}>
-                <div style={{ color: C.teal, fontWeight: 700, fontSize: 16, marginBottom: 6 }}>{recRisk.length} factor{recRisk.length !== 1 ? "s" : ""} identified</div>
-                <div style={{ color: C.navy, fontSize: 16, lineHeight: 1.6 }}>Bring this checklist to your appointment — the more your team knows, the better they can plan with you.</div>
-              </Card>
-              <div style={{ background: C.tealLight, borderRadius: 14, padding: 20, textAlign: "center", marginTop: 8 }}>
-                <div style={{ fontSize: 28, marginBottom: 8 }}>🎉</div>
-                <div style={{ color: C.teal, fontWeight: 700, fontSize: 18, marginBottom: 6 }}>All steps complete!</div>
-                <div style={{ color: C.navy, fontSize: 16, lineHeight: 1.6 }}>Your responses are ready to share with your healthcare team at your next appointment.</div>
-              </div>
-            </div>
-          )}
-        </div>
-      </div>
     </div>
   );
 };
@@ -1044,7 +993,6 @@ const CalculatorsSection = ({ scores, setScores, primarySymptom, setPrimarySympt
 // ─── SURGICAL SECTION ────────────────────────────────────────────────────────
 const SurgicalSection = ({ speak, stop, speaking }) => {
   const [open, setOpen] = useState(null);
-  const [meshPref, setMeshPref] = useState(null);
   const [surgRisk, setSurgRisk] = useState([]);
   const [recRisk, setRecRisk] = useState([]);
   const toggle = (id) => setOpen(open === id ? null : id);
@@ -1061,16 +1009,15 @@ const SurgicalSection = ({ speak, stop, speaking }) => {
   const sections = [
     { id: "what", q: "What is the surgery?", content: (<div><div style={{ color: C.navy, fontSize: 17, lineHeight: 1.7, marginBottom: 16 }}>The most common surgery for rectal prolapse is called <strong>rectopexy</strong> — the rectum is secured to the tailbone (sacrum) to stop it from prolapsing. It is usually done laparoscopically (keyhole surgery) or robotically, with small incisions.</div><VimeoEmbed videoId="1180494424" title="Rectopexy Surgical Animation" /><Card style={{ borderRadius: 14, padding: 14 }}><div style={{ color: C.teal, fontWeight: 700, fontSize: 16, marginBottom: 10 }}>What to expect in recovery</div>{["Hospital stay varies — often 1–3 days depending on approach", "Bowel function may be temporarily altered in the weeks after surgery", "Pelvic floor PT is often recommended post-operatively", "Fiber, hydration, and straining avoidance remain important after repair", "Symptom improvement may be gradual — allow time for full assessment"].map((t, i) => (<div key={i} style={{ display: "flex", gap: 10, marginBottom: 10 }}><span style={{ color: C.teal, flexShrink: 0 }}>→</span><span style={{ color: C.navy, fontSize: 16, lineHeight: 1.6 }}>{t}</span></div>))}</Card></div>) },
     { id: "happen", q: "What will happen to my symptoms?", content: (<div><Callout icon="⭐" color={C.coral} bg={C.coralLt} title="The most important thing to understand" body="Fixing the anatomy does not guarantee fixing the function. This is something your care team should discuss with you openly before any procedure." />{[{ title: "Fecal Incontinence & Leakage", icon: "💧", good: true, body: "Surgery for rectal prolapse is more likely to improve leakage and incontinence. If this is your most bothersome symptom, the evidence is more reassuring." }, { title: "Constipation & Difficult Evacuation", icon: "🚽", good: false, body: "Improvement is less predictable — around 60–70% of patients see improvement, meaning 30–40% may not. If straining is your primary complaint, discuss this honestly with your care team first." }].map(s => (<Card key={s.title} style={{ border: `2px solid ${s.good ? C.teal : C.warn}`, borderRadius: 14, padding: 14, marginBottom: 12 }}><div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 10 }}><span style={{ fontSize: 22 }}>{s.icon}</span><span style={{ color: C.navy, fontWeight: 700, fontSize: 16, flex: 1 }}>{s.title}</span><span style={{ background: s.good ? C.tealLight : C.warnLt, color: s.good ? C.teal : C.warn, borderRadius: 20, padding: "3px 10px", fontSize: 13, fontWeight: 700 }}>{s.good ? "More predictable" : "Less predictable"}</span></div><div style={{ color: C.navy, fontSize: 16, lineHeight: 1.7 }}>{s.body}</div></Card>))}<Callout icon="💙" body="If surgery doesn't resolve everything, that is not a failure. Pelvic floor PT, lifestyle changes, and follow-up care all remain part of the picture." /></div>) },
-    { id: "mesh", q: "Will I need mesh?", content: (<div><Callout body="Not all rectopexy procedures use mesh. Your care team will explain what they recommend and why. The information below supports an informed conversation." icon="ℹ️" />{[{ type: "Synthetic Mesh", icon: "🔩", desc: "Permanent synthetic material (polypropylene). Durable and widely used.", erosion: "~1.8% erosion rate", rec: "~3.7% recurrence" }, { type: "Biologic Mesh", icon: "🧬", desc: "Biologic material works by helping your body grow new, stronger tissue over time.", erosion: "~0.7% erosion rate", rec: "~4.0% recurrence" }, { type: "Suture Only — No Mesh", icon: "🪡", desc: "Rectum secured with sutures alone. A valid option for many patients.", erosion: "No mesh — no erosion risk", rec: "Comparable outcomes" }].map(m => (<Card key={m.type} style={{ borderRadius: 14, padding: 14, marginBottom: 10 }}><div style={{ display: "flex", gap: 10, alignItems: "center", marginBottom: 8 }}><span style={{ fontSize: 22 }}>{m.icon}</span><span style={{ color: C.navy, fontWeight: 700, fontSize: 16 }}>{m.type}</span></div><div style={{ color: C.navy, fontSize: 16, lineHeight: 1.6, marginBottom: 10 }}>{m.desc}</div><div style={{ display: "flex", gap: 24 }}><div><div style={{ color: C.muted, fontSize: 13, textTransform: "uppercase" }}>Erosion</div><div style={{ color: C.navy, fontSize: 15, fontWeight: 600 }}>{m.erosion}</div></div><div><div style={{ color: C.muted, fontSize: 13, textTransform: "uppercase" }}>Recurrence</div><div style={{ color: C.navy, fontSize: 15, fontWeight: 600 }}>{m.rec}</div></div></div></Card>))}<div style={{ color: C.navy, fontWeight: 700, fontSize: 16, marginBottom: 10 }}>My preference to discuss with my care team:</div>{[{ id: "discuss", label: "I'd like to discuss mesh options" }, { id: "avoid", label: "I'd prefer to discuss suture rectopexy (no mesh)" }, { id: "open", label: "I'm open to whatever my care team recommends" }].map(o => (<OptionCard key={o.id} label={o.label} selected={meshPref === o.id} onClick={() => setMeshPref(o.id)} />))}</div>) },
+    { id: "mesh", q: "Will I need mesh?", content: (<div><Callout body="Not all rectopexy procedures use mesh. Your care team will explain what they recommend and why. The information below supports an informed conversation." icon="ℹ️" />{[{ type: "Synthetic Mesh", icon: "🔩", desc: "Permanent synthetic material (polypropylene). Durable and widely used.", erosion: "~1.8% erosion rate", rec: "~15% recurrence" }, { type: "Biologic Mesh", icon: "🧬", desc: "Biologic material works by helping your body grow new, stronger tissue over time.", erosion: "~0.7% erosion rate", rec: "~15% recurrence" }, { type: "Suture Only — No Mesh", icon: "🪡", desc: "Rectum secured with sutures alone. A valid option for many patients.", erosion: "No mesh — no erosion risk", rec: "~15% recurrence" }].map(m => (<Card key={m.type} style={{ borderRadius: 14, padding: 14, marginBottom: 10 }}><div style={{ display: "flex", gap: 10, alignItems: "center", marginBottom: 8 }}><span style={{ fontSize: 22 }}>{m.icon}</span><span style={{ color: C.navy, fontWeight: 700, fontSize: 16 }}>{m.type}</span></div><div style={{ color: C.navy, fontSize: 16, lineHeight: 1.6, marginBottom: 10 }}>{m.desc}</div><div style={{ display: "flex", gap: 24 }}><div><div style={{ color: C.muted, fontSize: 13, textTransform: "uppercase" }}>Erosion</div><div style={{ color: C.navy, fontSize: 15, fontWeight: 600 }}>{m.erosion}</div></div><div><div style={{ color: C.muted, fontSize: 13, textTransform: "uppercase" }}>Recurrence</div><div style={{ color: C.navy, fontSize: 15, fontWeight: 600 }}>{m.rec}</div></div></div></Card>))}}
     { id: "risk", q: "Am I a good candidate for surgery?", content: (<div><div style={{ color: C.slate, fontSize: 16, lineHeight: 1.6, marginBottom: 16 }}>Select any factors that apply to you. This helps you start an informed conversation with your care team about surgical risk.</div>{SURG_RISKS.map(r => (<CheckCard key={r} label={r} checked={surgRisk.includes(r)} onClick={() => setSurgRisk(prev => prev.includes(r) ? prev.filter(x => x !== r) : [...prev, r])} />))}<Card style={{ background: C.tealLight, borderRadius: 14, padding: 14, marginTop: 4 }}><div style={{ color: C.teal, fontWeight: 700, fontSize: 16, marginBottom: 4 }}>{surgRisk.length === 0 ? "✅ No risk factors identified" : `${surgRisk.length} factor${surgRisk.length > 1 ? "s" : ""} to discuss`}</div><div style={{ color: C.navy, fontSize: 16, lineHeight: 1.6 }}>{surgRisk.length === 0 ? "Reassuring — your team will do their own full pre-op assessment." : "Bring these to your consultation. Your team can explain how they affect your individual risk."}</div></Card></div>) },
     { id: "recurrence", q: "Could prolapse come back after surgery?", content: (<div><Callout body="Yes — rectal prolapse can recur after surgery. Knowing your risk factors helps you and your care team make the best plan. Some factors can be improved before surgery." icon="🔄" />{REC_RISKS.map(r => (<div key={r.id}><CheckCard label={r.label} checked={recRisk.includes(r.id)} onClick={() => setRecRisk(prev => prev.includes(r.id) ? prev.filter(x => x !== r.id) : [...prev, r.id])} color={C.coral} />{recRisk.includes(r.id) && (<div style={{ background: C.coralLt, borderRadius: 12, padding: "12px 16px", marginTop: -6, marginBottom: 10 }}><div style={{ color: C.slate, fontSize: 15, lineHeight: 1.6 }}>{r.why}</div></div>)}</div>))}{recRisk.length > 0 && (<Card style={{ background: C.tealLight, borderRadius: 14, padding: 14 }}><div style={{ color: C.teal, fontWeight: 700, fontSize: 16, marginBottom: 6 }}>{recRisk.length} factor{recRisk.length > 1 ? "s" : ""} identified</div><div style={{ color: C.navy, fontSize: 16, lineHeight: 1.6 }}>Bring this to your appointment. The more your team knows, the better they can plan with you.</div></Card>)}</div>) },
-    { id: "questions", q: "What should I ask my care team?", content: (<div><div style={{ color: C.slate, fontSize: 16, lineHeight: 1.6, marginBottom: 16 }}>Empowered patients get better care. Use this list to prepare for your consultation:</div>{["What type of rectopexy are you recommending and why?", "Will mesh be used? What are the implications for my situation?", "What is the expected recurrence rate for me specifically?", "My most bothersome symptom is [leakage / constipation / prolapse] — how likely is surgery to improve this?", "What happens to my bowel function after surgery?", "What if my symptoms don't improve — what options remain?", "What should I do before surgery to optimize my outcome?", "Should I see a pelvic floor physical therapist before or after surgery?", "What is your personal experience and complication rate with this procedure?"].map((q, i) => (<Card key={i} style={{ borderRadius: 14, padding: 14, marginBottom: 10 }}><div style={{ display: "flex", gap: 14 }}><div style={{ color: C.teal, fontWeight: 800, fontSize: 17, flexShrink: 0, minWidth: 32 }}>Q{i + 1}</div><div style={{ color: C.navy, fontSize: 16, lineHeight: 1.6 }}>{q}</div></div></Card>))}<Callout body="Surgery is one part of the picture. Lifestyle work — fiber, movement, pelvic floor PT, stress management — remains important before and after any procedure." icon="🌿" /></div>) },
+    { id: "questions", q: "What should I ask my care team?", content: (<div><div style={{ color: C.slate, fontSize: 16, lineHeight: 1.6, marginBottom: 16 }}>These are questions worth raising at your consultation. To print them, tap <strong>☰ Menu → Generate My Summary</strong> — they'll appear in your pre-appointment report.</div>{["What type of rectopexy are you recommending and why?", "Will mesh be used? What are the implications for my situation?", "What is the expected recurrence rate for me specifically?", "My most bothersome symptom is [leakage / constipation / prolapse] — how likely is surgery to improve this?", "What happens to my bowel function after surgery?", "What if my symptoms don't improve — what options remain?", "What should I do before surgery to optimize my outcome?", "Should I see a pelvic floor physical therapist before or after surgery?", "What is your personal experience and complication rate with this procedure?"].map((q, i) => (<Card key={i} style={{ borderRadius: 14, padding: 14, marginBottom: 10 }}><div style={{ display: "flex", gap: 14 }}><div style={{ color: C.teal, fontWeight: 800, fontSize: 17, flexShrink: 0, minWidth: 32 }}>Q{i + 1}</div><div style={{ color: C.navy, fontSize: 16, lineHeight: 1.6 }}>{q}</div></div></Card>))}<Callout body="Surgery is one part of the picture. Lifestyle work — fiber, movement, pelvic floor PT, stress management — remains important before and after any procedure." icon="🌿" /></div>) },
   ];
 
   return (
     <div>
       <SectionHeader title="Considering Surgery" subtitle="Honest, patient-friendly information to help you prepare and ask better questions." />
-      <SpeakBtn speaking={speaking} onSpeak={() => speak(document.getElementById("section-content")?.innerText || "")} />
       <Callout body="Not sure if surgery is right for you? That's a completely normal place to be. This section helps you understand your options — at your own pace." icon="💙" />
       {sections.map((s, i) => (
         <div key={s.id} style={{ marginBottom: 4 }}>
@@ -1207,6 +1154,8 @@ Dyspareunia after surgery: Do NOT cite a specific percentage — no verified pub
 Recurrence after ventral rectopexy: Published systematic reviews report 0–18.8% recurrence — a wide range reflecting varied techniques and follow-up periods. Always add: "Your provider's own outcomes data matters more than population averages."
 
 Biofeedback for dyssynergic defecation: There is published meta-analysis data on this. If a patient asks for specific numbers, say: "There are published meta-analyses on biofeedback for this condition. Search PubMed for 'biofeedback dyssynergic defecation systematic review' — your provider can review the specific studies with you."
+
+Prolapse prevalence framing: Do NOT say rectal prolapse is "the most common" type of prolapse or imply it leads the list. Vaginal prolapse (including cystocele) is more prevalent overall. When listing types that affect the bowel, say: "Types that affect the bowel include rectal prolapse, rectocele, and internal prolapse." Do not rank them by prevalence.
 
 Colostomy: Clarify it is rare for elective pelvic floor surgery. Do not use "bowel diversion" without explaining it.
 
@@ -1356,13 +1305,53 @@ const Chatbot = ({ appState, onClose, chatMessages, setChatMessages, inline = fa
 
   // ── V2: Web Share API replaces broken copy button ──
   const handleShare = async () => {
-    const clean = (str) => str.replace(/[\u{1F300}-\u{1FFFF}]/gu, "").replace(/[⚠️💙🔒📋📅→•✓]/g, "").replace(/\s+/g, " ").trim();
-    const text = messages.map(m => `${m.role === "user" ? "Me" : "REPAIR"}: ${clean(m.content)}`).join("\n\n");
-    const shareData = { title: "My REPAIR conversation", text };
-    if (navigator.share && navigator.canShare && navigator.canShare(shareData)) {
-      try { await navigator.share(shareData); setShared(true); setTimeout(() => setShared(false), 2000); return; } catch {}
+    const clean = (str) => str
+      .replace(/[\u{1F300}-\u{1FFFF}]/gu, "")
+      .replace(/[⚠️💙🔒📋📅→•✓]/g, "")
+      .replace(/\*\*/g, "")
+      .trim();
+    const lines = messages.map(m =>
+      `${m.role === "user" ? "Me" : "REPAIR"}:\n${clean(m.content)}`
+    );
+    const text = lines.join("\n\n---\n\n");
+
+    // iOS-safe copy using textarea + execCommand
+    const copyViaTextarea = () => {
+      const ta = document.createElement("textarea");
+      ta.value = text;
+      ta.style.position = "fixed";
+      ta.style.top = "0";
+      ta.style.left = "0";
+      ta.style.opacity = "0";
+      document.body.appendChild(ta);
+      ta.focus();
+      ta.select();
+      try {
+        document.execCommand("copy");
+        setShared(true);
+        setTimeout(() => setShared(false), 2000);
+      } catch {}
+      document.body.removeChild(ta);
+    };
+
+    // Try Web Share API first (native iOS share sheet)
+    if (navigator.share) {
+      try {
+        await navigator.share({ title: "My REPAIR conversation", text });
+        setShared(true);
+        setTimeout(() => setShared(false), 2000);
+        return;
+      } catch {}
     }
-    navigator.clipboard.writeText(text).then(() => { setShared(true); setTimeout(() => setShared(false), 2000); });
+
+    // Try clipboard API, fall back to textarea
+    try {
+      await navigator.clipboard.writeText(text);
+      setShared(true);
+      setTimeout(() => setShared(false), 2000);
+    } catch {
+      copyViaTextarea();
+    }
   };
 
   // Inline mode: render chat content directly (no fixed modal wrapper)
@@ -1384,7 +1373,7 @@ const Chatbot = ({ appState, onClose, chatMessages, setChatMessages, inline = fa
         {messages.map((m, i) => (
           <div key={i} style={{ display: "flex", justifyContent: m.role === "user" ? "flex-end" : "flex-start", marginBottom: 16, alignItems: "flex-end", gap: 10 }}>
             {m.role === "assistant" && (<div style={{ width: 34, height: 34, borderRadius: "50%", background: `linear-gradient(135deg, ${C.teal}, ${C.tealMid})`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, flexShrink: 0, marginBottom: 2 }}>🌿</div>)}
-            <div style={{ maxWidth: "82%", background: m.role === "user" ? C.teal : C.card, color: m.role === "user" ? "#fff" : C.navy, fontSize: 16, lineHeight: 1.7, padding: "14px 18px", borderRadius: m.role === "user" ? "20px 20px 6px 20px" : "20px 20px 20px 6px", border: m.role === "assistant" ? `1px solid ${C.borderSoft}` : "none", boxShadow: "0 2px 8px rgba(0,0,0,0.06)", whiteSpace: "pre-wrap" }}>{m.content}</div>
+            <div style={{ maxWidth: "82%", background: m.role === "user" ? C.teal : C.card, color: m.role === "user" ? "#fff" : C.navy, fontSize: 16, lineHeight: 1.7, padding: "14px 18px", borderRadius: m.role === "user" ? "20px 20px 6px 20px" : "20px 20px 20px 6px", border: m.role === "assistant" ? `1px solid ${C.borderSoft}` : "none", boxShadow: "0 2px 8px rgba(0,0,0,0.06)", whiteSpace: "pre-wrap" }} dangerouslySetInnerHTML={{ __html: m.content.replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>") }} />
             {m.role === "user" && (<div style={{ width: 34, height: 34, borderRadius: "50%", background: C.navyMid, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, flexShrink: 0, color: "#fff", fontWeight: 700 }}>You</div>)}
           </div>
         ))}
@@ -1402,11 +1391,16 @@ const Chatbot = ({ appState, onClose, chatMessages, setChatMessages, inline = fa
       {/* Input */}
       <div style={{ borderTop: `1px solid ${C.border}`, padding: "12px 14px 14px", flexShrink: 0, background: C.card }}>
         {messages.length > 0 && (
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
-            <div style={{ color: C.muted, fontSize: 12 }}>📅 Save your summary to bring to your appointment.</div>
-            <button onClick={handleShare} style={{ background: "none", border: "none", color: C.teal, fontSize: 12, fontWeight: 600, cursor: "pointer", fontFamily: "Georgia, serif" }}>
-              {shared ? "✓ Saved!" : "📤 Save or send"}
-            </button>
+          <div style={{ display: "flex", flexDirection: "column", gap: 8, marginBottom: 8 }}>
+            <div style={{ background: C.tealLight, border: `1px solid ${C.teal}33`, borderRadius: 12, padding: "10px 14px", fontSize: 13, color: C.slate, lineHeight: 1.5 }}>
+              💡 Want a formatted summary to bring to your appointment? Tap <strong style={{ color: C.teal }}>☰ Menu → Generate My Summary</strong> — it includes your conversation, symptom scores, and questions for your care team in one printable report.
+            </div>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+              <div style={{ color: C.muted, fontSize: 12 }}>Or save just this conversation:</div>
+              <button onClick={handleShare} style={{ background: "none", border: "none", color: C.teal, fontSize: 12, fontWeight: 600, cursor: "pointer", fontFamily: "Georgia, serif" }}>
+                {shared ? "✓ Saved!" : "📤 Save or send"}
+              </button>
+            </div>
           </div>
         )}
         <div style={{ display: "flex", gap: 10, alignItems: "flex-end" }}>
@@ -1561,7 +1555,6 @@ export default function App() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [scores, setScores] = useState({});
   const [primarySymptom, setPrimarySymptom] = useState(null);
-  const { speak, stop, speaking } = useSpeech();
   const [showPDF, setShowPDF] = useState(false);
   const [chatMessages, setChatMessages] = useState([]);
 
@@ -1580,6 +1573,7 @@ export default function App() {
   const handleHomeChatClose = () => {
     setHomeChatStarted(false);
     setStarterPrompt(null);
+    setChatMessages([]);
   };
 
   return (
@@ -1676,12 +1670,12 @@ export default function App() {
         {/* SECTION PAGES: scrollable content + floating chat button */}
         {section !== "home" && (
           <div style={{ flex: 1, overflowY: "auto", padding: 18, paddingBottom: 120 }}>
-            {section === "prolapse" && <ProlapseSection speak={speak} stop={stop} speaking={speaking} />}
-            {section === "symptoms" && <SymptomsSection speak={speak} stop={stop} speaking={speaking} scores={scores} setScores={setScores} primarySymptom={primarySymptom} setPrimarySymptom={setPrimarySymptom} />}
-            {section === "imaging" && <ImagingSection speak={speak} stop={stop} speaking={speaking} />}
-            {section === "lifestyle" && <LifestyleSection speak={speak} stop={stop} speaking={speaking} />}
-            {section === "surgical" && <SurgicalSection speak={speak} stop={stop} speaking={speaking} />}
-            {section === "redflags" && <RedFlagsSection speak={speak} stop={stop} speaking={speaking} />}
+            {section === "prolapse" && <ProlapseSection />}
+            {section === "symptoms" && <SymptomsSection scores={scores} setScores={setScores} primarySymptom={primarySymptom} setPrimarySymptom={setPrimarySymptom} />}
+            {section === "imaging" && <ImagingSection />}
+            {section === "lifestyle" && <LifestyleSection />}
+            {section === "surgical" && <SurgicalSection />}
+            {section === "redflags" && <RedFlagsSection />}
           </div>
         )}
       </div>
