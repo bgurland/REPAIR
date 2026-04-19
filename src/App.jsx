@@ -254,9 +254,10 @@ const HomeSection = ({ onStartChat, onNav }) => {
       ))}
 
       <div style={{ textAlign: "center", marginTop: 8, paddingTop: 12, paddingBottom: 8 }}>
-        <button onClick={() => setShowTopics(true)} style={{ background: C.tealLight, border: `1.5px solid ${C.teal}`, borderRadius: 12, color: C.teal, fontSize: 15, fontWeight: 600, fontFamily: "Georgia, serif", cursor: "pointer", padding: "12px 20px", width: "100%" }}>
-          Browse topics on your own →
+        <button onClick={() => setShowTopics(true)} style={{ background: C.tealLight, border: `1.5px solid ${C.teal}`, borderRadius: 12, color: C.teal, fontSize: 16, fontWeight: 600, fontFamily: "Georgia, serif", cursor: "pointer", padding: "12px 20px", width: "100%", animation: "pulse 2s ease-in-out 1s 2" }}>
+          📚 Explore all topics on your own →
         </button>
+        <style>{`@keyframes pulse { 0%, 100% { box-shadow: 0 0 0 0 rgba(45,125,111,0); } 50% { box-shadow: 0 0 0 6px rgba(45,125,111,0.2); } }`}</style>
       </div>    </div>
   );
 };
@@ -1176,6 +1177,8 @@ SUICIDAL IDEATION: If a patient expresses any thought of self-harm or suicide, i
 
 PATIENT CANNOT ACCESS CARE: If a patient expresses they are alone and cannot reach their provider or get to care, escalate creatively and persistently. Suggest calling 911, going to a neighbor, a public place, or calling for help.
 
+CRISIS RE-SCOPING: After two exchanges around a crisis or emotional topic, if the patient indicates they are not in immediate danger, acknowledge warmly and gently redirect back to scope. Say something like: "I'm glad you're okay. I'm a pelvic floor education tool, so my ability to support you here is limited — but if you'd like to talk through anything about your health or your appointment, I'm here for that." Do not continue crisis questioning indefinitely once safety is established.
+
 ═══════════════════════════════════
 ADAPTIVE LISTENING STYLE
 ═══════════════════════════════════
@@ -1199,7 +1202,7 @@ const INFORMATIONAL_CONTEXT = ["mentioned", "told me", "risk of", "discussed", "
 const RED_FLAG_KEYWORDS = ["bleeding actively", "blood coming out", "can't push back", "stuck outside", "won't go back", "severe pain", "excruciating", "fever", "emergency", "purple tissue", "dark tissue", "can't pass stool"];
 
 // ── V2 CHATBOT — now supports inline={true} for home screen use ───────────────
-const Chatbot = ({ appState, onClose, chatMessages, setChatMessages, inline = false, starterPrompt = null }) => {
+const Chatbot = ({ appState, onClose, chatMessages, setChatMessages, inline = false, starterPrompt = null, onGenerateSummary = null }) => {
   const messages = chatMessages;
   const setMessages = setChatMessages;
   const [input, setInput] = useState("");
@@ -1378,9 +1381,9 @@ const Chatbot = ({ appState, onClose, chatMessages, setChatMessages, inline = fa
       <div style={{ borderTop: `1px solid ${C.border}`, padding: "12px 14px 14px", flexShrink: 0, background: C.card }}>
         {messages.length > 0 && (
           <div style={{ display: "flex", flexDirection: "column", gap: 8, marginBottom: 8 }}>
-            <div style={{ background: C.tealLight, border: `1px solid ${C.teal}33`, borderRadius: 12, padding: "10px 14px", fontSize: 13, color: C.slate, lineHeight: 1.5 }}>
-              💡 Want a formatted summary to bring to your appointment? Tap <strong style={{ color: C.teal }}>☰ Menu → Generate My Summary</strong> — it includes your conversation, symptom scores, and questions for your care team in one printable report.
-            </div>
+            <button onClick={() => onGenerateSummary && onGenerateSummary()} style={{ background: C.teal, color: "#fff", border: "none", borderRadius: 12, padding: "12px 16px", fontSize: 14, fontWeight: 700, cursor: "pointer", fontFamily: "Georgia, serif", width: "100%", textAlign: "left" }}>
+              📄 Generate my summary — includes this conversation + your symptom scores
+            </button>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
               <div style={{ color: C.muted, fontSize: 12 }}>Or save just this conversation:</div>
               <button onClick={handleShare} style={{ background: "none", border: "none", color: C.teal, fontSize: 12, fontWeight: 600, cursor: "pointer", fontFamily: "Georgia, serif" }}>
@@ -1542,7 +1545,10 @@ export default function App() {
   const [scores, setScores] = useState({});
   const [primarySymptom, setPrimarySymptom] = useState(null);
   const [showPDF, setShowPDF] = useState(false);
+  const [showAbout, setShowAbout] = useState(false);
+  const [showPrivacy, setShowPrivacy] = useState(false);
   const [chatMessages, setChatMessages] = useState([]);
+  const [savedChatMessages, setSavedChatMessages] = useState([]);
 
   // V2 home chat state
   const [homeChatStarted, setHomeChatStarted] = useState(false);
@@ -1559,14 +1565,18 @@ export default function App() {
   const handleHomeChatClose = () => {
     setHomeChatStarted(false);
     setStarterPrompt(null);
+    setSavedChatMessages(chatMessages); // preserve for PDF before clearing
     setChatMessages([]);
   };
+
+  // Combined messages for PDF — current session or last saved
+  const pdfChatMessages = chatMessages.length > 0 ? chatMessages : savedChatMessages;
 
   return (
     <div style={{ background: C.bg, minHeight: "100vh", maxWidth: 480, margin: "0 auto", position: "relative", fontFamily: "Georgia, serif", display: "flex", flexDirection: "column", height: "100vh" }}>
 
-      {/* TOP BAR */}
-      <div style={{ background: C.card, borderBottom: `1px solid ${C.border}`, padding: "12px 16px", flexShrink: 0 }}>
+      {/* TOP BAR — sticky so hamburger always visible */}
+      <div style={{ background: C.card, borderBottom: `1px solid ${C.border}`, padding: "12px 16px", flexShrink: 0, position: "sticky", top: 0, zIndex: 100 }}>
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
           <button onClick={() => setMenuOpen(true)} style={{ background: "none", border: "none", fontSize: 22, color: C.navy, cursor: "pointer", padding: 4 }}>☰</button>
           <div style={{ textAlign: "center" }}>
@@ -1597,15 +1607,15 @@ export default function App() {
               <div style={{ color: C.muted, fontSize: 14, marginTop: 2 }}>Pelvic floor companion</div>
             </div>
             <div style={{ borderTop: `1px solid ${C.border}`, marginBottom: 8 }} />
-            {/* V2: 3 items only */}
-            <button onClick={() => { setMenuOpen(false); }} style={{ width: "100%", textAlign: "left", background: "transparent", color: C.navy, fontSize: 16, padding: "14px 24px", border: "none", cursor: "pointer", fontFamily: "Georgia, serif", display: "flex", alignItems: "center", gap: 12 }}>
+            {/* V2: About → Privacy → Feedback */}
+            <button onClick={() => { setShowAbout(true); setMenuOpen(false); }} style={{ width: "100%", textAlign: "left", background: "transparent", color: C.navy, fontSize: 16, padding: "14px 24px", border: "none", cursor: "pointer", fontFamily: "Georgia, serif", display: "flex", alignItems: "center", gap: 12 }}>
               <span>ℹ️</span><span>About REPAIR</span>
+            </button>
+            <button onClick={() => { setShowPrivacy(true); setMenuOpen(false); }} style={{ width: "100%", textAlign: "left", background: "transparent", color: C.navy, fontSize: 16, padding: "14px 24px", border: "none", cursor: "pointer", fontFamily: "Georgia, serif", display: "flex", alignItems: "center", gap: 12 }}>
+              <span>🔒</span><span>Privacy</span>
             </button>
             <button onClick={() => { window.open("https://forms.gle/VaTBhPCe4iEL3ifd9", "_blank"); setMenuOpen(false); }} style={{ width: "100%", textAlign: "left", background: "transparent", color: C.navy, fontSize: 16, padding: "14px 24px", border: "none", cursor: "pointer", fontFamily: "Georgia, serif", display: "flex", alignItems: "center", gap: 12 }}>
               <span>💬</span><span>Feedback</span>
-            </button>
-            <button onClick={() => { setMenuOpen(false); }} style={{ width: "100%", textAlign: "left", background: "transparent", color: C.navy, fontSize: 16, padding: "14px 24px", border: "none", cursor: "pointer", fontFamily: "Georgia, serif", display: "flex", alignItems: "center", gap: 12 }}>
-              <span>🔒</span><span>Privacy</span>
             </button>
             <div style={{ borderTop: `1px solid ${C.border}`, margin: "8px 0" }} />
             <div style={{ padding: "12px 24px" }}>
@@ -1627,12 +1637,49 @@ export default function App() {
             </div>
             <Callout body="Save or print this now — it won't be here when you return." icon="⚠️" color={C.warn} bg={C.warnLt} />
             <button onClick={() => window.print()} style={{ background: C.teal, color: "#fff", border: "none", borderRadius: 14, padding: "16px 24px", fontSize: 17, fontWeight: 700, fontFamily: "Georgia, serif", cursor: "pointer", minHeight: 54, marginBottom: 16, width: "100%" }}>🖨️ Print / Save as PDF</button>
-            <PrintSummary scores={scores} primarySymptom={primarySymptom} chatMessages={chatMessages} />
+            <PrintSummary scores={scores} primarySymptom={primarySymptom} chatMessages={pdfChatMessages} />
           </div>
         </div>
       )}
 
-      {/* MAIN CONTENT AREA */}
+      {/* ABOUT SCREEN */}
+      {showAbout && (
+        <div style={{ position: "fixed", inset: 0, zIndex: 300, background: C.bg, overflowY: "auto" }}>
+          <div style={{ padding: 16, maxWidth: 480, margin: "0 auto" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 24 }}>
+              <div style={{ color: C.navy, fontWeight: 700, fontSize: 18 }}>About REPAIR</div>
+              <button onClick={() => setShowAbout(false)} style={{ background: "none", border: "none", color: C.muted, fontSize: 22, cursor: "pointer" }}>✕</button>
+            </div>
+            <div style={{ color: C.navy, fontSize: 16, lineHeight: 1.8 }}>
+              <p>REPAIR was built by Dr. Brooke Gurland and Stanford's pelvic floor team — colorectal surgeons, urogynecologists, gastroenterologists, and pelvic floor physical therapists who treat these conditions every day.</p>
+              <p>Patients with pelvic floor conditions are too often left to figure things out alone. REPAIR exists to close that gap — plain language, from specialists, on your own time.</p>
+              <p>REPAIR is educational. It helps you understand your condition and prepare for appointments. It does not diagnose or replace your doctor.</p>
+              <p style={{ color: C.teal, fontWeight: 700 }}>REPAIR is free. It will stay free. No advertising, no sponsorship, no fees — ever.</p>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* PRIVACY SCREEN */}
+      {showPrivacy && (
+        <div style={{ position: "fixed", inset: 0, zIndex: 300, background: C.bg, overflowY: "auto" }}>
+          <div style={{ padding: 16, maxWidth: 480, margin: "0 auto" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 24 }}>
+              <div style={{ color: C.navy, fontWeight: 700, fontSize: 18 }}>Your Privacy</div>
+              <button onClick={() => setShowPrivacy(false)} style={{ background: "none", border: "none", color: C.muted, fontSize: 22, cursor: "pointer" }}>✕</button>
+            </div>
+            <div style={{ color: C.navy, fontSize: 16, lineHeight: 1.8 }}>
+              <p style={{ fontWeight: 700, color: C.teal }}>REPAIR is private by design — not by promise.</p>
+              <p>Nothing you do here is saved. Not your questions, your symptom scores, your chat, or your summary. When you close the app, everything disappears. There is no account, no login, no database — nothing for anyone to look up, share, or leak.</p>
+              <p>If you want to keep your summary, use "Save or send" before closing. Once you leave, it's gone.</p>
+              <p>One thing to know: our chatbot is powered by Anthropic's Claude. Your questions are sent to Anthropic to generate a response and returned to you. Anthropic does not store or train on your questions.</p>
+              <p style={{ fontWeight: 700, fontStyle: "italic", color: C.tealDeep }}>The best way to build a tool patients trust with sensitive questions is to build one that forgets them the moment they leave.</p>
+            </div>
+          </div>
+        </div>
+      )}
+
+
       <div style={{ flex: 1, overflow: "hidden", display: "flex", flexDirection: "column" }}>
 
         {/* HOME: chat-first layout */}
@@ -1648,6 +1695,7 @@ export default function App() {
                 chatMessages={chatMessages}
                 setChatMessages={setChatMessages}
                 starterPrompt={starterPrompt}
+                onGenerateSummary={() => setShowPDF(true)}
               />
             )}
           </>
@@ -1693,6 +1741,7 @@ export default function App() {
           onClose={() => setChatOpen(false)}
           chatMessages={chatMessages}
           setChatMessages={setChatMessages}
+          onGenerateSummary={() => { setChatOpen(false); setShowPDF(true); }}
         />
       )}
     </div>
