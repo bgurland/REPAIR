@@ -1,32 +1,33 @@
 import { useState, useRef, useEffect } from "react";
 
 // ─── VIMEO EMBED ─────────────────────────────────────────────────────────────
-const VIMEO_URLS = {
-  "743819969":  "https://vimeo.com/743819969/0ab020862e",
-  "743821060":  "https://vimeo.com/743821060",
-  "1175949349": "https://vimeo.com/1175949349",
-  "1180494424": "https://vimeo.com/1180494424",
+// Videos set to "Anywhere" embedding + "All audiences" in Vimeo settings
+const VIMEO_IDS = {
+  "743819969":  "743819969/0ab020862e",
+  "743821060":  "743821060",
+  "1175949349": "1175949349",
+  "1180494424": "1180494424",
 };
 
-const VimeoEmbed = ({ videoId, title }) => (
-  <div style={{ margin: "16px 0" }}>
-    <a href={VIMEO_URLS[videoId] || `https://vimeo.com/${videoId}`} target="_blank" rel="noopener noreferrer" style={{ display: "block", textDecoration: "none" }}>
-      <div style={{ background: "linear-gradient(135deg, #1a2e3b, #2d7d6f)", padding: "32px 16px", cursor: "pointer", position: "relative", overflow: "hidden", borderRadius: 16, display: "flex", flexDirection: "column", alignItems: "center", gap: 12 }}>
-        <div style={{ position: "absolute", width: 140, height: 140, borderRadius: "50%", border: "1px solid rgba(255,255,255,0.1)", top: -30, right: -30 }} />
-        <div style={{ width: 64, height: 64, borderRadius: "50%", background: "rgba(255,255,255,0.15)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-          <span style={{ fontSize: 28, marginLeft: 4 }}>▶</span>
-        </div>
-        <div style={{ textAlign: "center" }}>
-          <div style={{ color: "#fff", fontWeight: 700, fontSize: 17, marginBottom: 4 }}>{title}</div>
-          <div style={{ color: "rgba(255,255,255,0.7)", fontSize: 12 }}>Tap to watch on Vimeo ↗</div>
-        </div>
-        <div style={{ background: "rgba(255,255,255,0.12)", borderRadius: 20, padding: "6px 16px", border: "1px solid rgba(255,255,255,0.2)" }}>
-          <span style={{ color: "#fff", fontSize: 16, fontWeight: 600 }}>Open video</span>
-        </div>
+const VimeoEmbed = ({ videoId, title }) => {
+  const id = VIMEO_IDS[videoId] || videoId;
+  // dnt=1 disables tracking; related=0 disables related videos at end
+  const src = `https://player.vimeo.com/video/${id}?badge=0&autopause=0&player_id=0&app_id=58479&dnt=1&related=0&title=0&byline=0&portrait=0`;
+  return (
+    <div style={{ margin: "16px 0" }}>
+      <div style={{ color: C.navy, fontSize: 14, fontWeight: 600, marginBottom: 8 }}>▶ {title}</div>
+      <div style={{ position: "relative", paddingBottom: "56.25%", height: 0, overflow: "hidden", borderRadius: 14, background: "#1a2e3b" }}>
+        <iframe
+          src={src}
+          style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "100%", border: "none" }}
+          allow="autoplay; fullscreen; picture-in-picture"
+          allowFullScreen
+          title={title}
+        />
       </div>
-    </a>
-  </div>
-);
+    </div>
+  );
+};
 
 // ─── COLORS ──────────────────────────────────────────────────────────────────
 const C = {
