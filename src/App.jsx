@@ -1298,12 +1298,13 @@ const Chatbot = ({ appState, onClose, chatMessages, setChatMessages, inline = fa
     const clean = (str) => str
       .replace(/[\u{1F300}-\u{1FFFF}]/gu, "")
       .replace(/[⚠️💙🔒📋📅→•✓]/g, "")
-      .replace(/\*\*/g, "")
+      .replace(/\*\*(.*?)\*\*/g, "$1")
+      .replace(/---/g, "")
       .trim();
     const lines = messages.map(m =>
       `${m.role === "user" ? "Me" : "REPAIR"}:\n${clean(m.content)}`
     );
-    const text = lines.join("\n\n---\n\n");
+    const text = lines.join("\n\n");
 
     // iOS-safe copy using textarea + execCommand
     const copyViaTextarea = () => {
@@ -1324,24 +1325,16 @@ const Chatbot = ({ appState, onClose, chatMessages, setChatMessages, inline = fa
       document.body.removeChild(ta);
     };
 
-    // Try Web Share API first (native iOS share sheet)
-    if (navigator.share) {
-      try {
-        await navigator.share({ title: "My REPAIR conversation", text });
-        setShared(true);
-        setTimeout(() => setShared(false), 2000);
-        return;
-      } catch {}
-    }
-
-    // Try clipboard API, fall back to textarea
+    // Try clipboard first — avoids URL encoding issue in share targets
     try {
       await navigator.clipboard.writeText(text);
       setShared(true);
       setTimeout(() => setShared(false), 2000);
-    } catch {
-      copyViaTextarea();
-    }
+      return;
+    } catch {}
+
+    // Fallback: textarea copy
+    copyViaTextarea();
   };
 
   // Inline mode: render chat content directly (no fixed modal wrapper)
@@ -1464,7 +1457,7 @@ const PrintSummary = ({ scores, primarySymptom, chatMessages = [] }) => {
   const now = new Date().toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" });
   const score16 = scores.impactDone && scores.impact ? calcIMPACT016(scores.impact) : null;
   const band = impactBand(score16);
-  const cleanText = (str) => str.replace(/[\u{1F300}-\u{1FFFF}]/gu, "").replace(/[⚠️💙🔒📋📅→•✓⭐🌿🌱]/g, "").trim();
+  const cleanText = (str) => str.replace(/[\u{1F300}-\u{1FFFF}]/gu, "").replace(/[⚠️💙🔒📋📅→•✓⭐🌿🌱]/g, "").replace(/\*\*(.*?)\*\*/g, "$1").trim();
 
   return (
     <div style={{ fontFamily: "Georgia, serif", maxWidth: 700, margin: "0 auto", padding: 32, color: "#1a2e3b" }}>
@@ -1636,17 +1629,19 @@ export default function App() {
               <div style={{ color: C.navy, fontWeight: 700, fontSize: 16 }}>Pre-Appointment Summary</div>
               <button onClick={() => setShowPDF(false)} style={{ background: "none", border: "none", color: C.muted, fontSize: 22, cursor: "pointer" }}>✕</button>
             </div>
-            <Callout body="Save or print this now — it won't be here when you return." icon="⚠️" color={C.warn} bg={C.warnLt} />
             <button onClick={async () => {
               if (navigator.share) {
                 try {
-                  await navigator.share({ title: "REPAIR Pre-Appointment Summary", text: "My pre-appointment summary from REPAIR — please open on a computer to print." });
+                  await navigator.share({
+                    title: "REPAIR Pre-Appointment Summary",
+                    text: "My pre-appointment summary from REPAIR. Open repair-v2.netlify.app on a computer to view and print."
+                  });
                   return;
                 } catch {}
               }
               window.print();
-            }} style={{ background: C.teal, color: "#fff", border: "none", borderRadius: 14, padding: "16px 24px", fontSize: 17, fontWeight: 700, fontFamily: "Georgia, serif", cursor: "pointer", minHeight: 54, marginBottom: 16, width: "100%" }}>
-              📤 Save or print this summary
+            }} style={{ background: C.tealDeep, color: "#fff", border: "none", borderRadius: 14, padding: "18px 24px", fontSize: 16, fontWeight: 700, fontFamily: "Georgia, serif", cursor: "pointer", minHeight: 54, marginBottom: 20, width: "100%", lineHeight: 1.4, textAlign: "center" }}>
+              📤 Save or print this now — it won't be here when you return
             </button>
             <PrintSummary scores={scores} primarySymptom={primarySymptom} chatMessages={pdfChatMessages} />
           </div>
