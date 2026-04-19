@@ -1300,14 +1300,15 @@ const Chatbot = ({ appState, onClose, chatMessages, setChatMessages, inline = fa
       .replace(/[⚠️💙🔒📋📅→•✓]/g, "")
       .replace(/\*\*(.*?)\*\*/g, "$1")
       .replace(/---/g, "")
-      .replace(/[^\x00-\x7F]/g, "") // strip any remaining non-ASCII
+      .replace(/[^\x00-\x7F]/g, "")
       .trim();
-    const lines = messages.map(m =>
-      `${m.role === "user" ? "Me" : "REPAIR"}:\n${clean(m.content)}`
-    );
-    const text = lines.join("\n\n");
 
-    // Try Web Share API with plain ASCII text
+    const lines = messages.map(m =>
+      `${m.role === "user" ? "Me" : "REPAIR"}: ${clean(m.content).replace(/\n+/g, " ")}`
+    );
+    const text = lines.join(" | ");
+
+    // Try Web Share API
     if (navigator.share) {
       try {
         await navigator.share({ title: "My REPAIR conversation", text });
