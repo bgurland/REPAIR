@@ -3,16 +3,16 @@ import { useState, useRef, useEffect } from "react";
 // ─── VIMEO EMBED ─────────────────────────────────────────────────────────────
 // Videos set to "Anywhere" embedding + "All audiences" in Vimeo settings
 const VIMEO_IDS = {
-  "743819969":  "743819969/0ab020862e",
-  "743821060":  "743821060",
-  "1175949349": "1175949349",
-  "1180494424": "1180494424",
+  "743819969":  { id: "743819969", h: "0ab020862e" },
+  "743821060":  { id: "743821060" },
+  "1175949349": { id: "1175949349" },
+  "1180494424": { id: "1180494424" },
 };
 
 const VimeoEmbed = ({ videoId, title }) => {
-  const id = VIMEO_IDS[videoId] || videoId;
-  // dnt=1 disables tracking; related=0 disables related videos at end
-  const src = `https://player.vimeo.com/video/${id}?badge=0&autopause=0&player_id=0&app_id=58479&dnt=1&related=0&title=0&byline=0&portrait=0`;
+  const meta = VIMEO_IDS[videoId] || { id: videoId };
+  const hash = meta.h ? `&h=${meta.h}` : "";
+  const src = `https://player.vimeo.com/video/${meta.id}?badge=0&autopause=0&player_id=0&app_id=58479&dnt=1&related=0&title=0&byline=0&portrait=0${hash}`;
   return (
     <div style={{ margin: "16px 0" }}>
       <div style={{ color: C.navy, fontSize: 14, fontWeight: 600, marginBottom: 8 }}>▶ {title}</div>
@@ -1748,3 +1748,4 @@ export default function App() {
     </div>
   );
 }
+
