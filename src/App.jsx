@@ -993,14 +993,75 @@ const CalculatorsSection = ({ scores, setScores, primarySymptom, setPrimarySympt
 };
 
 // ─── SURGICAL SECTION ────────────────────────────────────────────────────────
-const SurgicalSection = ({ speak, stop, speaking }) => {
+const SurgicalSection = () => {
   const [open, setOpen] = useState(null);
+  const [surgRisk, setSurgRisk] = useState([]);
+  const [recRisk, setRecRisk] = useState([]);
   const toggle = (id) => setOpen(open === id ? null : id);
+
+  const SURG_RISKS = ["Age over 75", "Active heart disease or recent cardiac event", "Poorly controlled diabetes", "BMI over 35", "Active smoking", "Severe lung disease (COPD, requiring oxygen)", "Kidney disease", "Prior pelvic or abdominal radiation", "Blood thinning medications", "Prior abdominal surgery with complications"];
+
+  const REC_RISKS = [
+    { id: "prior", label: "Prior rectal prolapse repair", why: "Previous repair is one of the strongest predictors of recurrence. Scar tissue affects tissue quality and repair durability." },
+    { id: "age80", label: "Age over 80", why: "Connective tissue weakens with age; supporting structures are less able to hold a repair long-term." },
+    { id: "hyper", label: "Connective tissue disorder / joint hypermobility", why: "People with generalized connective tissue laxity have higher recurrence risk." },
+    { id: "straining", label: "Chronic straining / constipation", why: "⭐ Modifiable. Optimizing bowel habits before surgery significantly improves outcomes." },
+    { id: "obesity", label: "BMI ≥ 30", why: "⭐ Modifiable. Even modest weight loss can meaningfully reduce intra-abdominal pressure on the repair." },
+  ];
 
   const sections = [
     { id: "what", q: "What is the surgery?", content: (<div><div style={{ color: C.navy, fontSize: 17, lineHeight: 1.7, marginBottom: 16 }}>The most common surgery for rectal prolapse is called <strong>rectopexy</strong> — the rectum is secured to the tailbone (sacrum) to stop it from prolapsing. It is usually done laparoscopically (keyhole surgery) or robotically, with small incisions.</div><VimeoEmbed videoId="1180494424" title="Rectopexy Surgical Animation" /><Card style={{ borderRadius: 14, padding: 14 }}><div style={{ color: C.teal, fontWeight: 700, fontSize: 16, marginBottom: 10 }}>What to expect in recovery</div>{["Hospital stay varies — often 1–3 days depending on approach", "Bowel function may be temporarily altered in the weeks after surgery", "Pelvic floor PT is often recommended post-operatively", "Fiber, hydration, and straining avoidance remain important after repair", "Symptom improvement may be gradual — allow time for full assessment"].map((t, i) => (<div key={i} style={{ display: "flex", gap: 10, marginBottom: 10 }}><span style={{ color: C.teal, flexShrink: 0 }}>→</span><span style={{ color: C.navy, fontSize: 16, lineHeight: 1.6 }}>{t}</span></div>))}</Card></div>) },
     { id: "happen", q: "What will happen to my symptoms?", content: (<div><Callout icon="⭐" color={C.coral} bg={C.coralLt} title="The most important thing to understand" body="Fixing the anatomy does not guarantee fixing the function. This is something your care team should discuss with you openly before any procedure." />{[{ title: "Fecal Incontinence & Leakage", icon: "💧", good: true, body: "Surgery for rectal prolapse is more likely to improve leakage and incontinence. If this is your most bothersome symptom, the evidence is more reassuring." }, { title: "Constipation & Difficult Evacuation", icon: "🚽", good: false, body: "Improvement is less predictable — around 60–70% of patients see improvement, meaning 30–40% may not. If straining is your primary complaint, discuss this honestly with your care team first." }].map(s => (<Card key={s.title} style={{ border: `2px solid ${s.good ? C.teal : C.warn}`, borderRadius: 14, padding: 14, marginBottom: 12 }}><div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 10 }}><span style={{ fontSize: 22 }}>{s.icon}</span><span style={{ color: C.navy, fontWeight: 700, fontSize: 16, flex: 1 }}>{s.title}</span><span style={{ background: s.good ? C.tealLight : C.warnLt, color: s.good ? C.teal : C.warn, borderRadius: 20, padding: "3px 10px", fontSize: 13, fontWeight: 700 }}>{s.good ? "More predictable" : "Less predictable"}</span></div><div style={{ color: C.navy, fontSize: 16, lineHeight: 1.7 }}>{s.body}</div></Card>))}<Callout icon="💙" body="If surgery doesn't resolve everything, that is not a failure. Pelvic floor PT, lifestyle changes, and follow-up care all remain part of the picture." /></div>) },
-    { id: "mesh", q: "Will I need mesh?", content: (<div><Callout body="Not all rectopexy procedures use mesh. Your care team will explain what they recommend and why. The information below supports an informed conversation." icon="ℹ️" />{[{ type: "Synthetic Mesh", icon: "🔩", desc: "Permanent synthetic material (polypropylene). Durable and widely used.", erosion: "~1.8% erosion rate", rec: "~15% recurrence" }, { type: "Biologic Mesh", icon: "🧬", desc: "Biologic material works by helping your body grow new, stronger tissue over time.", erosion: "~0.7% erosion rate", rec: "~15% recurrence" }, { type: "Suture Only — No Mesh", icon: "🪡", desc: "Rectum secured with sutures alone. A valid option for many patients.", erosion: "No mesh — no erosion risk", rec: "~15% recurrence" }].map(m => (<Card key={m.type} style={{ borderRadius: 14, padding: 14, marginBottom: 10 }}><div style={{ display: "flex", gap: 10, alignItems: "center", marginBottom: 8 }}><span style={{ fontSize: 22 }}>{m.icon}</span><span style={{ color: C.navy, fontWeight: 700, fontSize: 16 }}>{m.type}</span></div><div style={{ color: C.navy, fontSize: 16, lineHeight: 1.6, marginBottom: 10 }}>{m.desc}</div><div style={{ display: "flex", gap: 24 }}><div><div style={{ color: C.muted, fontSize: 13, textTransform: "uppercase" }}>Erosion</div><div style={{ color: C.navy, fontSize: 15, fontWeight: 600 }}>{m.erosion}</div></div><div><div style={{ color: C.muted, fontSize: 13, textTransform: "uppercase" }}>Recurrence</div><div style={{ color: C.navy, fontSize: 15, fontWeight: 600 }}>{m.rec}</div></div></div></Card>))}</div>) },    { id: "questions", q: "What should I ask my care team?", content: (<div><div style={{ color: C.slate, fontSize: 16, lineHeight: 1.6, marginBottom: 16 }}>These are questions worth raising at your consultation. To print them, tap <strong>☰ Menu → Generate My Summary</strong> — they'll appear in your pre-appointment report.</div>{["What type of rectopexy are you recommending and why?", "Will mesh be used? What are the implications for my situation?", "What is the expected recurrence rate for me specifically?", "My most bothersome symptom is [leakage / constipation / prolapse] — how likely is surgery to improve this?", "What happens to my bowel function after surgery?", "What if my symptoms don't improve — what options remain?", "What should I do before surgery to optimize my outcome?", "Should I see a pelvic floor physical therapist before or after surgery?", "What is your personal experience and complication rate with this procedure?"].map((q, i) => (<Card key={i} style={{ borderRadius: 14, padding: 14, marginBottom: 10 }}><div style={{ display: "flex", gap: 14 }}><div style={{ color: C.teal, fontWeight: 800, fontSize: 17, flexShrink: 0, minWidth: 32 }}>Q{i + 1}</div><div style={{ color: C.navy, fontSize: 16, lineHeight: 1.6 }}>{q}</div></div></Card>))}<Callout body="Surgery is one part of the picture. Lifestyle work — fiber, movement, pelvic floor PT, stress management — remains important before and after any procedure." icon="🌿" /></div>) },
+    { id: "mesh", q: "Will I need mesh?", content: (<div><Callout body="Not all rectopexy procedures use mesh. Your care team will explain what they recommend and why. The information below supports an informed conversation." icon="ℹ️" />{[{ type: "Synthetic Mesh", icon: "🔩", desc: "Permanent synthetic material (polypropylene). Durable and widely used.", erosion: "~1.8% erosion rate", rec: "~15% recurrence" }, { type: "Biologic Mesh", icon: "🧬", desc: "Biologic material works by helping your body grow new, stronger tissue over time.", erosion: "~0.7% erosion rate", rec: "~15% recurrence" }, { type: "Suture Only — No Mesh", icon: "🪡", desc: "Rectum secured with sutures alone. A valid option for many patients.", erosion: "No mesh — no erosion risk", rec: "~15% recurrence" }].map(m => (<Card key={m.type} style={{ borderRadius: 14, padding: 14, marginBottom: 10 }}><div style={{ display: "flex", gap: 10, alignItems: "center", marginBottom: 8 }}><span style={{ fontSize: 22 }}>{m.icon}</span><span style={{ color: C.navy, fontWeight: 700, fontSize: 16 }}>{m.type}</span></div><div style={{ color: C.navy, fontSize: 16, lineHeight: 1.6, marginBottom: 10 }}>{m.desc}</div><div style={{ display: "flex", gap: 24 }}><div><div style={{ color: C.muted, fontSize: 13, textTransform: "uppercase" }}>Erosion</div><div style={{ color: C.navy, fontSize: 15, fontWeight: 600 }}>{m.erosion}</div></div><div><div style={{ color: C.muted, fontSize: 13, textTransform: "uppercase" }}>Recurrence</div><div style={{ color: C.navy, fontSize: 15, fontWeight: 600 }}>{m.rec}</div></div></div></Card>))}</div>) },
+    { id: "risk", q: "Am I a good candidate for surgery?", content: (
+      <div>
+        <Callout body="Before surgery, your team will review these factors with you. Some can be optimized beforehand — which can meaningfully improve your outcome." icon="💡" />
+        <div style={{ color: C.slate, fontSize: 16, lineHeight: 1.6, marginBottom: 16 }}>Select any that apply to you:</div>
+        {SURG_RISKS.map(r => (<CheckCard key={r} label={r} checked={surgRisk.includes(r)} onClick={() => setSurgRisk(prev => prev.includes(r) ? prev.filter(x => x !== r) : [...prev, r])} />))}
+        <Card style={{ background: C.tealLight, borderRadius: 14, padding: 14, marginTop: 4 }}>
+          <div style={{ color: C.teal, fontWeight: 700, fontSize: 16, marginBottom: 4 }}>
+            {surgRisk.length === 0 ? "✅ No factors identified — reassuring" : `${surgRisk.length} factor${surgRisk.length > 1 ? "s" : ""} to discuss or optimize`}
+          </div>
+          <div style={{ color: C.navy, fontSize: 16, lineHeight: 1.6 }}>
+            {surgRisk.length === 0 ? "Your team will do their own full pre-op assessment." : "Bring these to your consultation. Your team can help you work on the ones that are modifiable — that preparation can meaningfully improve your outcome."}
+          </div>
+        </Card>
+      </div>
+    )},
+    { id: "recurrence", q: "Could prolapse come back after surgery?", content: (
+      <div>
+        <Callout body="Rectal prolapse can recur after surgery. Knowing your risk factors helps you and your care team make the best plan. Some can be improved before surgery." icon="🔄" />
+        {REC_RISKS.map(r => (
+          <div key={r.id}>
+            <CheckCard label={r.label} checked={recRisk.includes(r.id)} onClick={() => setRecRisk(prev => prev.includes(r.id) ? prev.filter(x => x !== r.id) : [...prev, r.id])} color={C.coral} />
+            {recRisk.includes(r.id) && (<div style={{ background: C.coralLt, borderRadius: 12, padding: "12px 16px", marginTop: -6, marginBottom: 10 }}><div style={{ color: C.slate, fontSize: 15, lineHeight: 1.6 }}>{r.why}</div></div>)}
+          </div>
+        ))}
+        {recRisk.length > 0 && (
+          <Card style={{ background: C.tealLight, borderRadius: 14, padding: 14 }}>
+            <div style={{ color: C.teal, fontWeight: 700, fontSize: 16, marginBottom: 6 }}>{recRisk.length} factor{recRisk.length > 1 ? "s" : ""} identified — some may be optimizable before surgery</div>
+            <div style={{ color: C.navy, fontSize: 16, lineHeight: 1.6 }}>Bring this to your appointment. Your team can help you work on the modifiable ones before surgery.</div>
+          </Card>
+        )}
+      </div>
+    )},
+    { id: "questions", q: "What should I ask my care team?", content: (
+      <div>
+        <div style={{ color: C.slate, fontSize: 16, lineHeight: 1.6, marginBottom: 14 }}>The most important questions depend on your specific situation — your symptoms, your goals, and what your care team has already told you.</div>
+        <div style={{ color: C.slate, fontSize: 16, lineHeight: 1.6, marginBottom: 14 }}>Your pre-appointment summary already includes questions to bring with you. You can also ask REPAIR to help you think through what matters most for your visit.</div>
+        <Card style={{ background: C.tealLight, borderRadius: 14, padding: 14, marginBottom: 14 }}>
+          <div style={{ color: C.tealDeep, fontWeight: 700, fontSize: 14, marginBottom: 8 }}>📄 Questions already in your summary:</div>
+          {["What realistic improvement can I expect in my specific symptoms?", "What are my surgical and non-surgical options — and which do you recommend for me?", "Should I see a pelvic floor physical therapist before or after treatment?", "What should I do to prepare — and what happens if my symptoms don't improve?"].map((q, i) => (
+            <div key={i} style={{ display: "flex", gap: 10, marginBottom: 8, alignItems: "flex-start" }}>
+              <span style={{ color: C.teal, flexShrink: 0 }}>□</span>
+              <span style={{ color: C.navy, fontSize: 15, lineHeight: 1.6 }}>{q}</span>
+            </div>
+          ))}
+          <div style={{ color: C.muted, fontSize: 13, marginTop: 8 }}>Tap ☰ Menu → Generate My Summary to print these before your appointment.</div>
+        </Card>
+        <Callout body="Surgery is one part of the picture. Lifestyle work — fiber, movement, pelvic floor PT, stress management — remains important before and after any procedure." icon="🌿" />
+      </div>
+    )},
   ];
 
   return (
@@ -1501,7 +1562,7 @@ const PrintSummary = ({ scores, primarySymptom, chatMessages = [] }) => {
 
       <div style={{ marginBottom: 24 }}>
         <div style={{ fontSize: 14, fontWeight: 700, color: "#2d7d6f", textTransform: "uppercase", letterSpacing: 1, marginBottom: 8 }}>3. Questions for My Appointment</div>
-        {["What realistic improvement I can expect in my specific symptoms", "Lifestyle or non-surgical options I should pursue first or alongside treatment", "Whether I should see a pelvic floor physical therapist", "Whether surgery is appropriate for my situation"].map((q, i) => (
+        {["What realistic improvement can I expect in my specific symptoms?", "What are my surgical and non-surgical options — and which do you recommend for me?", "Should I see a pelvic floor physical therapist before or after treatment?", "What should I do to prepare — and what happens if my symptoms don't improve?"].map((q, i) => (
           <div key={i} style={{ display: "flex", gap: 8, marginBottom: 6, fontSize: 14 }}>
             <span style={{ color: "#2d7d6f", fontWeight: 700 }}>□</span>
             <span>{q}</span>
@@ -1628,19 +1689,28 @@ export default function App() {
               <button onClick={() => setShowPDF(false)} style={{ background: "none", border: "none", color: C.muted, fontSize: 22, cursor: "pointer" }}>✕</button>
             </div>
             <button onClick={async () => {
-              if (navigator.share) {
+              const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+              if (isMobile && navigator.share) {
                 try {
                   await navigator.share({
-                    title: "REPAIR Pre-Appointment Summary",
-                    text: "My pre-appointment summary from REPAIR. Open repair-v2.netlify.app on a computer to view and print."
+                    title: "My REPAIR Pre-Appointment Summary",
+                    text: "I created a pre-appointment summary using the REPAIR pelvic floor app. To view and print the full summary, open this link on a computer:",
+                    url: "https://repair-v2.netlify.app"
                   });
                   return;
                 } catch {}
               }
               window.print();
-            }} style={{ background: C.tealDeep, color: "#fff", border: "none", borderRadius: 14, padding: "18px 24px", fontSize: 16, fontWeight: 700, fontFamily: "Georgia, serif", cursor: "pointer", minHeight: 54, marginBottom: 20, width: "100%", lineHeight: 1.4, textAlign: "center" }}>
-              📤 Save or print this now — it won't be here when you return
+            }} style={{ background: C.tealDeep, color: "#fff", border: "none", borderRadius: 14, padding: "18px 24px", fontSize: 16, fontWeight: 700, fontFamily: "Georgia, serif", cursor: "pointer", minHeight: 54, marginBottom: 8, width: "100%", lineHeight: 1.4, textAlign: "center" }}>
+              {/iPhone|iPad|iPod|Android/i.test(typeof navigator !== "undefined" ? navigator.userAgent : "") 
+                ? "📤 Send this summary to yourself to print later"
+                : "🖨️ Print / Save as PDF"}
             </button>
+            <div style={{ color: C.muted, fontSize: 13, textAlign: "center", marginBottom: 16, lineHeight: 1.5 }}>
+              {/iPhone|iPad|iPod|Android/i.test(typeof navigator !== "undefined" ? navigator.userAgent : "")
+                ? "On a phone, send yourself the link and open it on a computer to print."
+                : "Use your browser's print dialog to save as PDF."}
+            </div>
             <PrintSummary scores={scores} primarySymptom={primarySymptom} chatMessages={pdfChatMessages} />
           </div>
         </div>
