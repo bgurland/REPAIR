@@ -213,18 +213,15 @@ const TopicsOverlay = ({ onClose, onNav }) => (
 
 // ─── V2 HOME SECTION ─────────────────────────────────────────────────────────
 const STARTERS = [
-  { icon: "🔍", text: "Help me understand my symptoms or diagnosis", prompt: "I'd like to understand my symptoms or diagnosis better. Can you help me figure out what's happening?" },
-  { icon: "📅", text: "I'm preparing for an appointment", prompt: "I'm preparing for an upcoming appointment. Can you help me get ready — including what questions to ask?" },
-  { icon: "🥦", text: "What lifestyle changes can help?", prompt: "I want to know what lifestyle changes can help with my pelvic floor health." },
-  { icon: "🏥", text: "I'm thinking about surgery", prompt: "I'm thinking about surgery and want to understand my options and what to expect." },
+  { icon: "😔", text: "My symptoms", prompt: "I'd like to understand my symptoms or diagnosis better. Can you help me figure out what's happening?" },
+  { icon: "📋", text: "My appointment", prompt: "I'm preparing for an upcoming appointment. Can you help me get ready — including what questions to ask?" },
+  { icon: "🥗", text: "Lifestyle tips", prompt: "I want to know what lifestyle changes can help with my pelvic floor health." },
+  { icon: "✨", text: "Ask anything", prompt: null, isOpen: true },
 ];
 
 const HomeSection = ({ onStartChat, onNav }) => {
-  const [showTopics, setShowTopics] = useState(false);
-
   return (
     <div style={{ flex: 1, background: C.bg, overflowY: "auto", padding: "20px 16px 12px", display: "flex", flexDirection: "column", position: "relative" }}>
-      {showTopics && <TopicsOverlay onClose={() => setShowTopics(false)} onNav={onNav} />}
 
       {/* Intro card */}
       <div style={{ background: C.card, borderRadius: 20, padding: 20, marginBottom: 18, border: `1px solid ${C.border}`, boxShadow: "0 2px 10px rgba(26,46,59,0.05)" }}>
@@ -242,24 +239,55 @@ const HomeSection = ({ onStartChat, onNav }) => {
       {/* How I'm different card */}
       <DifferentCard />
 
-      {/* Starters */}
-      <div style={{ color: C.muted, fontSize: 12, fontWeight: 700, textTransform: "uppercase", letterSpacing: 1.2, margin: "6px 4px 10px" }}>Where to begin</div>
+      {/* Bot opening bubble with chips */}
+      <div style={{ display: "flex", alignItems: "flex-end", gap: 10, marginBottom: 14 }}>
+        <div style={{ width: 34, height: 34, borderRadius: "50%", background: `linear-gradient(135deg, ${C.teal}, ${C.tealMid})`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, flexShrink: 0 }}>🌿</div>
+        <div style={{ background: C.card, border: `1px solid ${C.border}`, borderRadius: "18px 18px 18px 4px", padding: "14px 16px", maxWidth: "90%", boxShadow: "0 1px 4px rgba(26,46,59,0.06)" }}>
+          <div style={{ color: C.navy, fontSize: 15, lineHeight: 1.5, marginBottom: 12 }}>What would you like to know about?</div>
+          <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+            {STARTERS.map((s, i) => (
+              <button key={i}
+                onClick={() => onStartChat(s.isOpen ? "I have a question I'd like to ask." : s.prompt)}
+                style={{
+                  display: "flex", alignItems: "center", gap: 10,
+                  background: s.isOpen ? C.tealDeep : C.card,
+                  border: `1.5px solid ${s.isOpen ? C.tealDeep : C.border}`,
+                  borderRadius: 12, padding: "9px 12px",
+                  fontSize: 14, fontWeight: 600,
+                  color: s.isOpen ? "#c8ebe3" : C.navy,
+                  cursor: "pointer", textAlign: "left", width: "100%",
+                  fontFamily: "Georgia, serif", transition: "all 0.15s ease"
+                }}>
+                <div style={{ width: 28, height: 28, borderRadius: "50%", background: s.isOpen ? "rgba(255,255,255,0.12)" : C.tealLight, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, flexShrink: 0 }}>{s.icon}</div>
+                <div style={{ flex: 1 }}>{s.text}</div>
+                <div style={{ fontSize: 16, opacity: 0.5 }}>›</div>
+              </button>
+            ))}
+          </div>
+        </div>
+      </div>
 
-      {STARTERS.map((s, i) => (
-        <button key={i} onClick={() => onStartChat(s.prompt)}
-          style={{ background: C.card, border: `1.5px solid ${C.border}`, borderRadius: 16, padding: "14px 16px", marginBottom: 10, display: "flex", alignItems: "center", gap: 14, cursor: "pointer", fontFamily: "Georgia, serif", textAlign: "left", width: "100%", transition: "all 0.15s ease" }}>
-          <div style={{ fontSize: 20, width: 38, height: 38, borderRadius: "50%", background: C.tealLight, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>{s.icon}</div>
-          <div style={{ flex: 1, color: C.navy, fontSize: 15, fontWeight: 600, lineHeight: 1.35 }}>{s.text}</div>
-          <div style={{ color: C.teal, fontSize: 18, flexShrink: 0 }}>›</div>
-        </button>
-      ))}
+      {/* Topic pills — always visible */}
+      <div style={{ borderTop: `1px solid ${C.border}`, paddingTop: 14, marginTop: 4 }}>
+        <div style={{ color: C.muted, fontSize: 11, fontWeight: 700, textTransform: "uppercase", letterSpacing: 1, marginBottom: 10 }}>Browse by topic:</div>
+        <div style={{ display: "flex", flexWrap: "wrap", gap: 8, paddingBottom: 16 }}>
+          {[
+            { id: "prolapse", icon: "🧠", label: "Understanding" },
+            { id: "symptoms", icon: "🔍", label: "Symptoms" },
+            { id: "imaging", icon: "🔬", label: "Testing" },
+            { id: "surgical", icon: "✂️", label: "Surgery" },
+            { id: "lifestyle", icon: "🥗", label: "Lifestyle" },
+            { id: "redflags", icon: "🚨", label: "Red flags" },
+          ].map(t => (
+            <button key={t.id} onClick={() => onNav(t.id)}
+              style={{ background: C.card, border: `1px solid ${C.border}`, borderRadius: 10, padding: "7px 12px", fontSize: 13, fontWeight: 600, color: C.navy, cursor: "pointer", display: "flex", alignItems: "center", gap: 6, fontFamily: "Georgia, serif", transition: "all 0.15s ease" }}>
+              {t.icon} {t.label}
+            </button>
+          ))}
+        </div>
+      </div>
 
-      <div style={{ textAlign: "center", marginTop: 8, paddingTop: 12, paddingBottom: 8 }}>
-        <button onClick={() => setShowTopics(true)} style={{ background: C.tealLight, border: `1.5px solid ${C.teal}`, borderRadius: 12, color: C.teal, fontSize: 16, fontWeight: 600, fontFamily: "Georgia, serif", cursor: "pointer", padding: "12px 20px", width: "100%", animation: "pulse 2s ease-in-out 1s 2" }}>
-          📚 Explore all topics on your own →
-        </button>
-        <style>{`@keyframes pulse { 0%, 100% { box-shadow: 0 0 0 0 rgba(45,125,111,0); } 50% { box-shadow: 0 0 0 6px rgba(45,125,111,0.2); } }`}</style>
-      </div>    </div>
+    </div>
   );
 };
 
