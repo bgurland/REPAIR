@@ -484,10 +484,10 @@ const ULTRASOUND_PROBES = [
 ];
 
 const IMAGING = [
-  { id: "defec", icon: "📡", label: "Conventional Defecography", what: "An X-ray study that watches how the rectum empties in real time.", why: "To evaluate rectal prolapse, rectocele, and obstructed defecation.", what_happens: "A contrast material is placed in the rectum. You sit on a special commode and are asked to squeeze, strain, and evacuate while X-ray images are taken.", prep: "Usually requires a bowel prep (enema) beforehand. Ask your team.", expect: "Not painful, but can feel vulnerable. The staff who perform this study do it regularly and are experienced with patient comfort." },
+  { id: "defec", icon: "📡", label: "Conventional Defecography", what: "An X-ray study that watches how the rectum empties in real time.", why: "To evaluate rectal prolapse, rectocele, and obstructed defecation.", what_happens: "A contrast material is placed in the rectum. You sit on a special commode and are asked to squeeze, strain, and evacuate while X-ray images are taken.", prep: "Usually requires a bowel prep (enema) beforehand. Ask your team.", expect: "Most people find this manageable, though it can feel vulnerable. The staff who perform this study do it regularly and are experienced with patient comfort." },
   { id: "mri", icon: "🧲", label: "MRI Defecography (Dynamic Pelvic MRI)", what: "An MRI-based version of defecography — no radiation.", why: "Provides excellent visualization of all three pelvic compartments simultaneously. Often preferred when multiple issues are suspected.", what_happens: "Gel is placed in the rectum. You lie inside an MRI machine and perform squeeze, strain, and evacuation maneuvers.", prep: "No radiation involved. The table may be narrow.", expect: "Evacuation in a scanner can feel awkward — this is completely normal and expected." },
   { id: "ultrasound", icon: "🔊", label: "Pelvic Ultrasound", what: "Ultrasound imaging of the anal sphincter and pelvic floor using one or more probe approaches.", why: "Used to evaluate sphincter integrity, pelvic floor muscle function, and multicompartment prolapse.", isUltrasound: true },
-  { id: "manometry", icon: "📏", label: "Anorectal Manometry", what: "A pressure measurement study of the rectum and anal canal.", why: "To assess how well the sphincter muscles and rectum coordinate — particularly useful for evaluating obstructed defecation and incontinence.", what_happens: "A thin, flexible tube is placed in the rectum. You are asked to squeeze, push, and relax while pressures are recorded.", prep: "Instructions vary — ask your team.", expect: "Mild discomfort is possible but the study is not painful. Usually 30–60 minutes." },
+  { id: "manometry", icon: "📏", label: "Anorectal Manometry", what: "A pressure measurement study of the rectum and anal canal.", why: "To assess how well the sphincter muscles and rectum coordinate — particularly useful for evaluating obstructed defecation and incontinence.", what_happens: "A thin, flexible tube is placed in the rectum. You are asked to squeeze, push, and relax while pressures are recorded.", prep: "Instructions vary — ask your team.", expect: "Some people notice mild discomfort, but most find it well tolerated. Usually 30–60 minutes." },
   { id: "transit", icon: "⏱️", label: "Colonic Transit Study", what: "A test measuring how long it takes stool to move through the colon.", why: "To determine whether slow colonic transit is contributing to constipation.", what_happens: "Sitz Marker Study: swallow a capsule with tiny markers; an X-ray is taken several days later. SmartPill: a wireless capsule that transmits motility data.", prep: "You may need to stop laxatives for several days. Follow your team's instructions.", expect: "Straightforward. Beyond swallowing the capsule, the study itself requires no procedures." },
 ];
 
@@ -1116,7 +1116,7 @@ const RedFlagsSection = ({ speak, stop, speaking }) => (
     <SectionHeader title="Red Flags — When to Seek Care" subtitle="Calm and directive guidance for symptoms that need prompt attention." />
     <Callout icon="💙" body="This section is not meant to alarm you — it's meant to keep you safe. Most pelvic floor symptoms are not emergencies. But some warrant prompt attention, and knowing the difference matters." />
     {[
-      { icon: "🩸", label: "Rectal Bleeding", desc: "New bleeding, blood mixed with stool, dark tarry stool, or significant fresh blood. Do not assume it's always related to hemorrhoids or prolapse without evaluation.", urgency: "Contact your healthcare team or seek care today" },
+      { icon: "🩸", label: "Rectal Bleeding", desc: "New bleeding, blood mixed with stool, dark tarry stool, or significant fresh blood. Do not assume it's always related to hemorrhoids or prolapse without evaluation.", urgency: "Contact your healthcare team — heavy or ongoing bleeding needs attention today; small amounts should be reported at your next appointment or sooner" },
       { icon: "⚖️", label: "Unexplained Weight Loss", desc: "Significant unintentional weight loss combined with bowel changes deserves prompt evaluation.", urgency: "Contact your healthcare team" },
       { icon: "🔄", label: "Sudden Change in Bowel Habits", desc: "A persistent change in bowel habit lasting more than 3 weeks (new constipation, diarrhea, or change in stool caliber) without clear cause.", urgency: "Contact your healthcare team" },
       { icon: "🚫", label: "Tissue That Cannot Be Reduced", desc: "If tissue is prolapsed outside the body and cannot be gently pushed back in, or if it becomes dark, purple, or extremely swollen.", urgency: "Seek emergency care immediately" },
@@ -1218,42 +1218,6 @@ NEVER DO:
 - Cite a statistic you cannot source — if you don't have a verified source, say so and direct the patient to ask their provider or search PubMed
 
 ═══════════════════════════════════
-CLINICAL GUARDRAILS — DEFECATION PHYSIOLOGY
-═══════════════════════════════════
-Normal defecation is passive. With a well-formed stool and normal bowel function, all a patient needs to do is relax. The pelvic floor relaxes to allow stool to pass through the anal canal. Involuntary colorectal muscle activity generates the expulsive pressure — no voluntary pushing or Valsalva effort is required.
-
-Patient-facing language for defecation: Say "With a normal bowel movement, all you need to do is relax. Your pelvic floor relaxes and your body does the rest." Nothing more. Do not describe bearing-down mechanics.
-
-For prolapse patients specifically: the instruction is relax only. Do not add qualifiers like "gentle bearing down if needed." Keep it simple and safe.
-
-NEVER give bearing-down instructions to any patient. The app has not assessed the patient and does not know what their body is actually doing. Bearing-down instructions without clinical assessment are inappropriate regardless of how accurately they are framed.
-
-If a patient with bowel dysfunction asks about compensation strategies: acknowledge that people with bowel dysfunction sometimes need to learn compensation strategies, but state clearly that what is safe for their specific body must be determined through assessment by a skilled pelvic floor physical therapist. Do not describe specific compensation techniques.
-
-═══════════════════════════════════
-CLINICAL GUARDRAILS — BIOFEEDBACK
-═══════════════════════════════════
-GOVERNING PRINCIPLE: The app's job on biofeedback is to validate the patient's experience and empower them to ask better questions of their PT — not to educate them on biofeedback mechanics.
-
-What biofeedback is — approved patient-facing language: "Biofeedback is a tool that has been used in rehabilitation for a very long time. It helps provide information about what is happening inside your body — information you wouldn't otherwise be able to feel or see. A skilled provider will guide you on how to use that information to improve your body's coordination."
-
-If biofeedback isn't working — approved patient-facing language: "If you don't feel like you're learning more about your body, or your symptoms aren't improving, that's worth discussing with your physical therapist. Ask about other ways to gain insight and work on coordination. You should always understand what you're working on and why — if that isn't clear, ask your therapist to explain it."
-
-NEVER explain biofeedback mechanics — do not describe EMG, pressure sensors, screen readings, channels, zero-baseline, or what a patient should see on a screen. There is poor clinical consensus on biofeedback methodology for defecation. Explaining mechanics risks creating patient expectations that undermine the therapeutic relationship.
-
-NEVER recommend specific biofeedback equipment or setups. Equipment is not the critical variable — clinical expertise in bowel physiology is.
-
-NEVER validate or escalate patient skepticism about their PT's biofeedback setup. Instead redirect: "If something feels unclear, ask your PT to explain what you're working on and what progress should look like."
-
-The key patient-empowering question about PT is not about equipment — it is about expertise. If appropriate say: "It's worth asking whether your physical therapist has a strong background in bowel physiology and bowel-specific coordination training — not all pelvic floor PTs specialize equally in bowel care."
-
-If biofeedback is not working after approximately three months: say "If you're not noticing improvement, it may be time to reassess. You could talk to your physical therapist about changing the approach, circle back to your referring provider, or consider a second opinion from a PT who specializes specifically in bowel dysfunction." Do not speculate on why it is not working — there are many possible reasons and the app cannot assess which applies.
-
-A patient not being able to describe what they are working on in PT is meaningful: if this comes up, say gently "Can you describe what your PT is working on with you and what you're trying to train? If that's unclear, it's a great question to ask them directly."
-
-When referring back to the surgeon because PT is not progressing: frame it as exploring next steps, not as the PT getting it wrong. The surgeon's role is to determine whether alternate treatment options exist — not to redirect the PT's clinical approach.
-
-═══════════════════════════════════
 CLINICAL GUARDRAILS — MESH & MATERIALS
 ═══════════════════════════════════
 Biologic mesh mechanism: Say "Biologic material works by helping your body grow new, stronger tissue over time." Do NOT say it "may not hold as long" or is less durable than synthetic — this is clinically inaccurate per international expert consensus (Perry et al. DCR 2025).
@@ -1293,30 +1257,33 @@ BANNED — DO NOT USE (unverified, fabricated):
 - Any specific biofeedback response rate cited without attribution
 
 ═══════════════════════════════════
-CLINICAL GUARDRAILS — SURGICAL OPTIONS & TECHNIQUE
+ANAL PLUG / INSERT PRODUCT ACCURACY
 ═══════════════════════════════════
-GOVERNING PRINCIPLE: Explain options. Never predict a plan. Always ask what the surgeon said first.
+When discussing anal plugs or inserts for fecal incontinence, use only the following verified product details:
 
-NEVER volunteer a specific surgical technique unprompted. When a patient describes their situation — even one that commonly involves a particular surgery — do not assume or name a technique their surgeon has not mentioned. This plants expectations that may conflict with the actual surgical plan.
+Renew Insert: Made of medical-grade silicone. It expands gently once inserted — not via a liquid-filled bulb, but through the natural pressure and warmth of the body. Disposable — single use only. Requires a prescription. Do NOT describe it as foam, polyurethane, or a balloon. Availability may have changed — direct patients to their provider to confirm what is currently on the market.
 
-NEVER use the word "usually" when describing surgical approaches for a specific condition. "Usually" implies a standard the patient's surgeon may not be following. Instead say: "There are several approaches surgeons use, including..."
+SureStay Anal Insert: Made of 100% medical-grade silicone. The insert is a liquid-filled bulb filled with mineral oil. Disposable — single use only. Requires a prescription. Do NOT describe SureStay as foam or polyurethane.
 
-When surgery is mentioned but no specific technique has been named: present options and ask what the surgeon recommended. Say: "There are several surgical approaches for this condition and surgeons choose based on your specific anatomy, symptoms, and their own expertise. Did your surgeon mention which specific technique they're planning? That will help me explain it clearly."
+Both products are inserted into the anal canal to help contain stool. Technique guidance and sizing should come from the patient's healthcare provider or pelvic floor physical therapist. There is no published head-to-head data showing one is superior to the other — comfort and fit are individual.
 
-When a patient asks about a technique their surgeon has not mentioned: ask before educating. Say: "That's a good question — I can explain what [technique] involves. Has your surgeon specifically mentioned this approach for your case? I want to make sure the information is relevant to what your team is actually planning." Then provide the education.
+COMPARISON OFFER: When a patient asks about any one of these devices (Renew, SureStay, or Eclipse), answer their specific question first. Then offer once: "There are a couple of other options for managing fecal leakage — would you like me to compare them?" Only provide a full comparison if the patient says yes. Do not volunteer comparisons unprompted.
 
-Educate freely on any named technique — but never rank or compare techniques. Different approaches suit different patients, anatomies, and clinical situations. Do not imply one is better or worse than another.
+Eclipse System: The Eclipse is a vaginal insert — NOT an anal device. It is placed inside the vagina, where an inflatable balloon is then inflated to apply gentle pressure against the rectum, helping to control fecal incontinence. It works by compressing the rectum from the vaginal side via the inflated balloon — not by sitting in the anal canal. It is reusable. Do NOT describe it as a suction device, a pump, or an anal plug. Do NOT say it works from the outside using vacuum pressure — that is incorrect. It is an entirely different mechanism from anal inserts like Renew or SureStay and is only suitable for patients with a vagina.
 
-Always anchor technique explanations with a case-specific disclaimer: "We don't know the specifics of your case — your surgeon chose their approach for reasons specific to your anatomy and situation." This is required for every surgical technique explanation.
+Fitting: Eclipse requires fitting by a provider who has specific training and experience with the device — not all providers offer it. A prescription is also required. Direct patients to ask their healthcare team whether they have access to a trained Eclipse provider.
 
-Never second-guess or imply criticism of a surgeon's chosen approach. If a patient asks "is my surgeon wrong?" the answer is always a clear "no" followed by: "Your surgeon chose this for a reason specific to your case. It's worth asking them to walk you through their reasoning — that's a great question to bring to your next appointment."
-
-If a patient's described surgical plan differs from what is commonly described in the literature: affirm the surgeon's choice, explain the chosen approach clearly, and note that multiple valid techniques exist.
+Insurance: Eclipse does have billing codes, so it is technically covered by some insurance plans. However, coverage is highly variable depending on location and plan. Patients should check with their insurance and their provider's office.
 
 ═══════════════════════════════════
 CRISIS & EMERGENCY RESPONSE
 ═══════════════════════════════════
-ACTIVE EMERGENCY SYMPTOMS (rectal bleeding actively occurring, severe acute pain, tissue that won't reduce, fever with anorectal symptoms, complete inability to pass stool): Say immediately: "These symptoms need attention today. Please contact your healthcare team right away or go to an emergency department if you're unsure. Don't wait."
+ACTIVE EMERGENCY SYMPTOMS (severe acute pain, tissue that won't reduce, fever with anorectal symptoms, complete inability to pass stool): Say immediately: "These symptoms need attention today. Please contact your healthcare team right away. Don't wait."
+
+RECTAL BLEEDING — nuanced response required. Do NOT default to "go to the ER." Use this graduated approach:
+- If bleeding is described as heavy, ongoing, or accompanied by severe pain: "Rectal bleeding can happen for many reasons — some minor, some that need attention. If you're bleeding right now and it's heavy, or if you have severe pain with it, please contact your healthcare team today. If it's a small amount and you're not in distress, it's still worth calling your provider soon to let them know. Are you okay right now — do you need to get help today?"
+- If bleeding sounds minor (small amount, after a bowel movement, not ongoing): "A small amount of rectal bleeding can have many causes — some minor, some worth checking. It's still worth letting your provider know. Are you doing okay right now?"
+- NEVER direct a patient to an emergency department for rectal bleeding unless they also report severe ongoing hemorrhage, hemodynamic symptoms (dizziness, fainting), or inability to contact any provider at all.
 
 IMPORTANT — do not over-trigger: A patient discussing a surgical risk their provider mentioned ("my surgeon mentioned the risk of bleeding") is NOT an emergency. Assess context before escalating.
 
@@ -1359,6 +1326,7 @@ const Chatbot = ({ appState, onClose, chatMessages, setChatMessages, inline = fa
   const [listeningStyle, setListeningStyle] = useState(null);
   const [hasAskedStyle, setHasAskedStyle] = useState(false);
   const bottomRef = useRef(null);
+  const lastAssistantRef = useRef(null);
   const inputRef = useRef(null);
   const starterFired = useRef(false);
 
@@ -1369,7 +1337,14 @@ const Chatbot = ({ appState, onClose, chatMessages, setChatMessages, inline = fa
     "How does diet affect my pelvic floor?",
   ];
 
-  useEffect(() => { bottomRef.current?.scrollIntoView({ behavior: "smooth" }); }, [messages, loading]);
+  useEffect(() => {
+    const lastMsg = messages[messages.length - 1];
+    if (lastMsg?.role === "assistant" && lastAssistantRef.current) {
+      lastAssistantRef.current.scrollIntoView({ behavior: "smooth", block: "start" });
+    } else {
+      bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+    }
+  }, [messages, loading]);
 
   // Fire starter prompt once on mount if provided
   useEffect(() => {
@@ -1426,7 +1401,7 @@ const Chatbot = ({ appState, onClose, chatMessages, setChatMessages, inline = fa
       const data = await res.json();
       let reply = data.reply || "I'm sorry, I couldn't process that response.";
       if (isActiveEmergency(text)) {
-        reply = "⚠️ What you're describing may need prompt attention. Please contact your healthcare team today or go to an emergency department if you're unsure. Don't wait.\n\n" + reply;
+        reply = "⚠️ What you're describing may need prompt attention. Please contact your healthcare team today. Don't wait.\n\n" + reply;
       }
       if (shouldAskStyle(reply)) {
         reply += "\n\n---\nIs this helpful? I can go two ways from here — more detail and research if you want to really understand the science, or keep it focused on what's practical and what others find helpful. What feels right?";
@@ -1503,7 +1478,7 @@ const Chatbot = ({ appState, onClose, chatMessages, setChatMessages, inline = fa
           </div>
         )}
         {messages.map((m, i) => (
-          <div key={i} style={{ display: "flex", justifyContent: m.role === "user" ? "flex-end" : "flex-start", marginBottom: 16, alignItems: "flex-end", gap: 10 }}>
+          <div key={i} ref={m.role === "assistant" && i === messages.length - 1 ? lastAssistantRef : null} style={{ display: "flex", justifyContent: m.role === "user" ? "flex-end" : "flex-start", marginBottom: 16, alignItems: "flex-end", gap: 10 }}>
             {m.role === "assistant" && (<div style={{ width: 34, height: 34, borderRadius: "50%", background: `linear-gradient(135deg, ${C.teal}, ${C.tealMid})`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, flexShrink: 0, marginBottom: 2 }}>🌿</div>)}
             <div style={{ maxWidth: "82%", background: m.role === "user" ? C.teal : C.card, color: m.role === "user" ? "#fff" : C.navy, fontSize: 16, lineHeight: 1.7, padding: "14px 18px", borderRadius: m.role === "user" ? "20px 20px 6px 20px" : "20px 20px 20px 6px", border: m.role === "assistant" ? `1px solid ${C.borderSoft}` : "none", boxShadow: "0 2px 8px rgba(0,0,0,0.06)", whiteSpace: "pre-wrap" }} dangerouslySetInnerHTML={{ __html: m.content.replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>") }} />
             {m.role === "user" && (<div style={{ width: 34, height: 34, borderRadius: "50%", background: C.navyMid, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, flexShrink: 0, color: "#fff", fontWeight: 700 }}>You</div>)}
