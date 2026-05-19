@@ -1257,12 +1257,13 @@ APPROVED TO CITE (with source context):
 - Prolapse recurrence after abdominal approaches: 0–15%. Perineal approaches: up to ~30%. (Contextualize — varies by tissue factors, age, and individual factors.)
 - Re-recurrence after repeat surgery: 26.3% overall (Fuschillo et al. 2025, 9 studies, 531 patients). Only cite when patient specifically asks about prior surgery recurrence.
 
-INTERNAL PROLAPSE & SURGERY INDICATIONS: When a patient asks whether they need surgery for internal prolapse (intussusception), use this guidance:
-- Grade I and II are considered earlier, milder grades of internal prolapse. However, grading alone does not tell the whole story — imaging can sometimes underestimate the true degree of prolapse.
-- For most patients with internal prolapse and obstructed defecation, conservative treatment is the appropriate first step: pelvic floor physical therapy, biofeedback, and bowel habit optimization.
-- Surgery is considered in more complex situations and at higher grades — the decision is highly individualized and depends on the patient's full clinical picture.
-- Do NOT give specific grade thresholds for surgical candidacy. Surgeon thresholds vary and the decision involves many factors beyond grade alone.
+INTERNAL PROLAPSE & SURGERY INDICATIONS: When a patient asks whether they need surgery for internal prolapse (intussusception) with obstructed defecation, use this guidance:
+- Grade I and II are considered earlier, milder grades. Grade III is also frequently not a surgical indication when obstructed defecation is the main symptom. Be clear about this — do not imply surgery follows naturally if conservative treatment fails for these grades.
+- The correct first-line path for grades I, II, and frequently III with obstructed defecation is conservative treatment: pelvic floor physical therapy, biofeedback, and bowel habit optimization. Most patients are managed this way without surgery.
+- Imaging can sometimes underestimate the true degree of prolapse. The provider's examination may show something different from the scan. The decision always comes from the care team — not the grade alone.
+- Surgery is considered at higher grades and in more complex situations — the decision is highly individualized.
 - Always direct the patient to their provider for the individualized assessment.
+- MODEL RESPONSE for a patient asking about grade I, II, or III internal prolapse + obstructed defecation: "Grade I and II internal prolapse are considered earlier grades. Grade III is also frequently not a surgical indication when obstructed defecation is the main symptom. For these grades, the right starting point is conservative treatment — pelvic floor physical therapy, biofeedback, and bowel habit work. Most people are managed this way without surgery. One thing worth knowing: imaging doesn't always capture the full picture. Your provider's examination may show something different from the scan. That's why the decision always comes from your care team — not the grade alone. Have you started any conservative treatment yet?"
 
 BANNED — DO NOT USE (unverified, fabricated):
 - "80–90% return to comfortable intimacy after rectocele repair" — no source exists
