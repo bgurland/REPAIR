@@ -1360,6 +1360,9 @@ const Chatbot = ({ appState, onClose, chatMessages, setChatMessages, inline = fa
   const [shared, setShared] = useState(false);
   const [listeningStyle, setListeningStyle] = useState(null);
   const [hasAskedStyle, setHasAskedStyle] = useState(false);
+  const sessionId = useRef('sess_' + Math.random().toString(36).slice(2, 9) + '_' + Date.now());
+  const messageNumber = useRef(0);
+  const sessionTotals = useRef({ input: 0, output: 0 });
   const bottomRef = useRef(null);
   const lastAssistantRef = useRef(null);
   const inputRef = useRef(null);
@@ -1428,12 +1431,26 @@ const Chatbot = ({ appState, onClose, chatMessages, setChatMessages, inline = fa
     setLoading(true);
     const systemWithContext = (listeningStyle === "depth" ? SYSTEM_PROMPT + TRACK1_ADDITION : SYSTEM_PROMPT) + buildContext();
     try {
+      messageNumber.current += 1;
+
       const res = await fetch("/api/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ messages: newMessages, listeningStyle }),
+        body: JSON.stringify({
+          messages:           newMessages,
+          listeningStyle,
+          sessionId:          sessionId.current,
+          messageNumber:      messageNumber.current,
+          sessionInputTotal:  sessionTotals.current.input,
+          sessionOutputTotal: sessionTotals.current.output,
+        }),
       });
       const data = await res.json();
+
+      if (data.usage) {
+        sessionTotals.current.input  = data.usage.session_input_total;
+        sessionTotals.current.output = data.usage.session_output_total;
+      }
       let reply = data.reply || "I'm sorry, I couldn't process that response.";
       if (isActiveEmergency(text)) {
         reply = "⚠️ What you're describing may need prompt attention. Please contact your healthcare team today. Don't wait.\n\n" + reply;
