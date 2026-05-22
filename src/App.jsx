@@ -239,7 +239,7 @@ const [introDismissed, setIntroDismissed] = useState(false);
             style={{ position: "absolute", top: 10, right: 11, background: "none", border: "none", cursor: "pointer", color: "#7fbfb0", fontSize: 15, fontFamily: "Georgia, serif", lineHeight: 1 }}>
             ✕
           </button>
-          <div style={{ color: "#9fd8ca", fontSize: 9, fontWeight: 700, letterSpacing: 1.4, textTransform: "uppercase", marginBottom: 8, fontFamily: "Georgia, serif" }}>
+          <div style={{ color: "#9fd8ca", fontSize: 13, fontWeight: 700, letterSpacing: 1.2, textTransform: "uppercase", marginBottom: 10, fontFamily: "Georgia, serif" }}>
             Welcome to REPAIR
           </div>
           <div style={{ color: "#fff", fontSize: 13.5, lineHeight: 1.65, marginBottom: 10, fontFamily: "Georgia, serif" }}>
@@ -1704,9 +1704,9 @@ export default function App() {
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
           <button onClick={() => setMenuOpen(true)} style={{ background: "none", border: "none", fontSize: 22, color: C.navy, cursor: "pointer", padding: 4 }}>☰</button>
           <div style={{ textAlign: "center" }}>
-            <div style={{ color: C.teal, fontWeight: 800, fontSize: 17, letterSpacing: 0.3 }}>🌿 REPAIR</div>
+            <div style={{ color: C.teal, fontWeight: 800, fontSize: 22, letterSpacing: 0.5 }}>🌿 REPAIR</div>
             {section === "home" ? (
-              <div style={{ color: C.muted, fontSize: 7.5, letterSpacing: 0.6, textTransform: "uppercase", fontWeight: 600, marginTop: 1, lineHeight: 1.5, fontFamily: "Georgia, serif" }}>
+              <div style={{ color: C.muted, fontSize: 10.5, letterSpacing: 0.6, textTransform: "uppercase", fontWeight: 700, marginTop: 3, lineHeight: 1.5, fontFamily: "Georgia, serif" }}>
                 Rectal Prolapse · Education · Patient<br />Awareness · Information · Resource
               </div>
             ) : (
