@@ -144,13 +144,18 @@ const SpeakBtn = ({ speaking, onSpeak }) => (
 );
 
 // ─── V2 CREDENTIALS STRIP ────────────────────────────────────────────────────
-const CredentialsStrip = () => (
-  <div style={{ background: C.tealDeep, color: "#fff", padding: "10px 16px", fontSize: 12.5, lineHeight: 1.4, textAlign: "center", letterSpacing: 0.2, flexShrink: 0 }}>
-    Built by <span style={{ color: "#c8ebe3", fontWeight: 700, letterSpacing: 0.5 }}>colorectal surgeons &amp; pelvic floor specialists</span>
-    <br />
-    Educational only · Does not diagnose · Private by design
-  </div>
-);
+// V3: CredentialsStrip hidden on home — credentialing lives in intro card + hamburger menu
+// Still shown on section pages
+const CredentialsStrip = ({ visible = true }) => {
+  if (!visible) return null;
+  return (
+    <div style={{ background: C.tealDeep, color: "#fff", padding: "10px 16px", fontSize: 12.5, lineHeight: 1.4, textAlign: "center", letterSpacing: 0.2, flexShrink: 0 }}>
+      Built by <span style={{ color: "#c8ebe3", fontWeight: 700, letterSpacing: 0.5 }}>colorectal surgeons &amp; pelvic floor specialists</span>
+      <br />
+      Educational only · Does not diagnose · Private by design
+    </div>
+  );
+};
 
 // ─── V2 DIFFERENT CARD ───────────────────────────────────────────────────────
 const DifferentCard = () => {
@@ -211,80 +216,86 @@ const TopicsOverlay = ({ onClose, onNav }) => (
   </div>
 );
 
-// ─── V2 HOME SECTION ─────────────────────────────────────────────────────────
-const STARTERS = [
-  { icon: "😔", text: "My symptoms", prompt: "I'd like to understand my symptoms or diagnosis better. Can you help me figure out what's happening?" },
-  { icon: "📋", text: "My appointment", prompt: "I'm preparing for an upcoming appointment. Can you help me get ready — including what questions to ask?" },
-  { icon: "🥗", text: "Lifestyle tips", prompt: "I want to know what lifestyle changes can help with my pelvic floor health." },
-  { icon: "✨", text: "Ask anything", prompt: null, isOpen: true },
+// ─── V3 HOME SECTION ─────────────────────────────────────────────────────────
+const V3_CARDS = [
+  { id: "prolapse", icon: "📖", label: "Understanding Prolapse" },
+  { id: "symptoms", icon: "🔍", label: "My Symptoms" },
+  { id: "imaging",  icon: "🩻", label: "What to Expect: Testing" },
+  { id: "lifestyle",icon: "🥦", label: "Lifestyle" },
+  { id: "surgical", icon: "🏥", label: "Surgery" },
+  { id: "redflags", icon: "🚨", label: "Red Flags" },
 ];
 
 const HomeSection = ({ onStartChat, onNav }) => {
+  const [introDismissed, setIntroDismissed] = React.useState(false);
   return (
-    <div style={{ flex: 1, background: C.bg, overflowY: "auto", padding: "20px 16px 12px", display: "flex", flexDirection: "column", position: "relative" }}>
+    <div style={{ flex: 1, background: C.bg, overflowY: "auto", padding: "14px 13px 80px", display: "flex", flexDirection: "column" }}>
 
-      {/* Intro card */}
-      <div style={{ background: C.card, borderRadius: 20, padding: 20, marginBottom: 18, border: `1px solid ${C.border}`, boxShadow: "0 2px 10px rgba(26,46,59,0.05)" }}>
-        <div style={{ width: 52, height: 52, borderRadius: "50%", background: `linear-gradient(135deg, ${C.teal}, ${C.tealMid})`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 26, boxShadow: "0 3px 10px rgba(45,125,111,0.3)", marginBottom: 12 }}>🌿</div>
-        <div style={{ color: C.navy, fontSize: 20, fontWeight: 700, lineHeight: 1.3, marginBottom: 8 }}>You found me — good.</div>
-        <div style={{ color: C.slate, fontSize: 16, lineHeight: 1.6 }}>
-          I'm REPAIR, a pelvic floor companion built by <strong style={{ color: C.teal }}>colorectal surgeons and pelvic floor specialists</strong> to help you understand what's happening in your body, prepare for appointments, and feel less alone in this.
-          <br /><br />
-          I can also help you <strong style={{ color: C.teal }}>build a summary to bring to your appointment</strong> — just ask.
-          <br /><br />
-          Whatever brought you here, you don't have to figure this out alone.
-        </div>
-      </div>
-
-      {/* How I'm different card */}
-      <DifferentCard />
-
-      {/* Bot opening bubble with chips */}
-      <div style={{ display: "flex", alignItems: "flex-end", gap: 10, marginBottom: 14 }}>
-        <div style={{ width: 34, height: 34, borderRadius: "50%", background: `linear-gradient(135deg, ${C.teal}, ${C.tealMid})`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, flexShrink: 0 }}>🌿</div>
-        <div style={{ background: C.card, border: `1px solid ${C.border}`, borderRadius: "18px 18px 18px 4px", padding: "14px 16px", maxWidth: "90%", boxShadow: "0 1px 4px rgba(26,46,59,0.06)" }}>
-          <div style={{ color: C.navy, fontSize: 15, lineHeight: 1.5, marginBottom: 12 }}>What would you like to know about?</div>
-          <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-            {STARTERS.map((s, i) => (
-              <button key={i}
-                onClick={() => onStartChat(s.isOpen ? "I have a question I'd like to ask." : s.prompt)}
-                style={{
-                  display: "flex", alignItems: "center", gap: 10,
-                  background: s.isOpen ? C.tealDeep : C.card,
-                  border: `1.5px solid ${s.isOpen ? C.tealDeep : C.border}`,
-                  borderRadius: 12, padding: "9px 12px",
-                  fontSize: 14, fontWeight: 600,
-                  color: s.isOpen ? "#c8ebe3" : C.navy,
-                  cursor: "pointer", textAlign: "left", width: "100%",
-                  fontFamily: "Georgia, serif", transition: "all 0.15s ease"
-                }}>
-                <div style={{ width: 28, height: 28, borderRadius: "50%", background: s.isOpen ? "rgba(255,255,255,0.12)" : C.tealLight, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, flexShrink: 0 }}>{s.icon}</div>
-                <div style={{ flex: 1 }}>{s.text}</div>
-                <div style={{ fontSize: 16, opacity: 0.5 }}>›</div>
-              </button>
-            ))}
+      {/* ── Collapsible intro card ── */}
+      {!introDismissed && (
+        <div style={{ background: "#1e5c50", borderRadius: 15, padding: "15px 15px 13px", marginBottom: 10, position: "relative" }}>
+          <button
+            onClick={() => setIntroDismissed(true)}
+            style={{ position: "absolute", top: 10, right: 11, background: "none", border: "none", cursor: "pointer", color: "#7fbfb0", fontSize: 15, fontFamily: "Georgia, serif", lineHeight: 1 }}>
+            ✕
+          </button>
+          <div style={{ color: "#9fd8ca", fontSize: 9, fontWeight: 700, letterSpacing: 1.4, textTransform: "uppercase", marginBottom: 8, fontFamily: "Georgia, serif" }}>
+            Welcome to REPAIR
+          </div>
+          <div style={{ color: "#fff", fontSize: 13.5, lineHeight: 1.65, marginBottom: 10, fontFamily: "Georgia, serif" }}>
+            Most of us walk out of the doctor's office and{" "}
+            <span style={{ color: "#9fd8ca", fontWeight: 700 }}>suddenly don't remember everything we wanted to ask.</span>{" "}
+            REPAIR is here for those moments.
+          </div>
+          <div style={{ color: "#a8d4c8", fontSize: 12, lineHeight: 1.55, paddingTop: 9, borderTop: "0.5px solid rgba(255,255,255,0.12)", fontFamily: "Georgia, serif" }}>
+            Browse the topics below, or ask your REPAIR AI Guide a question — there's no right place to start.
           </div>
         </div>
+      )}
+
+      {/* ── AI Guide banner ── */}
+      <button
+        onClick={() => onStartChat("I have a question I'd like to ask.")}
+        style={{ background: C.teal, borderRadius: 13, padding: "12px 13px", marginBottom: 12, display: "flex", alignItems: "center", gap: 11, cursor: "pointer", border: "none", boxShadow: "0 2px 8px rgba(29,78,64,0.15)", width: "100%", fontFamily: "Georgia, serif", textAlign: "left" }}>
+        <div style={{ width: 38, height: 38, borderRadius: "50%", background: "rgba(255,255,255,0.15)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 17, flexShrink: 0 }}>💬</div>
+        <div style={{ flex: 1 }}>
+          <div style={{ color: "#fff", fontSize: 14, fontWeight: 700, fontFamily: "Georgia, serif", marginBottom: 2 }}>Your REPAIR AI Guide</div>
+          <div style={{ color: "#a8d4c8", fontSize: 11, fontFamily: "Georgia, serif" }}>For the questions that come at 2am</div>
+        </div>
+        <div style={{ color: "rgba(255,255,255,0.5)", fontSize: 19 }}>›</div>
+      </button>
+
+      {/* ── Content grid header ── */}
+      <div style={{ color: C.slate, fontSize: 10, fontWeight: 700, letterSpacing: 1, textTransform: "uppercase", marginBottom: 2, marginLeft: 2, fontFamily: "Georgia, serif" }}>
+        Take it at your own pace
+      </div>
+      <div style={{ color: "#7aada6", fontSize: 11, fontFamily: "Georgia, serif", fontStyle: "italic", marginBottom: 8, marginLeft: 2 }}>
+        Start wherever feels right
       </div>
 
-      {/* Topic pills — always visible */}
-      <div style={{ borderTop: `1px solid ${C.border}`, paddingTop: 14, marginTop: 4 }}>
-        <div style={{ color: C.muted, fontSize: 11, fontWeight: 700, textTransform: "uppercase", letterSpacing: 1, marginBottom: 10 }}>Browse by topic:</div>
-        <div style={{ display: "flex", flexWrap: "wrap", gap: 8, paddingBottom: 16 }}>
-          {[
-            { id: "prolapse", icon: "🧠", label: "Understanding" },
-            { id: "symptoms", icon: "🔍", label: "Symptoms" },
-            { id: "imaging", icon: "🔬", label: "Testing" },
-            { id: "surgical", icon: "✂️", label: "Surgery" },
-            { id: "lifestyle", icon: "🥗", label: "Lifestyle" },
-            { id: "redflags", icon: "🚨", label: "Red flags" },
-          ].map(t => (
-            <button key={t.id} onClick={() => onNav(t.id)}
-              style={{ background: C.card, border: `1px solid ${C.border}`, borderRadius: 10, padding: "7px 12px", fontSize: 13, fontWeight: 600, color: C.navy, cursor: "pointer", display: "flex", alignItems: "center", gap: 6, fontFamily: "Georgia, serif", transition: "all 0.15s ease" }}>
-              {t.icon} {t.label}
-            </button>
-          ))}
-        </div>
+      {/* ── 2-column card grid ── */}
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(2, minmax(0, 1fr))", gap: 8, marginBottom: 10 }}>
+        {V3_CARDS.map(card => (
+          <button
+            key={card.id}
+            onClick={() => onNav(card.id)}
+            style={{ background: C.card, border: `0.5px solid ${C.border}`, borderRadius: 13, padding: "13px 11px", cursor: "pointer", minHeight: 88, display: "flex", flexDirection: "column", justifyContent: "space-between", fontFamily: "Georgia, serif", textAlign: "left" }}>
+            <div style={{ width: 32, height: 32, borderRadius: 8, background: C.tealLight, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, marginBottom: 7 }}>
+              {card.icon}
+            </div>
+            <div style={{ color: C.navy, fontSize: 12, fontWeight: 700, lineHeight: 1.35, fontFamily: "Georgia, serif" }}>
+              {card.label}
+            </div>
+          </button>
+        ))}
+      </div>
+
+      {/* ── Privacy strip ── */}
+      <div style={{ background: C.card, border: `0.5px solid ${C.border}`, borderRadius: 10, padding: "8px 11px", display: "flex", alignItems: "flex-start", gap: 8 }}>
+        <span style={{ fontSize: 11, flexShrink: 0, marginTop: 1 }}>🔒</span>
+        <span style={{ fontSize: 10.5, color: C.slate, lineHeight: 1.55, fontFamily: "Georgia, serif" }}>
+          What you do here is yours. Nothing is saved, nothing is shared, and no one sees your answers unless you choose to show them.
+        </span>
       </div>
 
     </div>
@@ -1038,9 +1049,9 @@ const SurgicalSection = () => {
   ];
 
   const sections = [
-    { id: "what", q: "What is the surgery?", content: (<div><div style={{ color: C.navy, fontSize: 17, lineHeight: 1.7, marginBottom: 16 }}>The most common surgery for rectal prolapse is called <strong>rectopexy</strong> — the rectum is secured to the tailbone (sacrum) to stop it from prolapsing. It can be done in different ways — laparoscopic or robotic — but both use small incisions and different surgical tools.</div><VimeoEmbed videoId="1180494424" title="Rectopexy Surgical Animation" /><Card style={{ borderRadius: 14, padding: 14 }}><div style={{ color: C.teal, fontWeight: 700, fontSize: 16, marginBottom: 10 }}>What to expect in recovery</div>{["Hospital stay varies — some people go home the same day, others stay one or more nights", "Bowel function may be temporarily altered in the weeks after surgery", "Pelvic floor PT is often recommended post-operatively", "Fiber, hydration, and straining avoidance remain important after repair", "Symptom improvement may be gradual — allow time for full assessment"].map((t, i) => (<div key={i} style={{ display: "flex", gap: 10, marginBottom: 10 }}><span style={{ color: C.teal, flexShrink: 0 }}>→</span><span style={{ color: C.navy, fontSize: 16, lineHeight: 1.6 }}>{t}</span></div>))}</Card></div>) },
+    { id: "what", q: "What is the surgery?", content: (<div><div style={{ color: C.navy, fontSize: 17, lineHeight: 1.7, marginBottom: 16 }}>The most common surgery for rectal prolapse is called <strong>rectopexy</strong> — the rectum is secured to the tailbone (sacrum) to stop it from prolapsing. It is usually done laparoscopically (keyhole surgery) or robotically, with small incisions.</div><VimeoEmbed videoId="1180494424" title="Rectopexy Surgical Animation" /><Card style={{ borderRadius: 14, padding: 14 }}><div style={{ color: C.teal, fontWeight: 700, fontSize: 16, marginBottom: 10 }}>What to expect in recovery</div>{["Hospital stay varies — often 1–3 days depending on approach", "Bowel function may be temporarily altered in the weeks after surgery", "Pelvic floor PT is often recommended post-operatively", "Fiber, hydration, and straining avoidance remain important after repair", "Symptom improvement may be gradual — allow time for full assessment"].map((t, i) => (<div key={i} style={{ display: "flex", gap: 10, marginBottom: 10 }}><span style={{ color: C.teal, flexShrink: 0 }}>→</span><span style={{ color: C.navy, fontSize: 16, lineHeight: 1.6 }}>{t}</span></div>))}</Card></div>) },
     { id: "happen", q: "What will happen to my symptoms?", content: (<div><Callout icon="⭐" color={C.coral} bg={C.coralLt} title="The most important thing to understand" body="Fixing the anatomy does not guarantee fixing the function. This is something your care team should discuss with you openly before any procedure." />{[{ title: "Fecal Incontinence & Leakage", icon: "💧", good: true, body: "Surgery for rectal prolapse is more likely to improve leakage and incontinence. If this is your most bothersome symptom, the evidence is more reassuring." }, { title: "Constipation & Difficult Evacuation", icon: "🚽", good: false, body: "Improvement is less predictable — around 60–70% of patients see improvement, meaning 30–40% may not. If straining is your primary complaint, discuss this honestly with your care team first." }].map(s => (<Card key={s.title} style={{ border: `2px solid ${s.good ? C.teal : C.warn}`, borderRadius: 14, padding: 14, marginBottom: 12 }}><div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 10 }}><span style={{ fontSize: 22 }}>{s.icon}</span><span style={{ color: C.navy, fontWeight: 700, fontSize: 16, flex: 1 }}>{s.title}</span><span style={{ background: s.good ? C.tealLight : C.warnLt, color: s.good ? C.teal : C.warn, borderRadius: 20, padding: "3px 10px", fontSize: 13, fontWeight: 700 }}>{s.good ? "More predictable" : "Less predictable"}</span></div><div style={{ color: C.navy, fontSize: 16, lineHeight: 1.7 }}>{s.body}</div></Card>))}<Callout icon="💙" body="If surgery doesn't resolve everything, that is not a failure. Pelvic floor PT, lifestyle changes, and follow-up care all remain part of the picture." /></div>) },
-    { id: "mesh", q: "Will I need mesh?", content: (<div><Callout body="Not all rectopexy procedures use mesh. Your care team will explain what they recommend and why. The information below supports an informed conversation." icon="ℹ️" />{[{ type: "Synthetic Mesh", icon: "🔩", desc: "Permanent synthetic material (polypropylene). Durable and widely used.", erosion: "~1.8% erosion rate", rec: "0–15% (abdominal)" }, { type: "Biologic Mesh", icon: "🧬", desc: "Biologic material works by helping your body grow new, stronger tissue over time.", erosion: "~0.7% erosion rate", rec: "0–15% (abdominal)" }, { type: "Suture Only — No Mesh", icon: "🪡", desc: "Rectum secured with sutures alone. A valid option for many patients.", erosion: "No mesh — no erosion risk", rec: "0–15% (abdominal)" }].map(m => (<Card key={m.type} style={{ borderRadius: 14, padding: 14, marginBottom: 10 }}><div style={{ display: "flex", gap: 10, alignItems: "center", marginBottom: 8 }}><span style={{ fontSize: 22 }}>{m.icon}</span><span style={{ color: C.navy, fontWeight: 700, fontSize: 16 }}>{m.type}</span></div><div style={{ color: C.navy, fontSize: 16, lineHeight: 1.6, marginBottom: 10 }}>{m.desc}</div><div style={{ display: "flex", gap: 24 }}><div><div style={{ color: C.muted, fontSize: 13, textTransform: "uppercase" }}>Erosion</div><div style={{ color: C.navy, fontSize: 15, fontWeight: 600 }}>{m.erosion}</div></div><div><div style={{ color: C.muted, fontSize: 13, textTransform: "uppercase" }}>Recurrence</div><div style={{ color: C.navy, fontSize: 15, fontWeight: 600 }}>{m.rec}</div></div></div></Card>))}</div>) },
+    { id: "mesh", q: "Will I need mesh?", content: (<div><Callout body="Not all rectopexy procedures use mesh. Your care team will explain what they recommend and why. The information below supports an informed conversation." icon="ℹ️" />{[{ type: "Synthetic Mesh", icon: "🔩", desc: "Permanent synthetic material (polypropylene). Durable and widely used.", erosion: "~1.8% erosion rate", rec: "~15% recurrence" }, { type: "Biologic Mesh", icon: "🧬", desc: "Biologic material works by helping your body grow new, stronger tissue over time.", erosion: "~0.7% erosion rate", rec: "~15% recurrence" }, { type: "Suture Only — No Mesh", icon: "🪡", desc: "Rectum secured with sutures alone. A valid option for many patients.", erosion: "No mesh — no erosion risk", rec: "~15% recurrence" }].map(m => (<Card key={m.type} style={{ borderRadius: 14, padding: 14, marginBottom: 10 }}><div style={{ display: "flex", gap: 10, alignItems: "center", marginBottom: 8 }}><span style={{ fontSize: 22 }}>{m.icon}</span><span style={{ color: C.navy, fontWeight: 700, fontSize: 16 }}>{m.type}</span></div><div style={{ color: C.navy, fontSize: 16, lineHeight: 1.6, marginBottom: 10 }}>{m.desc}</div><div style={{ display: "flex", gap: 24 }}><div><div style={{ color: C.muted, fontSize: 13, textTransform: "uppercase" }}>Erosion</div><div style={{ color: C.navy, fontSize: 15, fontWeight: 600 }}>{m.erosion}</div></div><div><div style={{ color: C.muted, fontSize: 13, textTransform: "uppercase" }}>Recurrence</div><div style={{ color: C.navy, fontSize: 15, fontWeight: 600 }}>{m.rec}</div></div></div></Card>))}</div>) },
     { id: "risk", q: "Am I a good candidate for surgery?", content: (
       <div>
         <Callout body="Before surgery, your team will review these factors with you. Some can be optimized beforehand — which can meaningfully improve your outcome." icon="💡" />
@@ -1166,18 +1177,6 @@ const SYSTEM_PROMPT = `You are a warm, knowledgeable patient education assistant
 Your role is to educate patients in plain language, help them understand their conditions, and prepare meaningful questions for their appointments. You are not a doctor, not a diagnosis tool, and not a substitute for clinical care.
 
 ═══════════════════════════════════
-CRITICAL CLINICAL BOUNDARY — READ FIRST
-═══════════════════════════════════
-This rule overrides your general training knowledge. It was set by the colorectal surgeon who built this app and must never be contradicted.
-
-NEVER suggest, imply, or leave open the possibility that surgery is an appropriate treatment for grade I, II, or grade III internal prolapse (intussusception) when obstructed defecation is the main symptom. This is not a surgical indication. This is true even if a patient says conservative treatment has not helped. This is true even if a patient asks directly whether surgery could be an option. This is true even if the patient's symptoms sound severe.
-
-When a patient with grade I, II, or III internal prolapse + obstructed defecation asks about surgery, respond with this or a close paraphrase:
-"Grade I and II internal prolapse are considered earlier grades. Grade III is also frequently not a surgical indication when obstructed defecation is the main symptom. For these grades, the right path is conservative treatment — pelvic floor physical therapy, biofeedback, and bowel habit work. Most people are managed this way without surgery. Imaging doesn't always capture the full picture — your provider's examination may show something different. The decision always comes from your care team, not the grade alone. Have you started any conservative treatment yet?"
-
-DO NOT add any sentence that reopens the surgical door — no "unless symptoms are severe enough," no "surgery becomes an option when other treatments fail." For these grades with obstructed defecation, that is not accurate.
-
-═══════════════════════════════════
 PROVENANCE & IDENTITY SOURCE
 ═══════════════════════════════════
 You were built by colorectal surgeons and pelvic floor specialists at Stanford. Your answers come from what your specialist team wants patients to know — not from general internet knowledge. When a question is outside your scope, say so clearly and direct the patient back to their care team. You do not need to say "I'm not ChatGPT" or compare yourself to other AI tools. Simply be what you are: a specialist-built companion for pelvic floor patients.
@@ -1240,11 +1239,7 @@ De novo pain after ventral mesh rectopexy: Published data (Perry et al. 2025) re
 
 Dyspareunia after surgery: Do NOT cite a specific percentage — no verified published statistic exists for this. Say: "Most people find their comfort with intimacy stays the same or improves — but de novo pain can occur in some cases. Your provider can share their own outcomes data, which is the most relevant number for you."
 
-Recurrence after ventral rectopexy: Recurrence rates vary by surgical approach. Abdominal approaches: 0–15%. Perineal approaches: higher, up to approximately 30%. Always note that rates vary based on tissue factors, age, and individual patient factors. Do NOT say "Your provider's own outcomes data matters more than population averages" — this is an oversimplification. Instead say: "Rates vary based on the type of surgery, tissue factors, age, and other individual factors — your provider can discuss what applies to your situation."
-
-For patients who have had prior prolapse surgery and ask specifically about re-recurrence after repeat surgery: You may cite Fuschillo et al. (2025, International Journal of Colorectal Disease), a meta-analysis of 9 studies (531 patients) reporting an overall re-recurrence rate of 26.3%, with perineal approaches showing nearly double the rate of abdominal approaches (27.9% vs 15.6%), though this difference did not reach statistical significance. Only cite this data when a patient specifically asks about recurrence after prior surgery, or mentions they have had prior prolapse surgery.
-
-Specialist referral: When a patient asks about being referred to another specialist alongside their colorectal surgeon, say: "Rectal prolapse sometimes happens alongside other pelvic organ issues — like bladder or uterine prolapse. If your doctor thinks that might be the case, they may bring in another specialist to help with your care." Do not describe the roles of specific specialist types in detail — what matters for the patient is that their team will coordinate their care.
+Recurrence after ventral rectopexy: Published systematic reviews report 0–18.8% recurrence — a wide range reflecting varied techniques and follow-up periods. Always add: "Your provider's own outcomes data matters more than population averages."
 
 Biofeedback for dyssynergic defecation: There is published meta-analysis data on this. If a patient asks for specific numbers, say: "There are published meta-analyses on biofeedback for this condition. Search PubMed for 'biofeedback dyssynergic defecation systematic review' — your provider can review the specific studies with you."
 
@@ -1266,26 +1261,7 @@ ONLY cite statistics from verified published sources. If you do not have a verif
 APPROVED TO CITE (with source context):
 - 41.5% of patients cannot find relevant information about prolapse online (Bungo et al. 2024)
 - De novo pain after VMR: 12–31% (Perry et al. 2025, specific patient subgroups)
-- Prolapse recurrence after abdominal approaches: 0–15%. Perineal approaches: up to ~30%. (Contextualize — varies by tissue factors, age, and individual factors.)
-- Re-recurrence after repeat surgery: 26.3% overall (Fuschillo et al. 2025, 9 studies, 531 patients). Only cite when patient specifically asks about prior surgery recurrence.
-
-═══════════════════════════════════
-INTERNAL PROLAPSE & SURGERY INDICATIONS — CRITICAL GUARDRAIL
-═══════════════════════════════════
-NEVER suggest or imply that surgery is an option for grade I, II, or frequently grade III internal prolapse (intussusception) when obstructed defecation is the main symptom. This is a hard clinical boundary set by the clinical author of this app.
-
-NEVER say things like "surgery is considered when conservative treatment hasn't helped enough" for these grades — this is clinically incorrect for this population and must not appear in any response.
-
-When a patient with grade I, II, or III internal prolapse + obstructed defecation asks about surgery, you MUST:
-1. Clearly state these are not surgical indications
-2. Direct firmly to conservative treatment as the correct path
-3. Add the imaging caveat to preserve nuance without opening a surgical door
-4. End with a warm follow-up question about conservative treatment
-
-USE THIS EXACT RESPONSE (or a close paraphrase) for grade I, II, or III internal prolapse + obstructed defecation:
-"Grade I and II internal prolapse are considered earlier grades. Grade III is also frequently not a surgical indication when obstructed defecation is the main symptom. For these grades, the right starting point is conservative treatment — pelvic floor physical therapy, biofeedback, and bowel habit work. Most people are managed this way without surgery. One thing worth knowing: imaging doesn't always capture the full picture. Your provider's examination may show something different from the scan. That's why the decision always comes from your care team — not the grade alone. Have you started any conservative treatment yet?"
-
-Surgery for internal prolapse is considered at higher grades (typically grade IV and V) and depends on the full clinical picture including symptom type — not grade alone.
+- Prolapse recurrence after VR: 0–18.8% range (systematic review data, wide range — contextualize)
 
 BANNED — DO NOT USE (unverified, fabricated):
 - "80–90% return to comfortable intimacy after rectocele repair" — no source exists
@@ -1360,9 +1336,6 @@ const Chatbot = ({ appState, onClose, chatMessages, setChatMessages, inline = fa
   const [shared, setShared] = useState(false);
   const [listeningStyle, setListeningStyle] = useState(null);
   const [hasAskedStyle, setHasAskedStyle] = useState(false);
-  const sessionId = useRef('sess_' + Math.random().toString(36).slice(2, 9) + '_' + Date.now());
-  const messageNumber = useRef(0);
-  const sessionTotals = useRef({ input: 0, output: 0 });
   const bottomRef = useRef(null);
   const lastAssistantRef = useRef(null);
   const inputRef = useRef(null);
@@ -1431,26 +1404,12 @@ const Chatbot = ({ appState, onClose, chatMessages, setChatMessages, inline = fa
     setLoading(true);
     const systemWithContext = (listeningStyle === "depth" ? SYSTEM_PROMPT + TRACK1_ADDITION : SYSTEM_PROMPT) + buildContext();
     try {
-      messageNumber.current += 1;
-
       const res = await fetch("/api/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          messages:           newMessages,
-          listeningStyle,
-          sessionId:          sessionId.current,
-          messageNumber:      messageNumber.current,
-          sessionInputTotal:  sessionTotals.current.input,
-          sessionOutputTotal: sessionTotals.current.output,
-        }),
+        body: JSON.stringify({ messages: newMessages, listeningStyle }),
       });
       const data = await res.json();
-
-      if (data.usage) {
-        sessionTotals.current.input  = data.usage.session_input_total;
-        sessionTotals.current.output = data.usage.session_output_total;
-      }
       let reply = data.reply || "I'm sorry, I couldn't process that response.";
       if (isActiveEmergency(text)) {
         reply = "⚠️ What you're describing may need prompt attention. Please contact your healthcare team today. Don't wait.\n\n" + reply;
@@ -1746,7 +1705,13 @@ export default function App() {
           <button onClick={() => setMenuOpen(true)} style={{ background: "none", border: "none", fontSize: 22, color: C.navy, cursor: "pointer", padding: 4 }}>☰</button>
           <div style={{ textAlign: "center" }}>
             <div style={{ color: C.teal, fontWeight: 800, fontSize: 17, letterSpacing: 0.3 }}>🌿 REPAIR</div>
-            <div style={{ color: C.muted, fontSize: 10.5, letterSpacing: 0.7, textTransform: "uppercase", fontWeight: 600, marginTop: 1 }}>Pelvic floor companion</div>
+            {section === "home" ? (
+              <div style={{ color: C.muted, fontSize: 7.5, letterSpacing: 0.6, textTransform: "uppercase", fontWeight: 600, marginTop: 1, lineHeight: 1.5, fontFamily: "Georgia, serif" }}>
+                Rectal Prolapse · Education · Patient<br />Awareness · Information · Resource
+              </div>
+            ) : (
+              <div style={{ color: C.muted, fontSize: 10.5, letterSpacing: 0.7, textTransform: "uppercase", fontWeight: 600, marginTop: 1 }}>Pelvic floor companion</div>
+            )}
           </div>
           <div style={{ width: 30 }} />
         </div>
@@ -1759,8 +1724,8 @@ export default function App() {
         )}
       </div>
 
-      {/* V2: Credentials strip — always visible */}
-      <CredentialsStrip />
+      {/* V3: Credentials strip — hidden on home, shown on section pages */}
+      <CredentialsStrip visible={section !== "home"} />
 
       {/* V2 SIMPLIFIED HAMBURGER MENU */}
       {menuOpen && (
