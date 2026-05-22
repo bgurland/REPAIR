@@ -227,7 +227,7 @@ const V3_CARDS = [
 ];
 
 const HomeSection = ({ onStartChat, onNav }) => {
-  const [introDismissed, setIntroDismissed] = React.useState(false);
+const [introDismissed, setIntroDismissed] = useState(false);
   return (
     <div style={{ flex: 1, background: C.bg, overflowY: "auto", padding: "14px 13px 80px", display: "flex", flexDirection: "column" }}>
 
