@@ -144,18 +144,13 @@ const SpeakBtn = ({ speaking, onSpeak }) => (
 );
 
 // ─── V2 CREDENTIALS STRIP ────────────────────────────────────────────────────
-// V3: CredentialsStrip hidden on home — credentialing lives in intro card + hamburger menu
-// Still shown on section pages
-const CredentialsStrip = ({ visible = true }) => {
-  if (!visible) return null;
-  return (
-    <div style={{ background: C.tealDeep, color: "#fff", padding: "10px 16px", fontSize: 12.5, lineHeight: 1.4, textAlign: "center", letterSpacing: 0.2, flexShrink: 0 }}>
-      Built by <span style={{ color: "#c8ebe3", fontWeight: 700, letterSpacing: 0.5 }}>colorectal surgeons &amp; pelvic floor specialists</span>
-      <br />
-      Educational only · Does not diagnose · Private by design
-    </div>
-  );
-};
+const CredentialsStrip = () => (
+  <div style={{ background: C.tealDeep, color: "#fff", padding: "10px 16px", fontSize: 12.5, lineHeight: 1.4, textAlign: "center", letterSpacing: 0.2, flexShrink: 0 }}>
+    Built by <span style={{ color: "#c8ebe3", fontWeight: 700, letterSpacing: 0.5 }}>colorectal surgeons &amp; pelvic floor specialists</span>
+    <br />
+    Educational only · Does not diagnose · Private by design
+  </div>
+);
 
 // ─── V2 DIFFERENT CARD ───────────────────────────────────────────────────────
 const DifferentCard = () => {
@@ -216,88 +211,83 @@ const TopicsOverlay = ({ onClose, onNav }) => (
   </div>
 );
 
-// ─── V3 HOME SECTION ─────────────────────────────────────────────────────────
-const V3_CARDS = [
-  { id: "prolapse", icon: "📖", label: "Understanding Prolapse" },
-  { id: "symptoms", icon: "🔍", label: "My Symptoms" },
-  { id: "imaging",  icon: "🩻", label: "What to Expect: Testing" },
-  { id: "lifestyle",icon: "🥦", label: "Lifestyle" },
-  { id: "surgical", icon: "🏥", label: "Surgery" },
-  { id: "redflags", icon: "🚨", label: "Red Flags" },
+// ─── V2 HOME SECTION ─────────────────────────────────────────────────────────
+const STARTERS = [
+  { icon: "😔", text: "My symptoms", prompt: "I'd like to understand my symptoms or diagnosis better. Can you help me figure out what's happening?" },
+  { icon: "📋", text: "My appointment", prompt: "I'm preparing for an upcoming appointment. Can you help me get ready — including what questions to ask?" },
+  { icon: "🥗", text: "Lifestyle tips", prompt: "I want to know what lifestyle changes can help with my pelvic floor health." },
+  { icon: "✨", text: "Ask anything", prompt: null, isOpen: true },
 ];
 
 const HomeSection = ({ onStartChat, onNav }) => {
-const [introDismissed, setIntroDismissed] = useState(false);
   return (
-    <div style={{ flex: 1, background: C.bg, overflowY: "auto", padding: "14px 13px 80px", display: "flex", flexDirection: "column" }}>
+    <div style={{ flex: 1, background: C.bg, overflowY: "auto", display: "flex", flexDirection: "column", position: "relative" }}>
 
-      {/* ── Collapsible intro card ── */}
-      {!introDismissed && (
-        <div style={{ background: "#1e5c50", borderRadius: 15, padding: "15px 15px 13px", marginBottom: 10, position: "relative" }}>
-          <button
-            onClick={() => setIntroDismissed(true)}
-            style={{ position: "absolute", top: 10, right: 11, background: "none", border: "none", cursor: "pointer", color: "#7fbfb0", fontSize: 15, fontFamily: "Georgia, serif", lineHeight: 1 }}>
-            ✕
-          </button>
-          <div style={{ color: "#9fd8ca", fontSize: 13, fontWeight: 700, letterSpacing: 1.2, textTransform: "uppercase", marginBottom: 10, fontFamily: "Georgia, serif" }}>
-            Welcome to REPAIR
-          </div>
-          <div style={{ color: "#fff", fontSize: 13.5, lineHeight: 1.65, marginBottom: 10, fontFamily: "Georgia, serif" }}>
-            Most of us walk out of the doctor's office and{" "}
-            <span style={{ color: "#9fd8ca", fontWeight: 700 }}>suddenly don't remember everything we wanted to ask.</span>{" "}
-            REPAIR is here for those moments.
-          </div>
-          <div style={{ color: "#a8d4c8", fontSize: 12, lineHeight: 1.55, paddingTop: 9, borderTop: "0.5px solid rgba(255,255,255,0.12)", fontFamily: "Georgia, serif" }}>
-            Browse the topics below, or ask your REPAIR AI Guide a question — there's no right place to start.
-          </div>
+      {/* Hero card — dark teal */}
+      <div style={{ background: C.tealDeep, padding: "24px 20px 20px", flexShrink: 0 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 14, marginBottom: 14 }}>
+          <div style={{ width: 48, height: 48, borderRadius: "50%", background: "rgba(255,255,255,0.12)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 24, flexShrink: 0 }}>🌿</div>
+          <div style={{ color: "#fff", fontWeight: 800, fontSize: 22, letterSpacing: 0.3, lineHeight: 1.1 }}>REPAIR</div>
         </div>
-      )}
-
-      {/* ── AI Guide banner ── */}
-      <button
-        onClick={() => onStartChat("I have a question I'd like to ask.")}
-        style={{ background: C.teal, borderRadius: 13, padding: "12px 13px", marginBottom: 12, display: "flex", alignItems: "center", gap: 11, cursor: "pointer", border: "none", boxShadow: "0 2px 8px rgba(29,78,64,0.15)", width: "100%", fontFamily: "Georgia, serif", textAlign: "left" }}>
-        <div style={{ width: 38, height: 38, borderRadius: "50%", background: "rgba(255,255,255,0.15)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 17, flexShrink: 0 }}>💬</div>
-        <div style={{ flex: 1 }}>
-          <div style={{ color: "#fff", fontSize: 14, fontWeight: 700, fontFamily: "Georgia, serif", marginBottom: 2 }}>Your REPAIR AI Guide</div>
-          <div style={{ color: "#a8d4c8", fontSize: 11, fontFamily: "Georgia, serif" }}>For the questions that come at 2am</div>
+        <div style={{ color: "rgba(255,255,255,0.9)", fontSize: 16, lineHeight: 1.65 }}>
+          Millions of people live with pelvic floor symptoms — and most never talk about them. This is a safe, shame-free place to learn and prepare.
         </div>
-        <div style={{ color: "rgba(255,255,255,0.5)", fontSize: 19 }}>›</div>
-      </button>
-
-      {/* ── Content grid header ── */}
-      <div style={{ color: C.slate, fontSize: 10, fontWeight: 700, letterSpacing: 1, textTransform: "uppercase", marginBottom: 2, marginLeft: 2, fontFamily: "Georgia, serif" }}>
-        Take it at your own pace
-      </div>
-      <div style={{ color: "#7aada6", fontSize: 11, fontFamily: "Georgia, serif", fontStyle: "italic", marginBottom: 8, marginLeft: 2 }}>
-        Start wherever feels right
       </div>
 
-      {/* ── 2-column card grid ── */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(2, minmax(0, 1fr))", gap: 8, marginBottom: 10 }}>
-        {V3_CARDS.map(card => (
-          <button
-            key={card.id}
-            onClick={() => onNav(card.id)}
-            style={{ background: C.card, border: `0.5px solid ${C.border}`, borderRadius: 13, padding: "13px 11px", cursor: "pointer", minHeight: 88, display: "flex", flexDirection: "column", justifyContent: "space-between", fontFamily: "Georgia, serif", textAlign: "left" }}>
-            <div style={{ width: 32, height: 32, borderRadius: 8, background: C.tealLight, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, marginBottom: 7 }}>
-              {card.icon}
-            </div>
-            <div style={{ color: C.navy, fontSize: 12, fontWeight: 700, lineHeight: 1.35, fontFamily: "Georgia, serif" }}>
-              {card.label}
-            </div>
-          </button>
-        ))}
+      {/* Privacy strip */}
+      <div style={{ background: "#f0f7f5", borderBottom: `1px solid ${C.teal}22`, padding: "10px 18px", display: "flex", alignItems: "center", gap: 10, flexShrink: 0 }}>
+        <span style={{ fontSize: 14 }}>🔒</span>
+        <span style={{ color: C.slate, fontSize: 13, lineHeight: 1.4 }}>Nothing is saved. Nothing is shared. What you do here is yours.</span>
       </div>
 
-      {/* ── Privacy strip ── */}
-      <div style={{ background: C.card, border: `0.5px solid ${C.border}`, borderRadius: 10, padding: "8px 11px", display: "flex", alignItems: "flex-start", gap: 8 }}>
-        <span style={{ fontSize: 11, flexShrink: 0, marginTop: 1 }}>🔒</span>
-        <span style={{ fontSize: 10.5, color: C.slate, lineHeight: 1.55, fontFamily: "Georgia, serif" }}>
-          What you do here is yours. Nothing is saved, nothing is shared, and no one sees your answers unless you choose to show them.
-        </span>
+      {/* Cards grid */}
+      <div style={{ padding: "18px 16px 28px", flex: 1 }}>
+
+        {/* 2-column grid */}
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, marginBottom: 10 }}>
+          {[
+            { id: "prolapse", icon: "📖", label: "Understanding Prolapse", hasVideo: true },
+            { id: "symptoms", icon: "🔍", label: "My Symptoms", hasVideo: true },
+            { id: "imaging", icon: "🩻", label: "What to Expect: Testing" },
+            { id: "lifestyle", icon: "🥦", label: "Lifestyle" },
+          ].map(t => (
+            <button key={t.id} onClick={() => onNav(t.id)}
+              style={{ background: C.card, border: `1px solid ${C.border}`, borderRadius: 16, padding: "18px 14px", display: "flex", flexDirection: "column", alignItems: "flex-start", gap: 8, cursor: "pointer", fontFamily: "Georgia, serif", textAlign: "left", boxShadow: "0 1px 4px rgba(26,46,59,0.04)", position: "relative" }}>
+              <div style={{ fontSize: 26 }}>{t.icon}</div>
+              <div style={{ color: C.navy, fontWeight: 700, fontSize: 15, lineHeight: 1.3 }}>{t.label}</div>
+              {t.hasVideo && (
+                <div style={{ position: "absolute", top: 10, right: 10, background: C.tealLight, color: C.teal, fontSize: 10, fontWeight: 700, padding: "3px 7px", borderRadius: 20, letterSpacing: 0.3 }}>▶ video</div>
+              )}
+            </button>
+          ))}
+        </div>
+
+        {/* Surgery — full width */}
+        <button onClick={() => onNav("surgical")}
+          style={{ width: "100%", background: C.card, border: `1px solid ${C.border}`, borderRadius: 16, padding: "16px 18px", display: "flex", alignItems: "center", gap: 14, cursor: "pointer", fontFamily: "Georgia, serif", textAlign: "left", boxShadow: "0 1px 4px rgba(26,46,59,0.04)", position: "relative" }}>
+          <div style={{ fontSize: 26, flexShrink: 0 }}>🏥</div>
+          <div style={{ flex: 1 }}>
+            <div style={{ color: C.navy, fontWeight: 700, fontSize: 16, lineHeight: 1.2, marginBottom: 3 }}>Surgery</div>
+            <div style={{ color: C.muted, fontSize: 13, lineHeight: 1.4 }}>What to expect, questions to ask, how to prepare</div>
+          </div>
+          <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 6, flexShrink: 0 }}>
+            <div style={{ background: C.tealLight, color: C.teal, fontSize: 10, fontWeight: 700, padding: "3px 7px", borderRadius: 20, letterSpacing: 0.3 }}>▶ video</div>
+            <div style={{ color: C.muted, fontSize: 18 }}>›</div>
+          </div>
+        </button>
+
       </div>
 
+      {/* Chat input bar — pinned to bottom */}
+      <div style={{ background: C.card, borderTop: `1px solid ${C.border}`, padding: "10px 14px 16px", flexShrink: 0 }}>
+        <button onClick={() => onStartChat("I have a question I'd like to ask.")}
+          style={{ width: "100%", background: C.bg, border: `1.5px solid ${C.border}`, borderRadius: 28, padding: "12px 16px", display: "flex", alignItems: "center", gap: 10, cursor: "pointer", fontFamily: "Georgia, serif", textAlign: "left" }}>
+          <span style={{ color: C.muted, fontSize: 15, flex: 1 }}>Ask anything about rectal prolapse...</span>
+          <div style={{ width: 32, height: 32, borderRadius: "50%", background: C.teal, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+            <span style={{ color: "#fff", fontSize: 16, lineHeight: 1 }}>↑</span>
+          </div>
+        </button>
+      </div>
     </div>
   );
 };
@@ -432,10 +422,10 @@ const ProlapseSection = ({ speak, stop, speaking }) => {
 // ─── SYMPTOMS ────────────────────────────────────────────────────────────────
 const SYMPTOMS = [
   { id: "evacuation", icon: "🚽", label: "Incomplete Evacuation / Straining", desc: "Feeling like you can't fully empty your bowel, needing to strain, or spending a long time on the toilet.", why: "This may be related to internal rectal prolapse (intussusception), where the rectum folds inward and creates an obstruction. It can also reflect pelvic floor muscle coordination problems or slow transit.", lifestyle: "Toilet positioning (raising knees with a step stool), bowel habit training, high-fiber diet, and pelvic floor PT can all help.", doctor: "If straining is your primary complaint and it hasn't improved with lifestyle changes, or if it's significantly affecting your quality of life.", redFlag: false, animationId: "1175949349", animationTitle: "Constipation & Dyssynergic Defecation" },
-  { id: "bulge", icon: "🔵", label: "Rectal Bulge or Tissue Coming Out", desc: "Feeling a bulge in the rectal area, or seeing or feeling tissue outside the body.", why: "This may represent external rectal prolapse (the rectum protruding through the anal opening) or rectocele. The severity ranges from occasional protrusion with straining to persistent prolapse.", lifestyle: "Avoid straining. Optimize fiber and hydration. Avoid prolonged sitting on the toilet.", doctor: "Always — any visible tissue coming out of the rectum should be evaluated by a healthcare provider.", redFlag: false, animationId: "743819969", animationTitle: "Rectal Prolapse & Rectocele" },
-  { id: "incontinence", icon: "💧", label: "Fecal Leakage / Incontinence", desc: "Inability to control gas, liquid, or solid stool. Urgency that doesn't give you time to reach the toilet.", why: "Rectal prolapse can stretch the anal sphincter over time, reducing its ability to maintain closure. Nerve damage or sphincter injury can also contribute.", lifestyle: "Dietary adjustments to regulate stool consistency. Pelvic floor PT for sphincter strengthening.", doctor: "Fecal incontinence is very treatable — please don't suffer in silence. If it's affecting your daily activities, your team needs to know.", redFlag: false },
+  { id: "bulge", icon: "⭕", label: "Rectal Bulge or Tissue Coming Out", desc: "Feeling a bulge in the rectal area, or seeing or feeling tissue outside the body.", why: "This may represent external rectal prolapse (the rectum protruding through the anal opening) or rectocele. The severity ranges from occasional protrusion with straining to persistent prolapse.", lifestyle: "Avoid straining. Optimize fiber and hydration. Avoid prolonged sitting on the toilet.", doctor: "Always — any visible tissue coming out of the rectum should be evaluated by a healthcare provider.", redFlag: false, animationId: "743819969", animationTitle: "Rectal Prolapse & Rectocele" },
+  { id: "incontinence", icon: "💩", label: "Fecal Leakage / Incontinence", desc: "Inability to control gas, liquid, or solid stool. Urgency that doesn't give you time to reach the toilet.", why: "Rectal prolapse can stretch the anal sphincter over time, reducing its ability to maintain closure. Nerve damage or sphincter injury can also contribute.", lifestyle: "Dietary adjustments to regulate stool consistency. Pelvic floor PT for sphincter strengthening.", doctor: "Fecal incontinence is very treatable — please don't suffer in silence. If it's affecting your daily activities, your team needs to know.", redFlag: false },
   { id: "pressure", icon: "⬇️", label: "Pelvic Pressure or Heaviness", desc: "A sensation of pressure, heaviness, or dragging in the pelvis or rectum. Feeling like something is falling out.", why: "This sensation often reflects downward displacement of pelvic organs, including the rectum, and is common with prolapse of any degree.", lifestyle: "Avoiding prolonged standing, high-impact activity during symptomatic periods. Core and pelvic floor PT.", doctor: "If this sensation is persistent or worsening, or if it's combined with other symptoms.", redFlag: false },
-  { id: "mucus", icon: "💛", label: "Mucus Discharge or Rectal Bleeding", desc: "Mucus coming from the rectum, or blood on toilet paper, in the bowl, or mixed with stool.", why: "Mucus discharge is common with rectal prolapse — the prolapsed tissue secretes mucus. Rectal bleeding can have many causes and must be evaluated.", lifestyle: "Mucus alone, in the context of known prolapse, is often related to the prolapse itself. Bleeding always deserves evaluation.", doctor: "Any rectal bleeding — especially new bleeding, bleeding mixed with stool, or dark blood — should be evaluated promptly. Do not assume it's always related to prolapse.", redFlag: true },
+  { id: "mucus", icon: "🔴", label: "Mucus Discharge or Rectal Bleeding", desc: "Mucus coming from the rectum, or blood on toilet paper, in the bowl, or mixed with stool.", why: "Mucus discharge is common with rectal prolapse — the prolapsed tissue secretes mucus. Rectal bleeding can have many causes and must be evaluated.", lifestyle: "Mucus alone, in the context of known prolapse, is often related to the prolapse itself. Bleeding always deserves evaluation.", doctor: "Any rectal bleeding — especially new bleeding, bleeding mixed with stool, or dark blood — should be evaluated promptly. Do not assume it's always related to prolapse.", redFlag: true },
 ];
 
 const SymptomsSection = ({ speak, stop, speaking, scores, setScores, primarySymptom, setPrimarySymptom }) => {
@@ -444,7 +434,7 @@ const SymptomsSection = ({ speak, stop, speaking, scores, setScores, primarySymp
   return (
     <div>
       <SectionHeader title="Symptoms & My Score" subtitle="Explore your symptoms, then see how you score with our validated questionnaire." />
-      <Callout body="Millions of people live with these symptoms — and most never talk about them. You're not alone in what you're experiencing." icon="💙" />
+      <Callout body="Millions of people live with these symptoms — and most never talk about them. You're not alone in what you're experiencing." icon="🌿" />
       {!showScores ? (
         <div>
           {SYMPTOMS.map(s => (
@@ -1704,28 +1694,23 @@ export default function App() {
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
           <button onClick={() => setMenuOpen(true)} style={{ background: "none", border: "none", fontSize: 22, color: C.navy, cursor: "pointer", padding: 4 }}>☰</button>
           <div style={{ textAlign: "center" }}>
-            <div style={{ color: C.teal, fontWeight: 800, fontSize: 22, letterSpacing: 0.5 }}>🌿 REPAIR</div>
-            {section === "home" ? (
-              <div style={{ color: C.muted, fontSize: 10.5, letterSpacing: 0.6, textTransform: "uppercase", fontWeight: 700, marginTop: 3, lineHeight: 1.5, fontFamily: "Georgia, serif" }}>
-                Rectal Prolapse · Education · Patient<br />Awareness · Information · Resource
-              </div>
-            ) : (
-              <div style={{ color: C.muted, fontSize: 10.5, letterSpacing: 0.7, textTransform: "uppercase", fontWeight: 600, marginTop: 1 }}>Pelvic floor companion</div>
-            )}
+            <div style={{ color: C.teal, fontWeight: 800, fontSize: 17, letterSpacing: 0.3 }}>🌿 REPAIR</div>
+            <div style={{ color: C.muted, fontSize: 10.5, letterSpacing: 0.7, textTransform: "uppercase", fontWeight: 600, marginTop: 1 }}>Rectal prolapse education resource</div>
           </div>
           <div style={{ width: 30 }} />
         </div>
         {section !== "home" && (
-          <div style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 4 }}>
-            <button onClick={() => setSection("home")} style={{ background: "none", border: "none", color: C.muted, fontSize: 13, cursor: "pointer", fontFamily: "Georgia, serif" }}>Home</button>
-            <span style={{ color: C.muted, fontSize: 13 }}>›</span>
-            <span style={{ color: C.teal, fontSize: 14, fontWeight: 600 }}>{currentNav?.label}</span>
+          <div style={{ marginTop: 10 }}>
+            <button onClick={() => setSection("home")} style={{ background: C.tealLight, border: `1px solid ${C.teal}33`, borderRadius: 12, padding: "10px 16px", color: C.teal, fontSize: 15, fontWeight: 700, cursor: "pointer", fontFamily: "Georgia, serif", display: "flex", alignItems: "center", gap: 8, minHeight: 44, width: "100%" }}>
+              <span style={{ fontSize: 17 }}>←</span>
+              <span>Home</span>
+            </button>
           </div>
         )}
       </div>
 
-      {/* V3: Credentials strip — hidden on home, shown on section pages */}
-      <CredentialsStrip visible={section !== "home"} />
+      {/* V2: Credentials strip — always visible */}
+      <CredentialsStrip />
 
       {/* V2 SIMPLIFIED HAMBURGER MENU */}
       {menuOpen && (
@@ -1734,7 +1719,7 @@ export default function App() {
           <div style={{ position: "absolute", left: 0, top: 0, bottom: 0, width: 280, background: C.card, padding: "48px 0 24px", overflowY: "auto" }}>
             <div style={{ padding: "0 24px 16px" }}>
               <div style={{ color: C.teal, fontWeight: 800, fontSize: 20 }}>🌿 REPAIR</div>
-              <div style={{ color: C.muted, fontSize: 14, marginTop: 2 }}>Pelvic floor companion</div>
+              <div style={{ color: C.muted, fontSize: 14, marginTop: 2 }}>Rectal prolapse education resource</div>
             </div>
             <div style={{ borderTop: `1px solid ${C.border}`, marginBottom: 8 }} />
             {/* V2: About → Privacy → Feedback */}
@@ -1748,11 +1733,12 @@ export default function App() {
               <span>💬</span><span>Feedback</span>
             </button>
             <div style={{ borderTop: `1px solid ${C.border}`, margin: "8px 0" }} />
-            <div style={{ padding: "12px 24px" }}>
-              <button onClick={() => { setShowPDF(true); setMenuOpen(false); }} style={{ width: "100%", background: C.tealLight, color: C.teal, border: "none", borderRadius: 12, padding: "14px 0", fontSize: 15, fontWeight: 600, cursor: "pointer", fontFamily: "Georgia, serif" }}>
-                📄 Generate My Summary
-              </button>
-            </div>
+            <button onClick={() => { setSection("redflags"); setMenuOpen(false); }} style={{ width: "100%", textAlign: "left", background: C.redLt, color: C.red, fontSize: 17, padding: "16px 24px", border: "none", cursor: "pointer", fontFamily: "Georgia, serif", display: "flex", alignItems: "center", gap: 12, fontWeight: 700 }}>
+              <span style={{ fontSize: 22 }}>🚨</span><span>Red Flags: When to Seek Care</span>
+            </button>
+            <button onClick={() => { setShowPDF(true); setMenuOpen(false); }} style={{ width: "100%", textAlign: "left", background: C.tealLight, color: C.tealDeep, fontSize: 17, padding: "16px 24px", border: "none", cursor: "pointer", fontFamily: "Georgia, serif", display: "flex", alignItems: "center", gap: 12, fontWeight: 700 }}>
+              <span style={{ fontSize: 22 }}>📄</span><span>Generate My Summary</span>
+            </button>
           </div>
         </div>
       )}
