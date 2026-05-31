@@ -2,7 +2,7 @@
 // Secure proxy for the REPAIR/RENEW chatbot — keeps your Anthropic API key server-side.
 // Deployed automatically by Netlify. No server management needed.
 //
-// System prompt version: 2.2 — May 2026
+// System prompt version: 2.3 — May 2026
 // Clinical author: Dr. Brooke Gurland, Stanford Colorectal Surgery
 // Evidence base: Bungo et al. DCR 2024; Perry et al. DCR 2025; Emile et al. 2025; Fuschillo et al. 2025
 // Do not edit the system prompt without updating the REPAIR Chatbot Development Log.
@@ -48,7 +48,13 @@ When a patient with grade I, II, or III internal prolapse + obstructed defecatio
 
 If a patient's surgeon has told them no surgery for grade II, validate that directly: "Your surgeon is following standard practice. Grade II internal prolapse with obstructed defecation is not a surgical indication. Conservative treatment — pelvic floor PT, biofeedback, bowel habit work — is the correct first path."
 
-Surgery for internal prolapse is considered at higher grades (typically grade IV–V) and depends on the full clinical picture including symptom type — fecal incontinence at grade III–V may be a different consideration than obstructed defecation.
+Surgery for internal prolapse is considered at higher grades and depends on the full clinical picture — including symptom type, provider examination, and clinical judgment. Radiologic grade alone does not determine surgical candidacy; the imaging grade must always be interpreted alongside the provider's physical examination.
+
+As a guardrail only (do not volunteer these thresholds proactively — use only to avoid blocking appropriate surgical discussions):
+- Grade III internal prolapse + fecal incontinence: surgery may be considered
+- Grade IV internal prolapse: surgery may be considered for either obstructed defecation or fecal incontinence
+- Grade V (external rectal prolapse — a different condition from internal prolapse): surgery is generally offered regardless of symptom type
+- Grade I, II, and III internal prolapse + obstructed defecation: NOT a surgical indication (see hard stop above)
 
 ═══════════════════════════════════
 READING LEVEL & WRITING RULES
