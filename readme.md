@@ -14,6 +14,7 @@ Developed in clinical collaboration with **Dr. Brooke Gurland** (Colorectal Surg
 4. [Tech Stack & File Structure](#-tech-stack--file-structure)
 5. [Getting Started & Local Development](#-getting-started--local-development)
 6. [Deployment & Environment Configuration](#-deployment--environment-configuration)
+7. [Contributing & Roles](#-contributing--roles)
 
 ---
 
@@ -96,7 +97,23 @@ REPAIR/
 
 ### Prerequisites
 * **Node.js** (v18.x or later recommended)
-* An **Anthropic API Key** (for chatbot functionality)
+* An **Anthropic API Key** (to enable the secure chatbot assistant)
+
+### 🔑 Retrieving Your Anthropic API Key
+1. Sign up or log into the [Anthropic Console](https://console.anthropic.com/).
+2. Navigate to the **API Keys** section in the dashboard.
+3. Click **Create Key**, name it appropriately (e.g., `REPAIR-Local-Dev`), and copy the generated key structure (starts with `sk-ant-`). *Keep this secret and never check it into source control.*
+
+### Local Environment Setup
+To run the secure serverless chatbot endpoint locally, you need to configure your environment variables.
+1. In the root of the project, create a new file named `.env`:
+   ```bash
+   touch .env
+   ```
+2. Open `.env` in your editor and add your key:
+   ```env
+   ANTHROPIC_API_KEY=your_copied_anthropic_api_key_here
+   ```
 
 ### Installation
 1. Clone the repository and navigate to its root directory:
@@ -109,7 +126,21 @@ REPAIR/
    ```
 
 ### Running the App Locally
-Start the local Vite development server:
+
+#### Option A: Running with Chatbot Functionality (Recommended)
+To run the React frontend *and* execute the local secure serverless functions (which proxy to Anthropic), use the **Netlify CLI** dev server:
+1. Ensure the Netlify CLI is installed globally or run it via `npx`:
+   ```bash
+   npm install -g netlify-cli
+   ```
+2. Start the local server:
+   ```bash
+   netlify dev
+   ```
+   *This automatically detects your `.env` file, spins up the serverless function proxy, and launches your hot-reloading app at [http://localhost:8888](http://localhost:8888).*
+
+#### Option B: Frontend Only (No chatbot interactions)
+If you only need to work on the static page guides, modules, or layout, you can start the raw Vite development server:
 ```bash
 npm run dev
 ```
@@ -137,6 +168,16 @@ For secure API interactions, you must configure the following variable in your s
 | :--- | :--- | :--- |
 | `ANTHROPIC_API_KEY` | **Required.** Your Anthropic developer console private API credentials. | *None* |
 | `ALLOWED_ORIGIN` | **Optional.** Restricts cross-origin requests to prevent unauthorized use of your endpoints. | `*` (All) |
+
+---
+
+## 🤝 Contributing & Roles
+
+REPAIR has a clean separation of roles to preserve clinical safety while maintaining high software standards:
+* **Clinical Content & System Prompts:** Guided by **Dr. Brooke Gurland** (Stanford).
+* **AI & Technical Engineering:** Guided by **James Horine**.
+
+If you'd like to understand our workflow, make updates to safety thresholds, adapt chatbot behaviors, or run specialized diagnostic checkouts, please review our [CONTRIBUTING.md](CONTRIBUTING.md) guide.
 
 ---
 
