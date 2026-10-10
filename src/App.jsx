@@ -10,20 +10,34 @@ const VIMEO_IDS = {
 };
 
 const VimeoEmbed = ({ videoId, title }) => {
+  const [playing, setPlaying] = useState(false);
   const meta = VIMEO_IDS[videoId] || { id: videoId };
   const hash = meta.h ? `&h=${meta.h}` : "";
-  const src = `https://player.vimeo.com/video/${meta.id}?badge=0&autopause=0&player_id=0&app_id=58479&dnt=1&related=0&title=0&byline=0&portrait=0${hash}`;
+  const src = `https://player.vimeo.com/video/${meta.id}?badge=0&autopause=0&player_id=0&app_id=58479&dnt=1&related=0&title=0&byline=0&portrait=0${hash}${playing ? "&autoplay=1" : ""}`;
+  // Focus-group fix: testers tapped the decorative ▶ text instead of the real player.
+  // Now there is ONE play button: a large overlay that loads and starts the video.
+  // (The Vimeo iframe is not loaded until tapped, which also keeps the page private by default.)
   return (
     <div style={{ margin: "16px 0" }}>
-      <div style={{ color: C.navy, fontSize: 14, fontWeight: 600, marginBottom: 8 }}>▶ {title}</div>
+      <div style={{ color: C.navy, fontSize: 14, fontWeight: 600, marginBottom: 8 }}>{title}</div>
       <div style={{ position: "relative", paddingBottom: "56.25%", height: 0, overflow: "hidden", borderRadius: 14, background: "#1a2e3b" }}>
-        <iframe
-          src={src}
-          style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "100%", border: "none" }}
-          allow="autoplay; fullscreen; picture-in-picture"
-          allowFullScreen
-          title={title}
-        />
+        {playing ? (
+          <iframe
+            src={src}
+            style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "100%", border: "none" }}
+            allow="autoplay; fullscreen; picture-in-picture"
+            allowFullScreen
+            title={title}
+          />
+        ) : (
+          <button onClick={() => setPlaying(true)} aria-label={`Play video: ${title}`}
+            style={{ position: "absolute", inset: 0, width: "100%", height: "100%", border: "none", cursor: "pointer", background: `linear-gradient(160deg, ${C.navyMid}, ${C.navy})`, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 12, fontFamily: "Georgia, serif" }}>
+            <span style={{ width: 76, height: 76, borderRadius: "50%", background: C.teal, border: "3px solid #fff", display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "0 4px 18px rgba(0,0,0,0.35)" }}>
+              <span style={{ width: 0, height: 0, borderTop: "14px solid transparent", borderBottom: "14px solid transparent", borderLeft: "22px solid #fff", marginLeft: 6 }} />
+            </span>
+            <span style={{ color: "#fff", fontSize: 16, fontWeight: 700 }}>Tap to play</span>
+          </button>
+        )}
       </div>
     </div>
   );
@@ -211,6 +225,18 @@ const TopicsOverlay = ({ onClose, onNav }) => (
   </div>
 );
 
+// ─── ASK BAR (chatbot entry point, always on screen) ─────────────────────────
+const AskBar = ({ onClick, label = "Ask anything about rectal prolapse..." }) => (
+  <button onClick={onClick} aria-label="Open the REPAIR chatbot"
+    style={{ width: "100%", background: C.card, border: `2px solid ${C.teal}`, borderRadius: 28, padding: "10px 12px 10px 16px", display: "flex", alignItems: "center", gap: 10, cursor: "pointer", fontFamily: "Georgia, serif", textAlign: "left", boxShadow: "0 2px 10px rgba(45,125,111,0.18)" }}>
+    <span style={{ fontSize: 20, flexShrink: 0 }}>💬</span>
+    <span style={{ color: C.slate, fontSize: 15, flex: 1 }}>{label}</span>
+    <div style={{ width: 34, height: 34, borderRadius: "50%", background: C.teal, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+      <span style={{ color: "#fff", fontSize: 17, lineHeight: 1 }}>↑</span>
+    </div>
+  </button>
+);
+
 // ─── V2 HOME SECTION ─────────────────────────────────────────────────────────
 const STARTERS = [
   { icon: "😔", text: "My symptoms", prompt: "I'd like to understand my symptoms or diagnosis better. Can you help me figure out what's happening?" },
@@ -221,7 +247,8 @@ const STARTERS = [
 
 const HomeSection = ({ onStartChat, onNav }) => {
   return (
-    <div style={{ flex: 1, background: C.bg, overflowY: "auto", display: "flex", flexDirection: "column", position: "relative" }}>
+    <div style={{ flex: 1, minHeight: 0, background: C.bg, display: "flex", flexDirection: "column", position: "relative" }}>
+     <div style={{ flex: 1, minHeight: 0, overflowY: "auto", display: "flex", flexDirection: "column" }}>
 
       {/* Hero card — dark teal */}
       <div style={{ background: C.tealDeep, padding: "24px 20px 20px", flexShrink: 0 }}>
@@ -238,6 +265,12 @@ const HomeSection = ({ onStartChat, onNav }) => {
       <div style={{ background: "#f0f7f5", borderBottom: `1px solid ${C.teal}22`, padding: "10px 18px", display: "flex", alignItems: "center", gap: 10, flexShrink: 0 }}>
         <span style={{ fontSize: 14 }}>🔒</span>
         <span style={{ color: C.slate, fontSize: 13, lineHeight: 1.4 }}>Nothing is saved. Nothing is shared. What you do here is yours.</span>
+      </div>
+
+      {/* Chat entry — near the top so no one has to scroll to find it */}
+      <div style={{ padding: "16px 16px 0", flexShrink: 0 }}>
+        <div style={{ color: C.tealDeep, fontSize: 13, fontWeight: 700, letterSpacing: 0.4, textTransform: "uppercase", marginBottom: 8 }}>Have a question? Ask here</div>
+        <AskBar onClick={() => onStartChat("I have a question I'd like to ask.")} />
       </div>
 
       {/* Cards grid */}
@@ -277,16 +310,11 @@ const HomeSection = ({ onStartChat, onNav }) => {
         </button>
 
       </div>
+     </div>
 
-      {/* Chat input bar — pinned to bottom */}
+      {/* Chat input bar — pinned to bottom, outside the scrolling area so it is always on screen */}
       <div style={{ background: C.card, borderTop: `1px solid ${C.border}`, padding: "10px 14px 16px", flexShrink: 0 }}>
-        <button onClick={() => onStartChat("I have a question I'd like to ask.")}
-          style={{ width: "100%", background: C.bg, border: `1.5px solid ${C.border}`, borderRadius: 28, padding: "12px 16px", display: "flex", alignItems: "center", gap: 10, cursor: "pointer", fontFamily: "Georgia, serif", textAlign: "left" }}>
-          <span style={{ color: C.muted, fontSize: 15, flex: 1 }}>Ask anything about rectal prolapse...</span>
-          <div style={{ width: 32, height: 32, borderRadius: "50%", background: C.teal, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-            <span style={{ color: "#fff", fontSize: 16, lineHeight: 1 }}>↑</span>
-          </div>
-        </button>
+        <AskBar onClick={() => onStartChat("I have a question I'd like to ask.")} />
       </div>
     </div>
   );
@@ -299,7 +327,7 @@ const PROLAPSE_CARDS = [
     content: () => (
       <div>
         <p style={{ color: C.navy, fontSize: 16, lineHeight: 1.7, marginBottom: 16 }}>Rectal prolapse occurs when part or all of the rectum slips out of its normal position and protrudes through the anal opening — or folds inward on itself. Think of the rectum like a sock: prolapse is like the sock starting to turn inside out.</p>
-        <p style={{ color: C.navy, fontSize: 17, fontWeight: 700, marginBottom: 8 }}>▶ Watch this animation first</p>
+        <p style={{ color: C.navy, fontSize: 17, fontWeight: 700, marginBottom: 8 }}>Watch this animation first</p>
         <VimeoEmbed videoId="743819969" title="Rectal Prolapse & Rectocele" />
         <Card style={{ borderRadius: 14, padding: 16, marginBottom: 12 }}>
           <div style={{ color: C.teal, fontWeight: 700, fontSize: 17, marginBottom: 8 }}>Internal vs External</div>
@@ -317,16 +345,16 @@ const PROLAPSE_CARDS = [
         <VimeoEmbed videoId="743821060" title="Degrees of Rectal Prolapse" />
         <Callout icon="⚠️" color={C.warn} bg={C.warnLt} title="Important" body="Imaging can both underestimate and overestimate the degree of prolapse. A physical examination is always needed before treatment decisions are made." />
         {[
-          { grade: "I", desc: "Internal intussusception — rectum folds slightly inward, stays high up", sig: "Generally not clinically significant on its own" },
-          { grade: "II", desc: "Internal intussusception reaching the upper anal canal", sig: "Generally not clinically significant on its own" },
-          { grade: "III", desc: "Internal intussusception reaching the lower anal canal", sig: "Clinically significant — needs confirmation with physical exam" },
-          { grade: "IV", desc: "Internal intussusception reaching or protruding to the anal verge", sig: "Clinically significant — needs confirmation with physical exam" },
-          { grade: "V", desc: "Full external prolapse — rectum protrudes completely outside the body", sig: "Visible externally; requires clinical evaluation" },
+          { grade: "1", desc: "Internal intussusception — rectum folds slightly inward, stays high up", sig: "Generally not clinically significant on its own" },
+          { grade: "2", desc: "Internal intussusception reaching the upper anal canal", sig: "Generally not clinically significant on its own" },
+          { grade: "3", desc: "Internal intussusception reaching the lower anal canal", sig: "Clinically significant — needs confirmation with physical exam" },
+          { grade: "4", desc: "Internal intussusception reaching or protruding to the anal verge", sig: "Clinically significant — needs confirmation with physical exam" },
+          { grade: "5", desc: "Full external prolapse — rectum protrudes completely outside the body", sig: "Visible externally; requires clinical evaluation" },
         ].map(r => (
           <Card key={r.grade} style={{ borderRadius: 14, padding: 14, marginBottom: 10 }}>
             <div style={{ display: "flex", gap: 12, alignItems: "flex-start" }}>
-              <div style={{ width: 36, height: 36, borderRadius: "50%", background: C.tealLight, color: C.teal, fontWeight: 800, fontSize: 15, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>G{r.grade}</div>
-              <div><div style={{ color: C.navy, fontSize: 16, fontWeight: 600, marginBottom: 4 }}>{r.desc}</div><div style={{ color: C.muted, fontSize: 13 }}>{r.sig}</div></div>
+              <div style={{ minWidth: 52, borderRadius: 12, background: C.tealLight, color: C.teal, padding: "6px 4px", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", flexShrink: 0 }}><span style={{ fontSize: 10, fontWeight: 700, letterSpacing: 0.6, textTransform: "uppercase" }}>Grade</span><span style={{ fontSize: 22, fontWeight: 800, lineHeight: 1.1 }}>{r.grade}</span></div>
+              <div><div style={{ color: C.navy, fontSize: 16, fontWeight: 600, marginBottom: 4 }}><span style={{ color: C.teal }}>Grade {r.grade}: </span>{r.desc}</div><div style={{ color: C.muted, fontSize: 13 }}>{r.sig}</div></div>
             </div>
           </Card>
         ))}
@@ -1683,6 +1711,22 @@ export default function App() {
     setChatMessages([]);
   };
 
+  // Header tap = Home. From a section, return to the home screen; from an open home chat,
+  // close the chat (messages are kept for the summary, same as the chat's own close button).
+  const goHome = () => {
+    setMenuOpen(false);
+    setChatOpen(false);
+    if (section === "home" && homeChatStarted) { handleHomeChatClose(); return; }
+    setSection("home");
+  };
+
+  // Open the chatbot from anywhere (menu entry)
+  const openChat = () => {
+    setMenuOpen(false);
+    if (section === "home") { if (!homeChatStarted) handleStartChat("I have a question I'd like to ask."); }
+    else setChatOpen(true);
+  };
+
   // Combined messages for PDF — current session or last saved
   const pdfChatMessages = chatMessages.length > 0 ? chatMessages : savedChatMessages;
 
@@ -1692,12 +1736,13 @@ export default function App() {
       {/* TOP BAR — sticky so hamburger always visible */}
       <div style={{ background: C.card, borderBottom: `1px solid ${C.border}`, padding: "12px 16px", flexShrink: 0, position: "sticky", top: 0, zIndex: 100 }}>
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-          <button onClick={() => setMenuOpen(true)} style={{ background: "none", border: "none", fontSize: 22, color: C.navy, cursor: "pointer", padding: 4 }}>☰</button>
-          <div style={{ textAlign: "center" }}>
+          <button onClick={() => setMenuOpen(true)} aria-label="Open menu" style={{ background: "none", border: "none", fontSize: 24, color: C.navy, cursor: "pointer", padding: 4, width: 44, height: 44 }}>☰</button>
+          <button onClick={goHome} aria-label="REPAIR — go to the home screen"
+            style={{ background: "none", border: "none", padding: "2px 6px", textAlign: "center", cursor: "pointer", fontFamily: "Georgia, serif", minHeight: 44 }}>
             <div style={{ color: C.teal, fontWeight: 800, fontSize: 17, letterSpacing: 0.3 }}>🌿 REPAIR</div>
             <div style={{ color: C.muted, fontSize: 10.5, letterSpacing: 0.7, textTransform: "uppercase", fontWeight: 600, marginTop: 1 }}>Rectal prolapse education resource</div>
-          </div>
-          <div style={{ width: 30 }} />
+          </button>
+          <div style={{ width: 44 }} />
         </div>
         {section !== "home" && (
           <div style={{ marginTop: 10 }}>
@@ -1716,13 +1761,25 @@ export default function App() {
       {menuOpen && (
         <div style={{ position: "fixed", inset: 0, zIndex: 200 }}>
           <div onClick={() => setMenuOpen(false)} style={{ position: "absolute", inset: 0, background: "rgba(0,0,0,0.4)" }} />
-          <div style={{ position: "absolute", left: 0, top: 0, bottom: 0, width: 280, background: C.card, padding: "48px 0 24px", overflowY: "auto" }}>
+          <div style={{ position: "absolute", left: 0, top: 0, bottom: 0, width: 280, background: C.card, padding: "24px 0 24px", overflowY: "auto" }}>
             <div style={{ padding: "0 24px 16px" }}>
               <div style={{ color: C.teal, fontWeight: 800, fontSize: 20 }}>🌿 REPAIR</div>
               <div style={{ color: C.muted, fontSize: 14, marginTop: 2 }}>Rectal prolapse education resource</div>
             </div>
             <div style={{ borderTop: `1px solid ${C.border}`, marginBottom: 8 }} />
-            {/* V2: About → Privacy → Feedback */}
+            {/* Focus-group fix: menu lists everything the app offers */}
+            <button onClick={openChat} style={{ width: "100%", textAlign: "left", background: C.tealLight, color: C.tealDeep, fontSize: 16, padding: "14px 24px", border: "none", cursor: "pointer", fontFamily: "Georgia, serif", display: "flex", alignItems: "center", gap: 12, fontWeight: 700 }}>
+              <span style={{ width: 24, textAlign: "center" }}>💬</span><span>Ask REPAIR (chatbot)</span>
+            </button>
+            <div style={{ color: C.muted, fontSize: 11.5, fontWeight: 700, letterSpacing: 0.8, textTransform: "uppercase", padding: "12px 24px 4px" }}>Learn</div>
+            {NAV.filter(n => n.id !== "redflags").map(n => (
+              <button key={n.id} onClick={() => { n.id === "home" ? goHome() : setSection(n.id); setMenuOpen(false); }}
+                style={{ width: "100%", textAlign: "left", background: section === n.id ? C.tealLight : "transparent", color: section === n.id ? C.tealDeep : C.navy, fontSize: 16, padding: "13px 24px", border: "none", cursor: "pointer", fontFamily: "Georgia, serif", display: "flex", alignItems: "center", gap: 12, fontWeight: section === n.id ? 700 : 400 }}>
+                <span style={{ width: 24, textAlign: "center" }}>{n.icon}</span><span>{n.label}</span>
+              </button>
+            ))}
+            <div style={{ borderTop: `1px solid ${C.border}`, margin: "8px 0" }} />
+            <div style={{ color: C.muted, fontSize: 11.5, fontWeight: 700, letterSpacing: 0.8, textTransform: "uppercase", padding: "4px 24px 4px" }}>About</div>
             <button onClick={() => { setShowAbout(true); setMenuOpen(false); }} style={{ width: "100%", textAlign: "left", background: "transparent", color: C.navy, fontSize: 16, padding: "14px 24px", border: "none", cursor: "pointer", fontFamily: "Georgia, serif", display: "flex", alignItems: "center", gap: 12 }}>
               <span>ℹ️</span><span>About REPAIR</span>
             </button>
@@ -1840,7 +1897,10 @@ export default function App() {
 
         {/* SECTION PAGES: scrollable content + floating chat button */}
         {section !== "home" && (
-          <div style={{ flex: 1, overflowY: "auto", padding: 18, paddingBottom: 120 }}>
+          <div style={{ flex: 1, overflowY: "auto", padding: 18, paddingTop: 0, paddingBottom: 120 }}>
+            <div style={{ position: "sticky", top: 0, zIndex: 20, background: C.bg, padding: "12px 0 10px", marginBottom: 6 }}>
+              <AskBar onClick={() => setChatOpen(true)} label="Ask REPAIR a question..." />
+            </div>
             {section === "prolapse" && <ProlapseSection />}
             {section === "symptoms" && <SymptomsSection scores={scores} setScores={setScores} primarySymptom={primarySymptom} setPrimarySymptom={setPrimarySymptom} />}
             {section === "imaging" && <ImagingSection />}
@@ -1860,14 +1920,6 @@ export default function App() {
             </button>
           ))}
         </div>
-      )}
-
-      {/* FLOATING CHAT BUTTON — section pages only */}
-      {section !== "home" && !chatOpen && (
-        <button onClick={() => setChatOpen(true)} style={{ position: "fixed", bottom: 90, right: 20, zIndex: 200, background: C.teal, color: "#fff", border: "none", borderRadius: 30, padding: "14px 22px", fontSize: 16, fontWeight: 700, fontFamily: "Georgia, serif", boxShadow: "0 4px 20px rgba(45,125,111,0.4)", display: "flex", alignItems: "center", gap: 10, cursor: "pointer" }}>
-          <span style={{ fontSize: 22 }}>💬</span>
-          <span>Ask REPAIR</span>
-        </button>
       )}
 
       {/* MODAL CHATBOT — section pages */}
